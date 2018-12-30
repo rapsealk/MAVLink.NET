@@ -45,7 +45,6 @@ namespace MAVLink.NET
             while (true)
             {
                 textBox1.BeginInvoke((Action)delegate () { textBox1.Text = String.Format("seq: {0:d}", node1.pSequence); });
-                // textBox1.Text = String.Format("seq: {0:d}", node1.pSequence);
                 System.Threading.Thread.Sleep(1000);
             }
         }

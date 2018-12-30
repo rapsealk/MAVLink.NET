@@ -54,12 +54,28 @@ namespace MAVLink.NET
         private byte _base_mode = 0;
         public byte _is_armed = 0;
 
+        /**
+         * Variables for agent's location.
+         */
+        public Vector3 Position;
+        //public Position_t Position;
+        public double pRatio = 10000;
+
+        /**
+         * Variables for desired direction.
+         */
+        public Vector3 Direction;
+
         public MAVLinkNode(string port, int baud, int SYSTEM_ID=1, int COMPONENT_ID=1)
         {
             Console.WriteLine("MAVLinkNode::Constructor");
 
             mavlink = new Mavlink();
             mavlink.PacketReceived += OnMAVPacketReceive;
+
+            Position = new Vector3();
+            //Position = new Position_t();
+            Direction = new Vector3();
 
             this.SYSTEM_ID = SYSTEM_ID;
             this.COMPONENT_ID = COMPONENT_ID;
@@ -129,7 +145,15 @@ namespace MAVLink.NET
             else if (message.GetType() == mAttitude.GetType())
                 mAttitude = (Msg_attitude)message;
             else if (message.GetType() == mGPS.GetType())
-                mGPS = (Msg_gps_raw_int)message;
+            {
+                mGPS = (Msg_gps_raw_int) message;
+                Position.X = mGPS.lat / pRatio;
+                Position.Y = mGPS.lon / pRatio;
+                Position.Z = mGPS.alt / pRatio;
+                //Position.Latitude   = (double) mGPS.lat / pRatio;
+                //Position.Longitude  = (double) mGPS.lon / pRatio;
+                //Position.Altitude   = (double) mGPS.alt / pRatio;
+            }
             else if (message.GetType() == mVfr.GetType())
                 mVfr = (Msg_vfr_hud)message;
             else if (message.GetType() == mRawPressure.GetType())
@@ -168,7 +192,7 @@ namespace MAVLink.NET
             mavlink.ParseBytes(bytes);
         }
 
-        public void SendPacket(MavlinkMessage message)
+        private void SendPacket(MavlinkMessage message)
         {
             MavlinkPacket packet = new MavlinkPacket()
             {
@@ -181,4 +205,18 @@ namespace MAVLink.NET
             Serial.Write(bytes, 0, bytes.Length);
         }
     }
+
+    /*
+    public struct Position_t
+    {
+        public double Latitude, Longitude, Altitude;
+
+        public Position_t(double latitude=0, double longitude=0, double altitude=0)
+        {
+            Latitude    = latitude;
+            Longitude   = longitude;
+            Altitude    = altitude;
+        }
+    }
+    */
 }
