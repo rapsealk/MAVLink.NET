@@ -15,6 +15,11 @@ namespace MAVLink.NET
             "(EMPTY)", "MANUAL", "ALTCTL", "POSCTL", "AUTO", "ACRO", "OFFBOARD", "STABILIZED", "RATTITUDE",
             "SIMPLE"    // FIXME: unused, but reserved for future use.
         };
+        private enum PX4FlightMode
+        {
+            MANUAL=1, ALTCTL, POSCTL, AUTO, ACRO, OFFBOARD, STABILIZED, RATTITUDE,
+            SIMPLE
+        }
         // PX4_CUSTOM_SUB_MODE AUTO
         private static readonly string[] PX4SubMode =
         {
@@ -32,8 +37,8 @@ namespace MAVLink.NET
         public System.IO.Ports.SerialPort Serial;
         public System.ComponentModel.BackgroundWorker heartbeatWorker;
 
-        public int SYSTEM_ID;
-        public int COMPONENT_ID;
+        public byte SYSTEM_ID;
+        public byte COMPONENT_ID;
 
         public byte pSequence { get; set; }
 
@@ -66,7 +71,7 @@ namespace MAVLink.NET
          */
         public Vector3 Direction;
 
-        public MAVLinkNode(string port, int baud, int SYSTEM_ID=1, int COMPONENT_ID=1)
+        public MAVLinkNode(string port, int baud, byte SYSTEM_ID=1, byte COMPONENT_ID=1)
         {
             Console.WriteLine("MAVLinkNode::Constructor");
 
@@ -77,8 +82,8 @@ namespace MAVLink.NET
             //Position = new Position_t();
             Direction = new Vector3();
 
-            this.SYSTEM_ID = SYSTEM_ID;
-            this.COMPONENT_ID = COMPONENT_ID;
+            this.SYSTEM_ID      = SYSTEM_ID;
+            this.COMPONENT_ID   = COMPONENT_ID;
 
             Serial = new System.IO.Ports.SerialPort()
             {
@@ -203,6 +208,91 @@ namespace MAVLink.NET
             };
             byte[] bytes = mavlink.Send(packet);
             Serial.Write(bytes, 0, bytes.Length);
+        }
+
+        public void SetFlightMode(uint mode)
+        {
+            Msg_set_mode message = new Msg_set_mode()
+            {
+                base_mode       = (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
+                custom_mode     = mode << 16,
+                target_system   = SYSTEM_ID
+            };
+            SendPacket(message);
+        }
+
+        public void ArmDisarmCommand(bool target_arm)
+        {
+            Msg_command_long message = new Msg_command_long()
+            {
+                command             = (ushort) MAV_CMD.MAV_CMD_COMPONENT_ARM_DISARM,
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID,
+                param1              = target_arm ? 1f : 0f  // 1: arm, 0: disarm
+            };
+            
+            do
+            {
+                SendPacket(message);
+                System.Threading.Thread.Sleep(1000);
+            } while (target_arm ^ (_is_armed == 0b1000_0000));
+        }
+
+        public void TakeoffCommand()
+        {
+            Msg_mission_clear_all clearMessage = new Msg_mission_clear_all()
+            {
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID
+            };
+            SendPacket(clearMessage);
+
+            Msg_mission_item message = new Msg_mission_item()
+            {
+                autocontinue    = 1,
+                command         = (byte) MAV_CMD.MAV_CMD_NAV_TAKEOFF,
+                current         = 0,
+                frame           = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                seq             = 1
+            };
+            SendPacket(message);
+        }
+
+        public void LandCommand()
+        {
+            Msg_mission_clear_all clearMessage = new Msg_mission_clear_all()
+            {
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID
+            };
+            SendPacket(clearMessage);
+
+            Msg_mission_item message = new Msg_mission_item()
+            {
+                autocontinue    = 1,
+                command         = (byte) MAV_CMD.MAV_CMD_NAV_LAND,
+                current         = 0,
+                frame           = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                seq             = 1
+            };
+            SendPacket(message);
+        }
+
+        public void NextWP()
+        {
+            Msg_mission_item message = new Msg_mission_item()
+            {
+                seq             = 1,
+                command         = (byte) MAV_CMD.MAV_CMD_NAV_WAYPOINT,
+                frame           = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                autocontinue    = 1,
+                current         = 0,
+                param1          = 2,
+                x               = 0,
+                y               = 0,
+                z               = 5
+            };
+            SendPacket(message);
         }
     }
 
