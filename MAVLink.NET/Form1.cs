@@ -28,7 +28,9 @@ namespace MAVLink.NET
 
         private void ArmButton_Click(object sender, EventArgs e)
         {
+            // ArmButton.BeginInvoke((Action) delegate () { ArmButton.Enabled = false; });
             node1.ArmDisarmCommand(true);
+            // ArmButton.BeginInvoke((Action) delegate () { ArmButton.Enabled = true; });
         }
 
         private void DisarmButton_Click(object sender, EventArgs e)

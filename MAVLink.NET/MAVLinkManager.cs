@@ -254,9 +254,7 @@ namespace MAVLink.NET
 
         public void ComputeNextPosition()
         {
-            //Position_t[] position = new Position_t[3];
-            //for (int i = 0; i < 3; i++)
-            //    position[i] = MAVLinkNodes[i].Position;
+            // TODO: Compute Next Waypoint for each Agent
         }
     }
 }

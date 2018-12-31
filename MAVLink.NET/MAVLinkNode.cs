@@ -47,6 +47,7 @@ namespace MAVLink.NET
         private Msg_power_status    mPowerStatus    = new Msg_power_status();
         private Msg_attitude        mAttitude       = new Msg_attitude();
         private Msg_gps_raw_int     mGPS            = new Msg_gps_raw_int();
+        private Msg_gps_rtk         mRTK            = new Msg_gps_rtk();
         private Msg_vfr_hud         mVfr            = new Msg_vfr_hud();   // heading, altitude
         private Msg_raw_pressure    mRawPressure    = new Msg_raw_pressure();
         private Msg_scaled_pressure mScaledPressure = new Msg_scaled_pressure();
@@ -149,6 +150,10 @@ namespace MAVLink.NET
                 //Position.Longitude  = (double) mGPS.lon / pRatio;
                 //Position.Altitude   = (double) mGPS.alt / pRatio;
             }
+            else if (message.GetType() == mRTK.GetType())
+            {
+                mRTK = (Msg_gps_rtk) message;
+            }
             else if (message.GetType() == mVfr.GetType())
                 mVfr = (Msg_vfr_hud) message;
             else if (message.GetType() == mRawPressure.GetType())
@@ -183,7 +188,7 @@ namespace MAVLink.NET
             int bsize = Serial.BytesToRead;
             byte[] bytes = new byte[bsize];
             for (int i = 0; i < bsize; i++)
-                bytes[i] = (byte)Serial.ReadByte();
+                bytes[i] = (byte) Serial.ReadByte();
             mavlink.ParseBytes(bytes);
         }
 
@@ -213,6 +218,7 @@ namespace MAVLink.NET
 
         public void ArmDisarmCommand(bool target_arm)
         {
+            // TODO: Thread
             Msg_command_long message = new Msg_command_long()
             {
                 command             = (ushort) MAV_CMD.MAV_CMD_COMPONENT_ARM_DISARM,
@@ -248,9 +254,13 @@ namespace MAVLink.NET
             SendPacket(message);
         }
 
+        /**
+         * https://mavlink.io/en/messages/common.html#MAV_CMD_NAV_TAKEOFF
+         */
         public void TakeoffCommand()
         {
             // SingleNavCommand(MAV_CMD.MAV_CMD_NAV_TAKEOFF);
+            //*
             Msg_command_long message = new Msg_command_long()
             {
                 command             = (ushort) MAV_CMD.MAV_CMD_NAV_TAKEOFF,
@@ -264,15 +274,53 @@ namespace MAVLink.NET
                 // param6: longitude    (not supported)
                 param7              = 5 // altitude     [meters]
             };
+            /*/
+            Msg_command_long message = new Msg_command_long()
+            {
+                command=(ushort)MAV_CMD.MAV_CMD_NAV_TAKEOFF_LOCAL,
+                target_system=SYSTEM_ID,
+                target_component=COMPONENT_ID,
+                // param1: Minimum pitch (if airspeed sensor present), desired pitch without sensor [rad]
+                // param2: Empty
+                // param3: Takeoff ascend rate [ms^-1]
+                // param4: Yaw angle [rad] (if magnetometer or another yaw estimation source present), ignored without one of these
+                // param5: Y-axis position [m]
+                // param6: X-axis position [m]
+                // param7: Z-axis position [m]
+                param7 = 5
+            };
+            //*/
+            SendPacket(message);
         }
 
+        /**
+         * https://mavlink.io/en/messages/common.html#MAV_CMD_NAV_LAND
+         */
         public void LandCommand()
         {
-            SingleNavCommand(MAV_CMD.MAV_CMD_NAV_LAND);
+            // SingleNavCommand(MAV_CMD.MAV_CMD_NAV_LAND);
+            Msg_command_long message = new Msg_command_long()
+            {
+                command             = (ushort) MAV_CMD.MAV_CMD_NAV_LAND,
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID,
+                // param1: Abort Alt
+                // param2: Precision land mode. (0 = normal landing, 1 = opportunistic precision landing, 2 = required precision landing)
+                // param3: Empty
+                // param4: Desired yaw angle. NaN for unchanged.
+                param5              = (float) Position.X,   // Latitude
+                param6              = (float) Position.Y    // Longitude
+                // param7: Altitude (ground level)
+            };
+            SendPacket(message);
         }
 
-        public void NextWP()
+        /**
+         * https://mavlink.io/en/messages/common.html#MAV_CMD_NAV_WAYPOINT
+         */
+        public void NextWP(double latitude, double longitude)
         {
+            /*
             Msg_mission_item message = new Msg_mission_item()
             {
                 seq             = 1,
@@ -285,6 +333,21 @@ namespace MAVLink.NET
                 y               = (float) Position.Y + 1,
                 z               = 5
             };
+            /*/
+            Msg_command_long message = new Msg_command_long()
+            {
+                command             = (ushort)MAV_CMD.MAV_CMD_NAV_WAYPOINT,
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID,
+                // param1: Hold time in decimal seconds. (ignored by fixed wing, time to stay at waypoint for rotary wing)
+                // param2: Acceptance radius in meters (if the sphere with this radius is hit, the waypoint counts as reached)
+                // param3: 0 to pass through the WP, if > 0 radius in meters to pass by WP. Positive value for clockwise orbit, negative value for counter-clockwise orbit. Allows trajectory control.
+                // param4: Desired yaw angle at waypoint (rotary wing). NaN for unchanged.
+                param5              = (float) latitude,     // Latitude
+                param6              = (float) longitude,    // Longitude
+                param7              = 5                     // Altitude
+            };
+            //*/
             SendPacket(message);
         }
     }
