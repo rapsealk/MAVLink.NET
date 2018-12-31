@@ -13,13 +13,18 @@ namespace MAVLink.NET
 {
     public partial class Form1 : Form
     {
+        private MAVLinkManager MAVManager;
         private MAVLinkNode node1;
 
         public Form1()
         {
             InitializeComponent();
 
-            node1 = new MAVLinkNode("COM11", 57600);
+            string[] portNames = System.IO.Ports.SerialPort.GetPortNames();
+
+            MAVManager = new MAVLinkManager();
+            MAVManager.RegisterAgent("COM11", 57600);
+            // node1 = new MAVLinkNode("COM11", 57600);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -44,7 +49,7 @@ namespace MAVLink.NET
         {
             while (true)
             {
-                textBox1.BeginInvoke((Action)delegate () { textBox1.Text = String.Format("seq: {0:d}", node1.pSequence); });
+                textBox1.BeginInvoke((Action)delegate () { textBox1.Text = String.Format("seq: {0:d}", node1.PacketSequence); });
                 System.Threading.Thread.Sleep(1000);
             }
         }

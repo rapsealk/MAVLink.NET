@@ -25,12 +25,35 @@ namespace MAVLink.NET
             MAVLinkNodes = new List<MAVLinkNode>();
         }
 
-        public void RegisterAgent(string port, int baud, int systemId=1, int componentId=1)
+        public void RegisterAgent(string port, int baud, byte systemId=1, byte componentId=1)
         {
             MAVLinkNodes.Add(new MAVLinkNode(port, baud, systemId, componentId));
             
             // TODO: move leader to the first index
             MAVLinkNodes.Sort((x, y) => x._is_leader ? 0 : 1);
+        }
+
+        public void RegisterAgent(MAVLinkNode node)
+        {
+            MAVLinkNodes.Add(node);
+
+            MAVLinkNodes.Sort((x, y) => x._is_leader ? 0 : 1);
+        }
+
+        /****************************************
+         * Serial
+         ****************************************/
+        public void Open(int index=0)
+        {
+            try
+            {
+                if (!MAVLinkNodes[index].Serial.IsOpen)
+                    MAVLinkNodes[index].Serial.Open();
+            }
+            catch (System.IO.IOException e)
+            {
+                Console.Error.WriteLine(e.Message);
+            }
         }
 
         /****************************************
@@ -43,7 +66,7 @@ namespace MAVLink.NET
             return new Vector3(x, y);
         }
 
-        public Vector3 Seperate(Vector3 self, Vector3 other1, Vector3 other2)
+        public Vector3 Separate(Vector3 self, Vector3 other1, Vector3 other2)
         {
             Vector3 vector1 = (self - other1);
             Vector3 vector2 = (self - other2);
@@ -82,11 +105,11 @@ namespace MAVLink.NET
                 distance[i, j] = (MAVLinkNodes[i].Position - MAVLinkNodes[j].Position).Size();
 
             Vector3 aVector2 = Alignment();
-            Vector3 sVector2 = Seperate(MAVLinkNodes[1].Position, MAVLinkNodes[0].Position, MAVLinkNodes[2].Position);
+            Vector3 sVector2 = Separate(MAVLinkNodes[1].Position, MAVLinkNodes[0].Position, MAVLinkNodes[2].Position);
             Vector3 cVector2 = Cohesion(MAVLinkNodes[1].Position, flockCenter);
 
             Vector3 aVector3 = Alignment();
-            Vector3 sVector3 = Seperate(MAVLinkNodes[2].Position, MAVLinkNodes[0].Position, MAVLinkNodes[1].Position);
+            Vector3 sVector3 = Separate(MAVLinkNodes[2].Position, MAVLinkNodes[0].Position, MAVLinkNodes[1].Position);
             Vector3 cVector3 = Cohesion(MAVLinkNodes[2].Position, flockCenter);
 
             aVector2.Normalize();
@@ -216,57 +239,6 @@ namespace MAVLink.NET
             //Position_t[] position = new Position_t[3];
             //for (int i = 0; i < 3; i++)
             //    position[i] = MAVLinkNodes[i].Position;
-        }
-    }
-
-    public class Vector3
-    {
-        public double X, Y, Z;
-
-        public Vector3(double x = 0, double y = 0, double z = 0)
-        {
-            this.X = x;
-            this.Y = y;
-            this.Z = z;
-        }
-
-        public static Vector3 operator +(Vector3 one, Vector3 other)
-        {
-            return new Vector3(one.X + other.X, one.Y + other.Y, one.Z + other.Z);
-        }
-
-        public static Vector3 operator -(Vector3 one, Vector3 other)
-        {
-            return new Vector3(one.X - other.X, one.Y - other.Y, one.Z - other.Z);
-        }
-
-        public static Vector3 operator *(Vector3 vector, double scalar)
-        {
-            return new Vector3(vector.X * scalar, vector.Y * scalar, vector.Z * scalar);
-        }
-
-        public static Vector3 operator /(Vector3 vector, double scalar)
-        {
-            return new Vector3(vector.X / scalar, vector.Y / scalar, vector.Z / scalar);
-        }
-
-        public double Size()
-        {
-            return Math.Abs(Math.Sqrt(Math.Pow(X, 2) + Math.Pow(Y, 2) + Math.Pow(Z, 2)));
-        }
-
-        public void Normalize()
-        {
-            double size = this.Size();
-            this.X /= size;
-            this.Y /= size;
-            this.Z /= size;
-        }
-
-        public Vector3 Normalized()
-        {
-            double size = this.Size();
-            return new Vector3(X / size, Y / size, Z / size);
         }
     }
 }

@@ -40,7 +40,7 @@ namespace MAVLink.NET
         public byte SYSTEM_ID;
         public byte COMPONENT_ID;
 
-        public byte pSequence { get; set; }
+        public byte PacketSequence { get; private set; }
 
         private Msg_heartbeat       mHeartbeat      = new Msg_heartbeat();
         private Msg_sys_status      mSysStatus      = new Msg_sys_status();
@@ -127,17 +127,14 @@ namespace MAVLink.NET
 
         private void OnMAVPacketReceive(object sender, MavlinkPacket packet)
         {
-            // Console.WriteLine("OnMAVPacketReceive");
-            // Console.WriteLine("OnPacket::SYSTEM_{0:d}::COMPONENT_{1:d}", packet.SystemId, packet.ComponentId);
-
             //if (packet.SystemId != SYSTEM_ID || packet.ComponentId != COMPONENT_ID)
             //    return;
 
             uint psize = mavlink.PacketsReceived;
-            // SYSTEM_ID = packet.SystemId;
-            // COMPONENT_ID = packet.ComponentId;
-            pSequence = packet.SequenceNumber;
-            // Console.WriteLine("Sequence #: " + pSequence);
+            SYSTEM_ID = (byte) packet.SystemId;
+            COMPONENT_ID = (byte) packet.ComponentId;
+            PacketSequence = packet.SequenceNumber;
+            // Console.WriteLine("Sequence #: " + PacketSequence);
 
             MavlinkMessage message = packet.Message;
 
@@ -202,7 +199,7 @@ namespace MAVLink.NET
             MavlinkPacket packet = new MavlinkPacket()
             {
                 Message = message,
-                SequenceNumber = (byte) pSequence,
+                SequenceNumber = (byte) PacketSequence,
                 SystemId = 255,
                 ComponentId = (byte) MAV_COMPONENT.MAV_COMP_ID_MISSIONPLANNER
             };
@@ -295,18 +292,4 @@ namespace MAVLink.NET
             SendPacket(message);
         }
     }
-
-    /*
-    public struct Position_t
-    {
-        public double Latitude, Longitude, Altitude;
-
-        public Position_t(double latitude=0, double longitude=0, double altitude=0)
-        {
-            Latitude    = latitude;
-            Longitude   = longitude;
-            Altitude    = altitude;
-        }
-    }
-    */
 }
