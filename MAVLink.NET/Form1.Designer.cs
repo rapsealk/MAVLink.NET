@@ -28,59 +28,95 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.button1 = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Button();
+            this.TakeoffButton = new System.Windows.Forms.Button();
+            this.LandButton = new System.Windows.Forms.Button();
+            this.ArmButton = new System.Windows.Forms.Button();
+            this.DisarmButton = new System.Windows.Forms.Button();
+            this.LatitudeLabel = new System.Windows.Forms.Label();
+            this.LongitudeLabel = new System.Windows.Forms.Label();
+            this.WaypointButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // button1
+            // TakeoffButton
             // 
-            this.button1.Location = new System.Drawing.Point(281, 175);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.Button1_Click);
+            this.TakeoffButton.Location = new System.Drawing.Point(166, 238);
+            this.TakeoffButton.Name = "TakeoffButton";
+            this.TakeoffButton.Size = new System.Drawing.Size(164, 23);
+            this.TakeoffButton.TabIndex = 0;
+            this.TakeoffButton.Text = "Takeoff";
+            this.TakeoffButton.UseVisualStyleBackColor = true;
+            this.TakeoffButton.Click += new System.EventHandler(this.TakeoffButton_Click);
             // 
-            // label1
+            // LandButton
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(391, 180);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(38, 12);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "label1";
+            this.LandButton.Location = new System.Drawing.Point(362, 238);
+            this.LandButton.Name = "LandButton";
+            this.LandButton.Size = new System.Drawing.Size(164, 23);
+            this.LandButton.TabIndex = 1;
+            this.LandButton.Text = "Land";
+            this.LandButton.UseVisualStyleBackColor = true;
+            this.LandButton.Click += new System.EventHandler(this.LandButton_Click);
             // 
-            // label2
+            // ArmButton
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(391, 218);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(38, 12);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "label2";
+            this.ArmButton.Location = new System.Drawing.Point(166, 209);
+            this.ArmButton.Name = "ArmButton";
+            this.ArmButton.Size = new System.Drawing.Size(164, 23);
+            this.ArmButton.TabIndex = 2;
+            this.ArmButton.Text = "Arm";
+            this.ArmButton.UseVisualStyleBackColor = true;
+            this.ArmButton.Click += new System.EventHandler(this.ArmButton_Click);
             // 
-            // button2
+            // DisarmButton
             // 
-            this.button2.Location = new System.Drawing.Point(281, 213);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 3;
-            this.button2.Text = "button2";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.Button2_Click);
+            this.DisarmButton.Location = new System.Drawing.Point(362, 209);
+            this.DisarmButton.Name = "DisarmButton";
+            this.DisarmButton.Size = new System.Drawing.Size(164, 23);
+            this.DisarmButton.TabIndex = 3;
+            this.DisarmButton.Text = "Disarm";
+            this.DisarmButton.UseVisualStyleBackColor = true;
+            this.DisarmButton.Click += new System.EventHandler(this.DisarmButton_Click);
+            // 
+            // LatitudeLabel
+            // 
+            this.LatitudeLabel.AutoSize = true;
+            this.LatitudeLabel.Location = new System.Drawing.Point(166, 303);
+            this.LatitudeLabel.Name = "LatitudeLabel";
+            this.LatitudeLabel.Size = new System.Drawing.Size(80, 12);
+            this.LatitudeLabel.TabIndex = 4;
+            this.LatitudeLabel.Text = "LatitudeLabel";
+            // 
+            // LongitudeLabel
+            // 
+            this.LongitudeLabel.AutoSize = true;
+            this.LongitudeLabel.Location = new System.Drawing.Point(360, 303);
+            this.LongitudeLabel.Name = "LongitudeLabel";
+            this.LongitudeLabel.Size = new System.Drawing.Size(91, 12);
+            this.LongitudeLabel.TabIndex = 5;
+            this.LongitudeLabel.Text = "LongitudeLabel";
+            // 
+            // WaypointButton
+            // 
+            this.WaypointButton.Location = new System.Drawing.Point(168, 147);
+            this.WaypointButton.Name = "WaypointButton";
+            this.WaypointButton.Size = new System.Drawing.Size(358, 23);
+            this.WaypointButton.TabIndex = 6;
+            this.WaypointButton.Text = "Waypoint";
+            this.WaypointButton.UseVisualStyleBackColor = true;
+            this.WaypointButton.Click += new System.EventHandler(this.WaypointButton_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.WaypointButton);
+            this.Controls.Add(this.LongitudeLabel);
+            this.Controls.Add(this.LatitudeLabel);
+            this.Controls.Add(this.DisarmButton);
+            this.Controls.Add(this.ArmButton);
+            this.Controls.Add(this.LandButton);
+            this.Controls.Add(this.TakeoffButton);
             this.Name = "Form1";
             this.Text = "Form1";
             this.ResumeLayout(false);
@@ -90,10 +126,13 @@
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button TakeoffButton;
+        private System.Windows.Forms.Button LandButton;
+        private System.Windows.Forms.Button ArmButton;
+        private System.Windows.Forms.Button DisarmButton;
+        private System.Windows.Forms.Label LatitudeLabel;
+        private System.Windows.Forms.Label LongitudeLabel;
+        private System.Windows.Forms.Button WaypointButton;
     }
 }
 

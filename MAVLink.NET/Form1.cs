@@ -14,49 +14,50 @@ namespace MAVLink.NET
     public partial class Form1 : Form
     {
         private MAVLinkManager MAVManager;
-        private MAVLinkNode node1, node2;
+        private MAVLinkNode node1;
 
         public Form1()
         {
             InitializeComponent();
 
-            //string[] portNames = System.IO.Ports.SerialPort.GetPortNames();
-
             MAVManager = new MAVLinkManager();
             node1 = MAVManager.RegisterAgent("COM10", 57600);
-            node2 = MAVManager.RegisterAgent("COM9", 57600);
-        }
 
-        private void Button1_Click(object sender, EventArgs e)
-        {
             MAVManager.Open(0);
-
-            System.Threading.Thread thread = new System.Threading.Thread(UpdatePacketSequence);
-            thread.Start();
         }
 
-        private void Button2_Click(object sender, EventArgs e)
+        private void ArmButton_Click(object sender, EventArgs e)
         {
-            MAVManager.Open(1);
-
-            System.Threading.Thread thread = new System.Threading.Thread(UpdatePacketSequence2);
-            thread.Start();
+            node1.ArmDisarmCommand(true);
         }
 
-        private void UpdatePacketSequence()
+        private void DisarmButton_Click(object sender, EventArgs e)
+        {
+            node1.ArmDisarmCommand(false);
+        }
+
+        private void TakeoffButton_Click(object sender, EventArgs e)
+        {
+            node1.TakeoffCommand();
+        }
+
+        private void LandButton_Click(object sender, EventArgs e)
+        {
+            node1.LandCommand();
+        }
+
+        private void WaypointButton_Click(object sender, EventArgs e)
+        {
+            node1.NextWP();
+        }
+
+        private void UpdateMAVPosition()
         {
             while (true)
             {
-                label1.BeginInvoke((Action) delegate () { label1.Text = String.Format("seq: {0:d}", node1.PacketSequence); });
-                System.Threading.Thread.Sleep(1000);
-            }
-        }
-
-        private void UpdatePacketSequence2()
-        {
-            while (true)
-            {
-                label2.BeginInvoke((Action) delegate () { label2.Text = String.Format("seq: {0:d}", node2.PacketSequence); });
+                Vector3 position = node1.Position;
+                LatitudeLabel.BeginInvoke((Action) delegate () { LatitudeLabel.Text = String.Format("{0:f}", position.X); });
+                LongitudeLabel.BeginInvoke((Action) delegate () { LongitudeLabel.Text = String.Format("{0:f}", position.Y); });
                 System.Threading.Thread.Sleep(1000);
             }
         }
