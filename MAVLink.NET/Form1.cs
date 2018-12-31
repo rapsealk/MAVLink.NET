@@ -50,7 +50,7 @@ namespace MAVLink.NET
 
         private void WaypointButton_Click(object sender, EventArgs e)
         {
-            node1.NextWP();
+            node1.NextWP(0, 0);
         }
 
         private void UpdateMAVPosition()

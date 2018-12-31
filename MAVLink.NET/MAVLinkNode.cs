@@ -218,20 +218,23 @@ namespace MAVLink.NET
 
         public void ArmDisarmCommand(bool target_arm)
         {
-            // TODO: Thread
-            Msg_command_long message = new Msg_command_long()
+            System.Threading.Thread thread = new System.Threading.Thread(() =>
             {
-                command             = (ushort) MAV_CMD.MAV_CMD_COMPONENT_ARM_DISARM,
-                target_system       = SYSTEM_ID,
-                target_component    = COMPONENT_ID,
-                param1              = target_arm ? 1f : 0f  // 1: arm, 0: disarm
-            };
-            
-            do
-            {
-                SendPacket(message);
-                System.Threading.Thread.Sleep(1000);
-            } while (target_arm ^ (_is_armed == 0b1000_0000));
+                Msg_command_long message = new Msg_command_long()
+                {
+                    command             = (ushort) MAV_CMD.MAV_CMD_COMPONENT_ARM_DISARM,
+                    target_system       = SYSTEM_ID,
+                    target_component    = COMPONENT_ID,
+                    param1              = target_arm ? 1f : 0f  // 1: arm, 0: disarm
+                };
+
+                do
+                {
+                    SendPacket(message);
+                    System.Threading.Thread.Sleep(1000);
+                } while (target_arm ^ (_is_armed == 0b1000_0000));
+            });
+            thread.Start();
         }
 
         public void SingleNavCommand(MAV_CMD command)
