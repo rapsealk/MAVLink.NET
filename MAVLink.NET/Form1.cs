@@ -14,34 +14,32 @@ namespace MAVLink.NET
     public partial class Form1 : Form
     {
         private MAVLinkManager MAVManager;
-        private MAVLinkNode node1;
+        private MAVLinkNode node1, node2;
 
         public Form1()
         {
             InitializeComponent();
 
-            string[] portNames = System.IO.Ports.SerialPort.GetPortNames();
+            //string[] portNames = System.IO.Ports.SerialPort.GetPortNames();
 
             MAVManager = new MAVLinkManager();
-            MAVManager.RegisterAgent("COM11", 57600);
-            // node1 = new MAVLinkNode("COM11", 57600);
+            node1 = MAVManager.RegisterAgent("COM10", 57600);
+            node2 = MAVManager.RegisterAgent("COM9", 57600);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
-            try
-            {
-                node1.Serial.Open();
-            }
-            catch (System.IO.IOException ee)
-            {
-                Console.Error.WriteLine(ee.Message);
-                return;
-            }
-            
-            node1.heartbeatWorker.RunWorkerAsync();
+            MAVManager.Open(0);
 
             System.Threading.Thread thread = new System.Threading.Thread(UpdatePacketSequence);
+            thread.Start();
+        }
+
+        private void Button2_Click(object sender, EventArgs e)
+        {
+            MAVManager.Open(1);
+
+            System.Threading.Thread thread = new System.Threading.Thread(UpdatePacketSequence2);
             thread.Start();
         }
 
@@ -49,7 +47,16 @@ namespace MAVLink.NET
         {
             while (true)
             {
-                textBox1.BeginInvoke((Action)delegate () { textBox1.Text = String.Format("seq: {0:d}", node1.PacketSequence); });
+                label1.BeginInvoke((Action) delegate () { label1.Text = String.Format("seq: {0:d}", node1.PacketSequence); });
+                System.Threading.Thread.Sleep(1000);
+            }
+        }
+
+        private void UpdatePacketSequence2()
+        {
+            while (true)
+            {
+                label2.BeginInvoke((Action) delegate () { label2.Text = String.Format("seq: {0:d}", node2.PacketSequence); });
                 System.Threading.Thread.Sleep(1000);
             }
         }

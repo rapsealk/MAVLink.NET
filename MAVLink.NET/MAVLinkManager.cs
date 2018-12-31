@@ -25,19 +25,22 @@ namespace MAVLink.NET
             MAVLinkNodes = new List<MAVLinkNode>();
         }
 
-        public void RegisterAgent(string port, int baud, byte systemId=1, byte componentId=1)
+        public MAVLinkNode RegisterAgent(string port, int baud, byte systemId=1, byte componentId=1)
         {
-            MAVLinkNodes.Add(new MAVLinkNode(port, baud, systemId, componentId));
-            
+            MAVLinkNode node = new MAVLinkNode(port, baud, systemId, componentId);
+            MAVLinkNodes.Add(node);
+
             // TODO: move leader to the first index
-            MAVLinkNodes.Sort((x, y) => x._is_leader ? 0 : 1);
+            //MAVLinkNodes.Sort((x, y) => x._is_leader ? 0 : 1);
+
+            return node;
         }
 
         public void RegisterAgent(MAVLinkNode node)
         {
             MAVLinkNodes.Add(node);
 
-            MAVLinkNodes.Sort((x, y) => x._is_leader ? 0 : 1);
+            //MAVLinkNodes.Sort((x, y) => x._is_leader ? 0 : 1);
         }
 
         /****************************************
@@ -45,15 +48,30 @@ namespace MAVLink.NET
          ****************************************/
         public void Open(int index=0)
         {
+            MAVLinkNode node = MAVLinkNodes[index];
+
             try
             {
-                if (!MAVLinkNodes[index].Serial.IsOpen)
-                    MAVLinkNodes[index].Serial.Open();
+                if (!node.Serial.IsOpen)
+                    node.Serial.Open();
             }
             catch (System.IO.IOException e)
             {
                 Console.Error.WriteLine(e.Message);
+                return;
             }
+
+            node.heartbeatWorker.RunWorkerAsync();
+        }
+
+        /**
+         * 
+         */
+        public void IsLeader(int index=0)
+        {
+            foreach (MAVLinkNode node in MAVLinkNodes)
+                node._is_leader = false;
+            MAVLinkNodes[index]._is_leader = true;
         }
 
         /****************************************

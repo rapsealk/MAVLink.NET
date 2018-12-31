@@ -57,9 +57,11 @@
     </Compile>
     <Compile Include="FrameworkBitConverter.cs" />
     <Compile Include="Mavlink.cs" />
+    <Compile Include="MAVLinkManager.cs" />
     <Compile Include="MAVLinkNode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Vector3.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
