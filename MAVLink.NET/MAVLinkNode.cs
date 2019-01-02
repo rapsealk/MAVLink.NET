@@ -146,9 +146,30 @@ namespace MAVLink.NET
                 Position.X = mGPS.lat / pRatio;
                 Position.Y = mGPS.lon / pRatio;
                 Position.Z = mGPS.alt / pRatio;
-                //Position.Latitude   = (double) mGPS.lat / pRatio;
-                //Position.Longitude  = (double) mGPS.lon / pRatio;
-                //Position.Altitude   = (double) mGPS.alt / pRatio;
+
+                // MySQL Update Query
+                MySql.Data.MySqlClient.MySqlConnection conn = DatabaseManager.GetConnection();
+                try
+                {
+                    conn.Open();
+                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand()
+                    {
+                        Connection = conn,
+                        CommandText = "UPDATE realtime SET Lattitude=@lat, Longitude=@lon WHERE UAV_ID=@id"
+                    };
+                    command.Parameters.Add("@lat", MySql.Data.MySqlClient.MySqlDbType.Double);
+                    command.Parameters.Add("@lon", MySql.Data.MySqlClient.MySqlDbType.Double);
+                    command.Parameters.Add("@id", MySql.Data.MySqlClient.MySqlDbType.Int32);
+                    command.Parameters[0].Value = Position.X;
+                    command.Parameters[1].Value = Position.Y;
+                    command.Parameters[2].Value = SYSTEM_ID;
+                    command.ExecuteNonQuery();
+                    conn.Close();
+                }
+                catch (MySql.Data.MySqlClient.MySqlException e)
+                {
+                    Console.Error.WriteLine(e.Message);
+                }
             }
             else if (message.GetType() == mRTK.GetType())
             {
