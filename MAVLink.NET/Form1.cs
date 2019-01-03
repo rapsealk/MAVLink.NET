@@ -62,10 +62,10 @@ namespace MAVLink.NET
                     Vector3 position = node1.Position;
                     try
                     {
-                        LatitudeLabel.BeginInvoke((Action)delegate () { LatitudeLabel.Text = String.Format("{0:f}", position.X); });
-                        LongitudeLabel.BeginInvoke((Action)delegate () { LongitudeLabel.Text = String.Format("{0:f}", position.Y); });
-                        StatusMessageLabel.BeginInvoke((Action)delegate () { StatusMessageLabel.Text = node1.StatusMessage; });
-                        CommandResultMessageLabel.BeginInvoke((Action)delegate () { CommandResultMessageLabel.Text = node1.CommandResultMessage; });
+                        LatitudeLabel.BeginInvoke((Action) delegate () { LatitudeLabel.Text = String.Format("{0:f}", position.X); });
+                        LongitudeLabel.BeginInvoke((Action) delegate () { LongitudeLabel.Text = String.Format("{0:f}", position.Y); });
+                        StatusMessageLabel.BeginInvoke((Action) delegate () { StatusMessageLabel.Text = node1.StatusMessage; });
+                        CommandResultMessageLabel.BeginInvoke((Action) delegate () { CommandResultMessageLabel.Text = node1.CommandResultMessage; });
                     }
                     catch (InvalidOperationException e)
                     {
@@ -82,6 +82,11 @@ namespace MAVLink.NET
             ClearMissionButton.BeginInvoke((Action) delegate () { ClearMissionButton.Enabled = false; });
             node1.ClearMission();
             ClearMissionButton.BeginInvoke((Action) delegate () { ClearMissionButton.Enabled = true; });
+        }
+
+        private void MissionStartButton_Click(object sender, EventArgs e)
+        {
+            node1.StartMission();
         }
     }
 }

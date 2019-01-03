@@ -27,6 +27,10 @@ namespace MAVLink.NET
             "(EMPTY)", "READY", "TAKEOFF", "LOITER", "MISSION", "RTL", "LAND",
             "RTGS", "FOLLOW_TARGET", "PRECLAND"
         };
+        private enum PX4FlightSubMode
+        {
+            READY=1, TAKEOFF, LOITER, MISSION, RTL, LAND, RTGS, FOLLOW_TARGET, PRECLAND
+        };
         // COMMAND_ACK
         private static readonly string[] ResultMessage =
         {
@@ -43,25 +47,29 @@ namespace MAVLink.NET
 
         public byte PacketSequence { get; private set; }
 
-        private Msg_heartbeat       mHeartbeat              = new Msg_heartbeat();
-        private Msg_sys_status      mSysStatus              = new Msg_sys_status();
-        private Msg_power_status    mPowerStatus            = new Msg_power_status();
-        private Msg_attitude        mAttitude               = new Msg_attitude();
-        private Msg_gps_raw_int     mGPS                    = new Msg_gps_raw_int();
-        private Msg_gps_rtk         mRTK                    = new Msg_gps_rtk();
-        private Msg_vfr_hud         mVfr                    = new Msg_vfr_hud();   // heading, altitude
-        private Msg_raw_pressure    mRawPressure            = new Msg_raw_pressure();
-        private Msg_scaled_pressure mScaledPressure         = new Msg_scaled_pressure();
-        private Msg_command_ack     mCommandAck             = new Msg_command_ack();
-        private Msg_statustext      mStatusText             = new Msg_statustext();
-        private Msg_mission_count   mMissionCount           = new Msg_mission_count();
-        private Msg_mission_request mMissionRequest         = new Msg_mission_request();
-        private Msg_mission_ack     mMissionAck             = new Msg_mission_ack();
+        private Msg_heartbeat               mHeartbeat              = new Msg_heartbeat();
+        private Msg_sys_status              mSysStatus              = new Msg_sys_status();
+        private Msg_power_status            mPowerStatus            = new Msg_power_status();
+        private Msg_battery_status          mBatteryStatus          = new Msg_battery_status();
+        private Msg_attitude                mAttitude               = new Msg_attitude();
+        private Msg_gps_raw_int             mGPS                    = new Msg_gps_raw_int();
+        private Msg_gps_rtk                 mRTK                    = new Msg_gps_rtk();
+        private Msg_vfr_hud                 mVfr                    = new Msg_vfr_hud();   // heading, altitude
+        private Msg_raw_pressure            mRawPressure            = new Msg_raw_pressure();
+        private Msg_scaled_pressure         mScaledPressure         = new Msg_scaled_pressure();
+        private Msg_command_ack             mCommandAck             = new Msg_command_ack();
+        private Msg_statustext              mStatusText             = new Msg_statustext();
+        private Msg_mission_count           mMissionCount           = new Msg_mission_count();
+        private Msg_mission_request         mMissionRequest         = new Msg_mission_request();
+        private Msg_mission_ack             mMissionAck             = new Msg_mission_ack();
+        private Msg_mission_item_reached    mMissionItemReached     = new Msg_mission_item_reached();
 
         public bool _is_leader = false;
 
         private byte _base_mode = 0;
         public byte _is_armed = 0;
+
+        public sbyte BatteryPercentage = 0;
 
         private Msg_mission_item[] MissionItems = new Msg_mission_item[32];
         private int MissionItemCount = 0;
@@ -144,9 +152,18 @@ namespace MAVLink.NET
             if (message.GetType() == mHeartbeat.GetType())
                 mHeartbeat = (Msg_heartbeat)message;
             else if (message.GetType() == mSysStatus.GetType())
-                mSysStatus = (Msg_sys_status)message;
+            {
+                mSysStatus = (Msg_sys_status) message;
+            }
             else if (message.GetType() == mPowerStatus.GetType())
-                mPowerStatus = (Msg_power_status)message;
+            {
+                mPowerStatus = (Msg_power_status) message;
+            }
+            else if (message.GetType() == mBatteryStatus.GetType())
+            {
+                mBatteryStatus = (Msg_battery_status) message;
+                BatteryPercentage = mBatteryStatus.battery_remaining;
+            }
             else if (message.GetType() == mAttitude.GetType())
                 mAttitude = (Msg_attitude)message;
             else if (message.GetType() == mGPS.GetType())
@@ -405,6 +422,20 @@ namespace MAVLink.NET
             };
             SendPacket(landMessage);
             */
+        }
+
+        /**
+         * https://docs.px4.io/en/flight_modes/mission.html
+         */
+        public void StartMission()
+        {
+            Msg_set_mode message = new Msg_set_mode()
+            {
+                target_system   = SYSTEM_ID,
+                base_mode       = (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
+                custom_mode     = ((uint) PX4FlightMode.OFFBOARD << 16) + (uint) PX4FlightSubMode.MISSION
+            };
+            SendPacket(message);
         }
 
         /*
