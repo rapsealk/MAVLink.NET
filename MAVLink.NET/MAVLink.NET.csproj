@@ -49,6 +49,7 @@
     <Compile Include="ByteArrayUtil.cs" />
     <Compile Include="common.generated.cs" />
     <Compile Include="common_codec.generated.cs" />
+    <Compile Include="DatabaseManager.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

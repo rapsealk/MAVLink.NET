@@ -34,7 +34,8 @@
             this.DisarmButton = new System.Windows.Forms.Button();
             this.LatitudeLabel = new System.Windows.Forms.Label();
             this.LongitudeLabel = new System.Windows.Forms.Label();
-            this.WaypointButton = new System.Windows.Forms.Button();
+            this.MissionUploadButton = new System.Windows.Forms.Button();
+            this.StatusMessageLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // TakeoffButton
@@ -95,22 +96,32 @@
             this.LongitudeLabel.TabIndex = 5;
             this.LongitudeLabel.Text = "LongitudeLabel";
             // 
-            // WaypointButton
+            // MissionUploadButton
             // 
-            this.WaypointButton.Location = new System.Drawing.Point(168, 147);
-            this.WaypointButton.Name = "WaypointButton";
-            this.WaypointButton.Size = new System.Drawing.Size(358, 23);
-            this.WaypointButton.TabIndex = 6;
-            this.WaypointButton.Text = "Waypoint";
-            this.WaypointButton.UseVisualStyleBackColor = true;
-            this.WaypointButton.Click += new System.EventHandler(this.WaypointButton_Click);
+            this.MissionUploadButton.Location = new System.Drawing.Point(168, 147);
+            this.MissionUploadButton.Name = "MissionUploadButton";
+            this.MissionUploadButton.Size = new System.Drawing.Size(358, 23);
+            this.MissionUploadButton.TabIndex = 6;
+            this.MissionUploadButton.Text = "Mission Upload";
+            this.MissionUploadButton.UseVisualStyleBackColor = true;
+            this.MissionUploadButton.Click += new System.EventHandler(this.MissionUploadButton_Click);
+            // 
+            // StatusMessageLabel
+            // 
+            this.StatusMessageLabel.AutoSize = true;
+            this.StatusMessageLabel.Location = new System.Drawing.Point(166, 344);
+            this.StatusMessageLabel.Name = "StatusMessageLabel";
+            this.StatusMessageLabel.Size = new System.Drawing.Size(38, 12);
+            this.StatusMessageLabel.TabIndex = 7;
+            this.StatusMessageLabel.Text = "StatusMessageLabel";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.WaypointButton);
+            this.Controls.Add(this.StatusMessageLabel);
+            this.Controls.Add(this.MissionUploadButton);
             this.Controls.Add(this.LongitudeLabel);
             this.Controls.Add(this.LatitudeLabel);
             this.Controls.Add(this.DisarmButton);
@@ -132,7 +143,8 @@
         private System.Windows.Forms.Button DisarmButton;
         private System.Windows.Forms.Label LatitudeLabel;
         private System.Windows.Forms.Label LongitudeLabel;
-        private System.Windows.Forms.Button WaypointButton;
+        private System.Windows.Forms.Button MissionUploadButton;
+        private System.Windows.Forms.Label StatusMessageLabel;
     }
 }
 

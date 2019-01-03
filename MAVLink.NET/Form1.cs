@@ -28,14 +28,12 @@ namespace MAVLink.NET
 
         private void ArmButton_Click(object sender, EventArgs e)
         {
-            // ArmButton.BeginInvoke((Action) delegate () { ArmButton.Enabled = false; });
-            node1.ArmDisarmCommand(true);
-            // ArmButton.BeginInvoke((Action) delegate () { ArmButton.Enabled = true; });
+            node1.ArmDisarmCommand(true, ArmButton);
         }
-
+        
         private void DisarmButton_Click(object sender, EventArgs e)
         {
-            node1.ArmDisarmCommand(false);
+            node1.ArmDisarmCommand(false, DisarmButton);
         }
 
         private void TakeoffButton_Click(object sender, EventArgs e)
@@ -48,9 +46,10 @@ namespace MAVLink.NET
             node1.LandCommand();
         }
 
-        private void WaypointButton_Click(object sender, EventArgs e)
+        private void MissionUploadButton_Click(object sender, EventArgs e)
         {
-            node1.NextWP(0, 0);
+            // node1.NextWP(0, 0);
+            node1.UploadMission();
         }
 
         private void UpdateMAVPosition()
@@ -60,6 +59,7 @@ namespace MAVLink.NET
                 Vector3 position = node1.Position;
                 LatitudeLabel.BeginInvoke((Action) delegate () { LatitudeLabel.Text = String.Format("{0:f}", position.X); });
                 LongitudeLabel.BeginInvoke((Action) delegate () { LongitudeLabel.Text = String.Format("{0:f}", position.Y); });
+                StatusMessageLabel.BeginInvoke((Action) delegate () { StatusMessageLabel.Text = String.Format("{0:s}", node1.StatusMessage); });
                 System.Threading.Thread.Sleep(1000);
             }
         }

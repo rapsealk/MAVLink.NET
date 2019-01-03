@@ -1,8 +1,11 @@
-﻿using System;
+﻿//#define MYSQL
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+#if MYSQL
 using MySql.Data.MySqlClient;
 
 namespace MAVLink.NET
@@ -24,3 +27,4 @@ namespace MAVLink.NET
         }
     }
 }
+#endif

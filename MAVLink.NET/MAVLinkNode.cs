@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define MYSQL
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -59,6 +61,8 @@ namespace MAVLink.NET
 
         private byte _base_mode = 0;
         public byte _is_armed = 0;
+
+        public string StatusMessage = "null";
 
         /**
          * Variables for agent's location.
@@ -146,7 +150,7 @@ namespace MAVLink.NET
                 Position.X = mGPS.lat / pRatio;
                 Position.Y = mGPS.lon / pRatio;
                 Position.Z = mGPS.alt / pRatio;
-
+#if MYSQL
                 // MySQL Update Query
                 MySql.Data.MySqlClient.MySqlConnection conn = DatabaseManager.GetConnection();
                 try
@@ -170,6 +174,7 @@ namespace MAVLink.NET
                 {
                     Console.Error.WriteLine(e.Message);
                 }
+#endif
             }
             else if (message.GetType() == mRTK.GetType())
             {
@@ -188,16 +193,14 @@ namespace MAVLink.NET
             else if (message.GetType() == mMissionCount.GetType())      // TODO: Handle mission
                 mMissionCount = (Msg_mission_count) message;
 
-
             _is_armed = (byte) (mHeartbeat.base_mode & (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED);
-            // Console.WriteLine("[ARMED]: " + (_is_armed != 0));
 
             if (mStatusText.text != null)
             {
                 int tsize = mStatusText.text.Length;
                 char[] c = new char[tsize];
                 for (int i = 0; i < tsize; i++) c[i] = (char) mStatusText.text[i];
-                Console.WriteLine("[STATUS_MESSAGE]: " + new string(c));
+                StatusMessage = new string(c);
             }
             Console.WriteLine("[COMMAND_RESULT_MESSAGE]: " + ResultMessage[mCommandAck.result]);
 
@@ -237,10 +240,12 @@ namespace MAVLink.NET
             SendPacket(message);
         }
 
-        public void ArmDisarmCommand(bool target_arm)
+        public void ArmDisarmCommand(bool target_arm, System.Windows.Forms.Button button)
         {
             System.Threading.Thread thread = new System.Threading.Thread(() =>
             {
+                button.BeginInvoke((Action) delegate () { button.Enabled = false; });
+
                 Msg_command_long message = new Msg_command_long()
                 {
                     command             = (ushort) MAV_CMD.MAV_CMD_COMPONENT_ARM_DISARM,
@@ -254,10 +259,13 @@ namespace MAVLink.NET
                     SendPacket(message);
                     System.Threading.Thread.Sleep(1000);
                 } while (target_arm ^ (_is_armed == 0b1000_0000));
+
+                button.BeginInvoke((Action) delegate () { button.Enabled = true; });
             });
             thread.Start();
         }
 
+        /*
         public void SingleNavCommand(MAV_CMD command)
         {
             Msg_mission_clear_all clearMessage = new Msg_mission_clear_all()
@@ -277,13 +285,77 @@ namespace MAVLink.NET
             };
             SendPacket(message);
         }
+        */
+        public void UploadMission()
+        {
+            Msg_mission_clear_all clearMessage = new Msg_mission_clear_all()
+            {
+                target_system       = SYSTEM_ID,
+                target_component    = (byte) MAV_COMPONENT.MAV_COMP_ID_ALL
+            };
+            SendPacket(clearMessage);
+
+            MAV_CMD[] commands = new MAV_CMD[]
+            {
+                MAV_CMD.MAV_CMD_NAV_TAKEOFF,
+                MAV_CMD.MAV_CMD_NAV_WAYPOINT,
+                MAV_CMD.MAV_CMD_NAV_WAYPOINT,
+                MAV_CMD.MAV_CMD_NAV_LAND
+            };
+            float[] xs = new float[]
+            {
+                0f,
+                37.599202f,
+                37.599246f,
+                0f
+            };
+            float[] ys = new float[]
+            {
+                0f,
+                126.863422f,
+                126.863236f,
+                0f
+            };
+
+            for (int i = 0; i < commands.Length; i++)
+            {
+                MAV_CMD command = commands[i];
+                /**
+                 * https://mavlink.io/en/services/mission.html
+                 * 
+                 * The items for the different types of mission..
+                 * # Flight plans:
+                 * 1) NAV commands (MAV_CMD_NAV_*) for navigation/movement.
+                 * 2) DO commands (MAV_CMD_DO_*) for immediate actions like changing speed or activating a servo.
+                 * 3) CONDITION commands (MAV_CMD_CONDITION_*) for changing the execution of the mission based on a condition;
+                 *    - e.g. pausing the mission for a time before executing next command.
+                 * # Geofence mission items:
+                 * - Prefixed with MAV_CMD_NAV_FENCE_.
+                 * # Rally point mission items
+                 * - There is just one rally point MAV_CMD: MAV_CMD_NAV_RALLY_POINT.
+                 */
+                Msg_mission_item message = new Msg_mission_item()
+                {
+                    target_system       = SYSTEM_ID,
+                    target_component    = COMPONENT_ID,
+                    autocontinue        = 1,
+                    command             = (ushort) command,
+                    current             = 0,
+                    frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                    seq                 = (ushort) i,
+                    x                   = xs[i],
+                    y                   = ys[i],
+                    z                   = 5
+                };
+                SendPacket(message);
+            }
+        }
 
         /**
          * https://mavlink.io/en/messages/common.html#MAV_CMD_NAV_TAKEOFF
          */
         public void TakeoffCommand()
         {
-            // SingleNavCommand(MAV_CMD.MAV_CMD_NAV_TAKEOFF);
             //*
             Msg_command_long message = new Msg_command_long()
             {
@@ -322,7 +394,6 @@ namespace MAVLink.NET
          */
         public void LandCommand()
         {
-            // SingleNavCommand(MAV_CMD.MAV_CMD_NAV_LAND);
             Msg_command_long message = new Msg_command_long()
             {
                 command             = (ushort) MAV_CMD.MAV_CMD_NAV_LAND,
