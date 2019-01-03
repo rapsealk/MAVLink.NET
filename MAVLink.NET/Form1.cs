@@ -58,12 +58,20 @@ namespace MAVLink.NET
             System.Threading.Thread thread = new System.Threading.Thread(() => {
                 while (true)
                 {
-                    Vector3 position = node1.Position;
-                    LatitudeLabel.BeginInvoke((Action) delegate () { LatitudeLabel.Text = String.Format("{0:f}", position.X); });
-                    LongitudeLabel.BeginInvoke((Action) delegate () { LongitudeLabel.Text = String.Format("{0:f}", position.Y); });
-                    StatusMessageLabel.BeginInvoke((Action) delegate () { StatusMessageLabel.Text = node1.StatusMessage; });
-                    CommandResultMessageLabel.BeginInvoke((Action) delegate () { CommandResultMessageLabel.Text = node1.CommandResultMessage; });
                     System.Threading.Thread.Sleep(1000);
+                    Vector3 position = node1.Position;
+                    try
+                    {
+                        LatitudeLabel.BeginInvoke((Action)delegate () { LatitudeLabel.Text = String.Format("{0:f}", position.X); });
+                        LongitudeLabel.BeginInvoke((Action)delegate () { LongitudeLabel.Text = String.Format("{0:f}", position.Y); });
+                        StatusMessageLabel.BeginInvoke((Action)delegate () { StatusMessageLabel.Text = node1.StatusMessage; });
+                        CommandResultMessageLabel.BeginInvoke((Action)delegate () { CommandResultMessageLabel.Text = node1.CommandResultMessage; });
+                    }
+                    catch (InvalidOperationException e)
+                    {
+                        Console.Error.WriteLine(e.Message);
+                        break;
+                    }
                 }
             });
             thread.Start();

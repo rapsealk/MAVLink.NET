@@ -43,23 +43,28 @@ namespace MAVLink.NET
 
         public byte PacketSequence { get; private set; }
 
-        private Msg_heartbeat       mHeartbeat      = new Msg_heartbeat();
-        private Msg_sys_status      mSysStatus      = new Msg_sys_status();
-        private Msg_power_status    mPowerStatus    = new Msg_power_status();
-        private Msg_attitude        mAttitude       = new Msg_attitude();
-        private Msg_gps_raw_int     mGPS            = new Msg_gps_raw_int();
-        private Msg_gps_rtk         mRTK            = new Msg_gps_rtk();
-        private Msg_vfr_hud         mVfr            = new Msg_vfr_hud();   // heading, altitude
-        private Msg_raw_pressure    mRawPressure    = new Msg_raw_pressure();
-        private Msg_scaled_pressure mScaledPressure = new Msg_scaled_pressure();
-        private Msg_command_ack     mCommandAck     = new Msg_command_ack();
-        private Msg_statustext      mStatusText     = new Msg_statustext();
-        private Msg_mission_count   mMissionCount   = new Msg_mission_count();
+        private Msg_heartbeat       mHeartbeat              = new Msg_heartbeat();
+        private Msg_sys_status      mSysStatus              = new Msg_sys_status();
+        private Msg_power_status    mPowerStatus            = new Msg_power_status();
+        private Msg_attitude        mAttitude               = new Msg_attitude();
+        private Msg_gps_raw_int     mGPS                    = new Msg_gps_raw_int();
+        private Msg_gps_rtk         mRTK                    = new Msg_gps_rtk();
+        private Msg_vfr_hud         mVfr                    = new Msg_vfr_hud();   // heading, altitude
+        private Msg_raw_pressure    mRawPressure            = new Msg_raw_pressure();
+        private Msg_scaled_pressure mScaledPressure         = new Msg_scaled_pressure();
+        private Msg_command_ack     mCommandAck             = new Msg_command_ack();
+        private Msg_statustext      mStatusText             = new Msg_statustext();
+        private Msg_mission_count   mMissionCount           = new Msg_mission_count();
+        private Msg_mission_request mMissionRequest         = new Msg_mission_request();
+        private Msg_mission_ack     mMissionAck             = new Msg_mission_ack();
 
         public bool _is_leader = false;
 
         private byte _base_mode = 0;
         public byte _is_armed = 0;
+
+        private Msg_mission_item[] MissionItems = new Msg_mission_item[32];
+        private int MissionItemCount = 0;
 
         public string StatusMessage         = "null";
         public string CommandResultMessage  = "null";
@@ -137,16 +142,16 @@ namespace MAVLink.NET
             MavlinkMessage message = packet.Message;
 
             if (message.GetType() == mHeartbeat.GetType())
-                mHeartbeat = (Msg_heartbeat) message;
+                mHeartbeat = (Msg_heartbeat)message;
             else if (message.GetType() == mSysStatus.GetType())
-                mSysStatus = (Msg_sys_status) message;
+                mSysStatus = (Msg_sys_status)message;
             else if (message.GetType() == mPowerStatus.GetType())
-                mPowerStatus = (Msg_power_status) message;
+                mPowerStatus = (Msg_power_status)message;
             else if (message.GetType() == mAttitude.GetType())
-                mAttitude = (Msg_attitude) message;
+                mAttitude = (Msg_attitude)message;
             else if (message.GetType() == mGPS.GetType())
             {
-                mGPS = (Msg_gps_raw_int) message;
+                mGPS = (Msg_gps_raw_int)message;
                 Position.X = mGPS.lat / pRatio;
                 Position.Y = mGPS.lon / pRatio;
                 Position.Z = mGPS.alt / pRatio;
@@ -178,23 +183,34 @@ namespace MAVLink.NET
             }
             else if (message.GetType() == mRTK.GetType())
             {
-                mRTK = (Msg_gps_rtk) message;
+                mRTK = (Msg_gps_rtk)message;
             }
             else if (message.GetType() == mVfr.GetType())
-                mVfr = (Msg_vfr_hud) message;
+                mVfr = (Msg_vfr_hud)message;
             else if (message.GetType() == mRawPressure.GetType())
-                mRawPressure = (Msg_raw_pressure) message;
+                mRawPressure = (Msg_raw_pressure)message;
             else if (message.GetType() == mScaledPressure.GetType())    // TODO: Log press_abs, temperature, press_diff
-                mScaledPressure = (Msg_scaled_pressure) message;
+                mScaledPressure = (Msg_scaled_pressure)message;
             else if (message.GetType() == mCommandAck.GetType())
             {
-                mCommandAck = (Msg_command_ack) message;
+                mCommandAck = (Msg_command_ack)message;
                 CommandResultMessage = ResultMessage[mCommandAck.result];
             }
             else if (message.GetType() == mStatusText.GetType())        // TODO: System status message
-                mStatusText = (Msg_statustext) message;
-            else if (message.GetType() == mMissionCount.GetType())      // TODO: Handle mission
-                mMissionCount = (Msg_mission_count) message;
+                mStatusText = (Msg_statustext)message;
+            //else if (message.GetType() == mMissionCount.GetType())      // TODO: Handle mission
+            //    mMissionCount = (Msg_mission_count) message;
+            else if (message.GetType() == mMissionRequest.GetType())
+            {
+                mMissionRequest = (Msg_mission_request)message;
+                Console.WriteLine("mMissionRequest.seq: " + mMissionRequest.seq);
+                SendMission(mMissionRequest.seq);
+            }
+            else if (message.GetType() == mMissionAck.GetType())
+            {
+                mMissionAck = (Msg_mission_ack) message;
+                Console.WriteLine("Mission Ack: " + (mMissionAck.type == (byte) MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED));
+            }
 
             _is_armed = (byte) (mHeartbeat.base_mode & (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED);
 
@@ -299,20 +315,65 @@ namespace MAVLink.NET
             SendPacket(clearMessage);
         }
 
+        /**
+         * https://mavlink.io/en/services/mission.html#uploading_mission
+         */
+        public void SendMission(int index)
+        {
+            Msg_mission_item message = MissionItems[index];
+            message.seq = (ushort) index;
+            SendPacket(message);
+        }
+
         public void UploadMission()
         {
-            float[] xs = new float[]
+            /**
+             * https://mavlink.io/en/services/mission.html
+             * 
+             * The items for the different types of mission..
+             * # Flight plans:
+             * 1) NAV commands (MAV_CMD_NAV_*) for navigation/movement.
+             * 2) DO commands (MAV_CMD_DO_*) for immediate actions like changing speed or activating a servo.
+             * 3) CONDITION commands (MAV_CMD_CONDITION_*) for changing the execution of the mission based on a condition;
+             *    - e.g. pausing the mission for a time before executing next command.
+             * # Geofence mission items:
+             * - Prefixed with MAV_CMD_NAV_FENCE_.
+             * # Rally point mission items
+             * - There is just one rally point MAV_CMD: MAV_CMD_NAV_RALLY_POINT.
+             */
+            float[] xs = new float[] { 37.599202f, 37.599246f };
+            float[] ys = new float[] { 126.863422f, 126.863236f };
+            MissionItemCount = 0;
+            for (int i = 0; i < xs.Length; i++)
             {
-                37.599202f,
-                37.599246f
-            };
-            float[] ys = new float[]
-            {
-                126.863422f,
-                126.863236f
-            };
-            int missionCount = xs.Length;
+                MissionItems[MissionItemCount++] = new Msg_mission_item()
+                {
+                    target_system       = SYSTEM_ID,
+                    target_component    = COMPONENT_ID,
+                    command             = (ushort) MAV_CMD.MAV_CMD_NAV_WAYPOINT,
+                    frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                    autocontinue        = 1,
+                    current             = (byte) (i == 0 ? 1 : 0),
+                    seq                 = (byte) (i + 1)
+                };
+            }
+            MissionItems[0].param1 = 5; // minimum pitch
 
+            // 1) Firstly, GCS sends MISSION_COUNT including the number of mission items to be uploaded.
+            //   - A timeout must be started for the GCS to wait on the response from Drone (MISSION_REQUEST_INT).
+            Msg_mission_count missionCountMessage = new Msg_mission_count()
+            {
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID,
+                count               = 2
+            };
+            SendPacket(missionCountMessage);
+
+            // 2) Drone receives the message, and prepares to upload mission items.
+
+            // 3) Drone responds with MISSION_REQUEST_INT requesting the first mission items.
+            
+            /*
             Msg_mission_item takeoffMessage = new Msg_mission_item()
             {
                 target_system       = SYSTEM_ID,
@@ -326,37 +387,9 @@ namespace MAVLink.NET
             };
             SendPacket(takeoffMessage);
 
-            for (int i = 0; i < missionCount; i++)
+            for (int i = 0; i < 0; i++)
             {
-                /**
-                 * https://mavlink.io/en/services/mission.html
-                 * 
-                 * The items for the different types of mission..
-                 * # Flight plans:
-                 * 1) NAV commands (MAV_CMD_NAV_*) for navigation/movement.
-                 * 2) DO commands (MAV_CMD_DO_*) for immediate actions like changing speed or activating a servo.
-                 * 3) CONDITION commands (MAV_CMD_CONDITION_*) for changing the execution of the mission based on a condition;
-                 *    - e.g. pausing the mission for a time before executing next command.
-                 * # Geofence mission items:
-                 * - Prefixed with MAV_CMD_NAV_FENCE_.
-                 * # Rally point mission items
-                 * - There is just one rally point MAV_CMD: MAV_CMD_NAV_RALLY_POINT.
-                 */
-                Console.WriteLine("Mission #{0:d}", i + 2);
-
-                Msg_mission_item message = new Msg_mission_item()
-                {
-                    target_system       = SYSTEM_ID,
-                    target_component    = COMPONENT_ID,
-                    command             = (ushort) MAV_CMD.MAV_CMD_NAV_WAYPOINT,
-                    autocontinue        = 1,
-                    current             = 0,
-                    frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                    seq                 = (ushort) (i+2),
-                    x                   = xs[i],
-                    y                   = ys[i],
-                    z                   = 5
-                };
+                
                 SendPacket(message);
             }
 
@@ -371,6 +404,7 @@ namespace MAVLink.NET
                 seq                 = (ushort) (missionCount + 2)
             };
             SendPacket(landMessage);
+            */
         }
 
         /*
