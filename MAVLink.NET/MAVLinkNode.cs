@@ -301,29 +301,32 @@ namespace MAVLink.NET
 
         public void UploadMission()
         {
-            MAV_CMD[] commands = new MAV_CMD[]
-            {
-                //MAV_CMD.MAV_CMD_NAV_TAKEOFF,
-                MAV_CMD.MAV_CMD_NAV_WAYPOINT,
-                MAV_CMD.MAV_CMD_NAV_WAYPOINT,
-                MAV_CMD.MAV_CMD_NAV_LAND
-            };
             float[] xs = new float[]
             {
-                //0f,
                 37.599202f,
-                37.599246f,
                 37.599246f
             };
             float[] ys = new float[]
             {
-                //0f,
                 126.863422f,
-                126.863236f,
                 126.863236f
             };
+            int missionCount = xs.Length;
 
-            for (int i = 0; i < commands.Length; i++)
+            Msg_mission_item takeoffMessage = new Msg_mission_item()
+            {
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID,
+                command             = (byte) MAV_CMD.MAV_CMD_NAV_TAKEOFF,
+                frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                autocontinue        = 1,
+                current             = 1,
+                seq                 = 1,
+                param1              = 5     // minimum pitch
+            };
+            SendPacket(takeoffMessage);
+
+            for (int i = 0; i < missionCount; i++)
             {
                 /**
                  * https://mavlink.io/en/services/mission.html
@@ -339,23 +342,35 @@ namespace MAVLink.NET
                  * # Rally point mission items
                  * - There is just one rally point MAV_CMD: MAV_CMD_NAV_RALLY_POINT.
                  */
-                
+                Console.WriteLine("Mission #{0:d}", i + 2);
+
                 Msg_mission_item message = new Msg_mission_item()
                 {
                     target_system       = SYSTEM_ID,
                     target_component    = COMPONENT_ID,
-                    command             = (ushort) commands[i],
+                    command             = (ushort) MAV_CMD.MAV_CMD_NAV_WAYPOINT,
                     autocontinue        = 1,
-                    current             = (byte) ((i == 0) ? 1 : 0),
+                    current             = 0,
                     frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                    seq                 = (ushort) (i+1),
+                    seq                 = (ushort) (i+2),
                     x                   = xs[i],
                     y                   = ys[i],
-                    z                   = 5,
-                    param1              = 15    // minimum pitch
+                    z                   = 5
                 };
                 SendPacket(message);
             }
+
+            Msg_mission_item landMessage = new Msg_mission_item()
+            {
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID,
+                command             = (byte) MAV_CMD.MAV_CMD_NAV_TAKEOFF,
+                frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                autocontinue        = 1,
+                current             = 0,
+                seq                 = (ushort) (missionCount + 2)
+            };
+            SendPacket(landMessage);
         }
 
         /*

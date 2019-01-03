@@ -66,6 +66,7 @@ namespace MAVLink.NET
                     System.Threading.Thread.Sleep(1000);
                 }
             });
+            thread.Start();
         }
 
         private void ClearMissionButton_Click(object sender, EventArgs e)
