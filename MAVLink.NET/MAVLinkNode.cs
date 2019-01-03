@@ -1,5 +1,4 @@
 ﻿//#define MYSQL
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,7 +61,8 @@ namespace MAVLink.NET
         private byte _base_mode = 0;
         public byte _is_armed = 0;
 
-        public string StatusMessage = "null";
+        public string StatusMessage         = "null";
+        public string CommandResultMessage  = "null";
 
         /**
          * Variables for agent's location.
@@ -187,7 +187,10 @@ namespace MAVLink.NET
             else if (message.GetType() == mScaledPressure.GetType())    // TODO: Log press_abs, temperature, press_diff
                 mScaledPressure = (Msg_scaled_pressure) message;
             else if (message.GetType() == mCommandAck.GetType())
+            {
                 mCommandAck = (Msg_command_ack) message;
+                CommandResultMessage = ResultMessage[mCommandAck.result];
+            }
             else if (message.GetType() == mStatusText.GetType())        // TODO: System status message
                 mStatusText = (Msg_statustext) message;
             else if (message.GetType() == mMissionCount.GetType())      // TODO: Handle mission
@@ -202,7 +205,6 @@ namespace MAVLink.NET
                 for (int i = 0; i < tsize; i++) c[i] = (char) mStatusText.text[i];
                 StatusMessage = new string(c);
             }
-            Console.WriteLine("[COMMAND_RESULT_MESSAGE]: " + ResultMessage[mCommandAck.result]);
 
             _base_mode = mHeartbeat.base_mode;
         }
@@ -254,11 +256,12 @@ namespace MAVLink.NET
                     param1              = target_arm ? 1f : 0f  // 1: arm, 0: disarm
                 };
 
+                int trial = 0;
                 do
                 {
                     SendPacket(message);
                     System.Threading.Thread.Sleep(1000);
-                } while (target_arm ^ (_is_armed == 0b1000_0000));
+                } while (target_arm ^ (_is_armed == 0b1000_0000) && ++trial < 5);
 
                 button.BeginInvoke((Action) delegate () { button.Enabled = true; });
             });
@@ -286,7 +289,7 @@ namespace MAVLink.NET
             SendPacket(message);
         }
         */
-        public void UploadMission()
+        public void ClearMission()
         {
             Msg_mission_clear_all clearMessage = new Msg_mission_clear_all()
             {
@@ -294,32 +297,34 @@ namespace MAVLink.NET
                 target_component    = (byte) MAV_COMPONENT.MAV_COMP_ID_ALL
             };
             SendPacket(clearMessage);
+        }
 
+        public void UploadMission()
+        {
             MAV_CMD[] commands = new MAV_CMD[]
             {
-                MAV_CMD.MAV_CMD_NAV_TAKEOFF,
+                //MAV_CMD.MAV_CMD_NAV_TAKEOFF,
                 MAV_CMD.MAV_CMD_NAV_WAYPOINT,
                 MAV_CMD.MAV_CMD_NAV_WAYPOINT,
                 MAV_CMD.MAV_CMD_NAV_LAND
             };
             float[] xs = new float[]
             {
-                0f,
+                //0f,
                 37.599202f,
                 37.599246f,
-                0f
+                37.599246f
             };
             float[] ys = new float[]
             {
-                0f,
+                //0f,
                 126.863422f,
                 126.863236f,
-                0f
+                126.863236f
             };
 
             for (int i = 0; i < commands.Length; i++)
             {
-                MAV_CMD command = commands[i];
                 /**
                  * https://mavlink.io/en/services/mission.html
                  * 
@@ -334,22 +339,40 @@ namespace MAVLink.NET
                  * # Rally point mission items
                  * - There is just one rally point MAV_CMD: MAV_CMD_NAV_RALLY_POINT.
                  */
+                
                 Msg_mission_item message = new Msg_mission_item()
                 {
                     target_system       = SYSTEM_ID,
                     target_component    = COMPONENT_ID,
+                    command             = (ushort) commands[i],
                     autocontinue        = 1,
-                    command             = (ushort) command,
-                    current             = 0,
+                    current             = (byte) ((i == 0) ? 1 : 0),
                     frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                    seq                 = (ushort) i,
+                    seq                 = (ushort) (i+1),
                     x                   = xs[i],
                     y                   = ys[i],
-                    z                   = 5
+                    z                   = 5,
+                    param1              = 15    // minimum pitch
                 };
                 SendPacket(message);
             }
         }
+
+        /*
+        public void UpdateHomeCommand(float latitude, float longitude, float altitude=5f)
+        {
+            Msg_command_long message = new Msg_command_long()
+            {
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID,
+                command             = (byte) MAV_CMD.MAV_CMD_DO_SET_HOME,
+                param1              = 0,
+                param2              = 0,
+                param3              = 0,
+                param4              = 0
+            };
+        }
+        */
 
         /**
          * https://mavlink.io/en/messages/common.html#MAV_CMD_NAV_TAKEOFF

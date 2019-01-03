@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using MavLink;
 
 namespace MAVLink.NET
 {
@@ -59,9 +58,17 @@ namespace MAVLink.NET
                 Vector3 position = node1.Position;
                 LatitudeLabel.BeginInvoke((Action) delegate () { LatitudeLabel.Text = String.Format("{0:f}", position.X); });
                 LongitudeLabel.BeginInvoke((Action) delegate () { LongitudeLabel.Text = String.Format("{0:f}", position.Y); });
-                StatusMessageLabel.BeginInvoke((Action) delegate () { StatusMessageLabel.Text = String.Format("{0:s}", node1.StatusMessage); });
+                StatusMessageLabel.BeginInvoke((Action) delegate () { StatusMessageLabel.Text = node1.StatusMessage; });
+                CommandResultMessageLabel.BeginInvoke((Action) delegate () { CommandResultMessageLabel.Text = node1.CommandResultMessage; });
                 System.Threading.Thread.Sleep(1000);
             }
+        }
+
+        private void ClearMissionButton_Click(object sender, EventArgs e)
+        {
+            ClearMissionButton.BeginInvoke((Action) delegate () { ClearMissionButton.Enabled = false; });
+            node1.ClearMission();
+            ClearMissionButton.BeginInvoke((Action) delegate () { ClearMissionButton.Enabled = true; });
         }
     }
 }

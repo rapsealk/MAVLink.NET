@@ -36,6 +36,8 @@
             this.LongitudeLabel = new System.Windows.Forms.Label();
             this.MissionUploadButton = new System.Windows.Forms.Button();
             this.StatusMessageLabel = new System.Windows.Forms.Label();
+            this.ClearMissionButton = new System.Windows.Forms.Button();
+            this.CommandResultMessageLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // TakeoffButton
@@ -98,7 +100,7 @@
             // 
             // MissionUploadButton
             // 
-            this.MissionUploadButton.Location = new System.Drawing.Point(168, 147);
+            this.MissionUploadButton.Location = new System.Drawing.Point(168, 118);
             this.MissionUploadButton.Name = "MissionUploadButton";
             this.MissionUploadButton.Size = new System.Drawing.Size(358, 23);
             this.MissionUploadButton.TabIndex = 6;
@@ -111,15 +113,36 @@
             this.StatusMessageLabel.AutoSize = true;
             this.StatusMessageLabel.Location = new System.Drawing.Point(166, 344);
             this.StatusMessageLabel.Name = "StatusMessageLabel";
-            this.StatusMessageLabel.Size = new System.Drawing.Size(38, 12);
+            this.StatusMessageLabel.Size = new System.Drawing.Size(124, 12);
             this.StatusMessageLabel.TabIndex = 7;
             this.StatusMessageLabel.Text = "StatusMessageLabel";
+            // 
+            // ClearMissionButton
+            // 
+            this.ClearMissionButton.Location = new System.Drawing.Point(168, 147);
+            this.ClearMissionButton.Name = "ClearMissionButton";
+            this.ClearMissionButton.Size = new System.Drawing.Size(358, 23);
+            this.ClearMissionButton.TabIndex = 8;
+            this.ClearMissionButton.Text = "Clear Mission";
+            this.ClearMissionButton.UseVisualStyleBackColor = true;
+            this.ClearMissionButton.Click += new System.EventHandler(this.ClearMissionButton_Click);
+            // 
+            // CommandResultMessageLabel
+            // 
+            this.CommandResultMessageLabel.AutoSize = true;
+            this.CommandResultMessageLabel.Location = new System.Drawing.Point(166, 371);
+            this.CommandResultMessageLabel.Name = "CommandResultMessageLabel";
+            this.CommandResultMessageLabel.Size = new System.Drawing.Size(38, 12);
+            this.CommandResultMessageLabel.TabIndex = 9;
+            this.CommandResultMessageLabel.Text = "CommandResultMessageLabel";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.CommandResultMessageLabel);
+            this.Controls.Add(this.ClearMissionButton);
             this.Controls.Add(this.StatusMessageLabel);
             this.Controls.Add(this.MissionUploadButton);
             this.Controls.Add(this.LongitudeLabel);
@@ -145,6 +168,8 @@
         private System.Windows.Forms.Label LongitudeLabel;
         private System.Windows.Forms.Button MissionUploadButton;
         private System.Windows.Forms.Label StatusMessageLabel;
+        private System.Windows.Forms.Button ClearMissionButton;
+        private System.Windows.Forms.Label CommandResultMessageLabel;
     }
 }
 
