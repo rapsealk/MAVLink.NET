@@ -68,7 +68,7 @@ namespace MAVLink.NET
          * Variables for agent's location.
          */
         public Vector3 Position;
-        public double pRatio = 10000;
+        public static double pRatio = 10 * 1000 * 1000;
 
         /**
          * Variables for desired direction.

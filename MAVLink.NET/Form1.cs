@@ -23,6 +23,8 @@ namespace MAVLink.NET
             node1 = MAVManager.RegisterAgent("COM10", 57600);
 
             MAVManager.Open(0);
+
+            UpdateMAVPosition();
         }
 
         private void ArmButton_Click(object sender, EventArgs e)
@@ -53,15 +55,17 @@ namespace MAVLink.NET
 
         private void UpdateMAVPosition()
         {
-            while (true)
-            {
-                Vector3 position = node1.Position;
-                LatitudeLabel.BeginInvoke((Action) delegate () { LatitudeLabel.Text = String.Format("{0:f}", position.X); });
-                LongitudeLabel.BeginInvoke((Action) delegate () { LongitudeLabel.Text = String.Format("{0:f}", position.Y); });
-                StatusMessageLabel.BeginInvoke((Action) delegate () { StatusMessageLabel.Text = node1.StatusMessage; });
-                CommandResultMessageLabel.BeginInvoke((Action) delegate () { CommandResultMessageLabel.Text = node1.CommandResultMessage; });
-                System.Threading.Thread.Sleep(1000);
-            }
+            System.Threading.Thread thread = new System.Threading.Thread(() => {
+                while (true)
+                {
+                    Vector3 position = node1.Position;
+                    LatitudeLabel.BeginInvoke((Action) delegate () { LatitudeLabel.Text = String.Format("{0:f}", position.X); });
+                    LongitudeLabel.BeginInvoke((Action) delegate () { LongitudeLabel.Text = String.Format("{0:f}", position.Y); });
+                    StatusMessageLabel.BeginInvoke((Action) delegate () { StatusMessageLabel.Text = node1.StatusMessage; });
+                    CommandResultMessageLabel.BeginInvoke((Action) delegate () { CommandResultMessageLabel.Text = node1.CommandResultMessage; });
+                    System.Threading.Thread.Sleep(1000);
+                }
+            });
         }
 
         private void ClearMissionButton_Click(object sender, EventArgs e)
