@@ -64,8 +64,8 @@ namespace MAVLink.NET
                     Vector3 position = node1.Position;
                     try
                     {
-                        LatitudeLabel.BeginInvoke((Action) delegate () { LatitudeLabel.Text = String.Format("{0:f}", position.X); });
-                        LongitudeLabel.BeginInvoke((Action) delegate () { LongitudeLabel.Text = String.Format("{0:f}", position.Y); });
+                        LatitudeLabel.BeginInvoke((Action) delegate () { LatitudeLabel.Text = String.Format("{0:f6}", position.X); });
+                        LongitudeLabel.BeginInvoke((Action) delegate () { LongitudeLabel.Text = String.Format("{0:f6}", position.Y); });
                         FlightModeLabel.BeginInvoke((Action)delegate () { FlightModeLabel.Text = node1.FlightMode; });
                         SubModeLabel.BeginInvoke((Action) delegate () { SubModeLabel.Text = node1.SubMode; });
                         StatusMessageLabel.BeginInvoke((Action) delegate () { StatusMessageLabel.Text = node1.StatusMessage; });
