@@ -11,7 +11,7 @@ namespace MAVLink.NET
     class MAVLinkNode
     {
         // PX4_CUSTOM_MAIN_MODE
-        private static readonly string[] PX4Mode =
+        public static readonly string[] PX4Mode =
         {
             "(EMPTY)", "MANUAL", "ALTCTL", "POSCTL", "AUTO", "ACRO", "OFFBOARD", "STABILIZED", "RATTITUDE",
             "SIMPLE"    // FIXME: unused, but reserved for future use.
@@ -73,6 +73,8 @@ namespace MAVLink.NET
 
         private Msg_mission_item[] MissionItems = new Msg_mission_item[32];
         private int MissionItemCount = 0;
+
+        public string FlightMode            = "null";
 
         public string StatusMessage         = "null";
         public string CommandResultMessage  = "null";
@@ -150,7 +152,10 @@ namespace MAVLink.NET
             MavlinkMessage message = packet.Message;
 
             if (message.GetType() == mHeartbeat.GetType())
-                mHeartbeat = (Msg_heartbeat)message;
+            {
+                mHeartbeat = (Msg_heartbeat) message;
+                FlightMode = PX4Mode[mHeartbeat.custom_mode / 65536];
+            }
             else if (message.GetType() == mSysStatus.GetType())
             {
                 mSysStatus = (Msg_sys_status) message;
@@ -165,10 +170,10 @@ namespace MAVLink.NET
                 BatteryPercentage = mBatteryStatus.battery_remaining;
             }
             else if (message.GetType() == mAttitude.GetType())
-                mAttitude = (Msg_attitude)message;
+                mAttitude = (Msg_attitude) message;
             else if (message.GetType() == mGPS.GetType())
             {
-                mGPS = (Msg_gps_raw_int)message;
+                mGPS = (Msg_gps_raw_int) message;
                 Position.X = mGPS.lat / pRatio;
                 Position.Y = mGPS.lon / pRatio;
                 Position.Z = mGPS.alt / pRatio;
@@ -200,26 +205,26 @@ namespace MAVLink.NET
             }
             else if (message.GetType() == mRTK.GetType())
             {
-                mRTK = (Msg_gps_rtk)message;
+                mRTK = (Msg_gps_rtk) message;
             }
             else if (message.GetType() == mVfr.GetType())
-                mVfr = (Msg_vfr_hud)message;
+                mVfr = (Msg_vfr_hud) message;
             else if (message.GetType() == mRawPressure.GetType())
-                mRawPressure = (Msg_raw_pressure)message;
+                mRawPressure = (Msg_raw_pressure) message;
             else if (message.GetType() == mScaledPressure.GetType())    // TODO: Log press_abs, temperature, press_diff
-                mScaledPressure = (Msg_scaled_pressure)message;
+                mScaledPressure = (Msg_scaled_pressure) message;
             else if (message.GetType() == mCommandAck.GetType())
             {
-                mCommandAck = (Msg_command_ack)message;
+                mCommandAck = (Msg_command_ack) message;
                 CommandResultMessage = ResultMessage[mCommandAck.result];
             }
             else if (message.GetType() == mStatusText.GetType())        // TODO: System status message
-                mStatusText = (Msg_statustext)message;
+                mStatusText = (Msg_statustext) message;
             //else if (message.GetType() == mMissionCount.GetType())      // TODO: Handle mission
             //    mMissionCount = (Msg_mission_count) message;
             else if (message.GetType() == mMissionRequest.GetType())
             {
-                mMissionRequest = (Msg_mission_request)message;
+                mMissionRequest = (Msg_mission_request) message;
                 Console.WriteLine("mMissionRequest.seq: " + mMissionRequest.seq);
                 SendMission(mMissionRequest.seq);
             }
