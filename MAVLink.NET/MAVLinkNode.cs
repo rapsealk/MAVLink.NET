@@ -84,6 +84,8 @@ namespace MAVLink.NET
         public float Pitch  = 0f;
         public float Yaw    = 0f;
 
+        private static float Radian = (float) (180 / Math.PI);
+
         /**
          * Variables for agent's location.
          */
@@ -193,9 +195,9 @@ namespace MAVLink.NET
             else if (message.GetType() == mAttitude.GetType())
             {
                 mAttitude = (Msg_attitude) message;
-                Roll = mAttitude.roll;
-                Pitch = mAttitude.pitch;
-                Yaw = mAttitude.yaw;
+                Roll = mAttitude.roll * Radian;
+                Pitch = mAttitude.pitch * Radian;
+                Yaw = mAttitude.yaw * Radian;
             }
             else if (message.GetType() == mGPS.GetType())
             {

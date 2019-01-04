@@ -53,6 +53,8 @@
             this.RollLabel = new System.Windows.Forms.Label();
             this.PitchLabel = new System.Windows.Forms.Label();
             this.YawLabel = new System.Windows.Forms.Label();
+            this.BatteryTag = new System.Windows.Forms.Label();
+            this.BatteryLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // TakeoffButton
@@ -292,11 +294,32 @@
             this.YawLabel.TabIndex = 24;
             this.YawLabel.Text = "YawLabel";
             // 
+            // BatteryTag
+            // 
+            this.BatteryTag.AutoSize = true;
+            this.BatteryTag.Location = new System.Drawing.Point(23, 311);
+            this.BatteryTag.Name = "BatteryTag";
+            this.BatteryTag.Size = new System.Drawing.Size(37, 12);
+            this.BatteryTag.TabIndex = 25;
+            this.BatteryTag.Text = "Battery: ";
+            // 
+            // BatteryLabel
+            // 
+            this.BatteryLabel.AutoSize = true;
+            this.BatteryLabel.ForeColor = System.Drawing.Color.Red;
+            this.BatteryLabel.Location = new System.Drawing.Point(75, 311);
+            this.BatteryLabel.Name = "BatteryLabel";
+            this.BatteryLabel.Size = new System.Drawing.Size(37, 12);
+            this.BatteryLabel.TabIndex = 26;
+            this.BatteryLabel.Text = "0";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.BatteryLabel);
+            this.Controls.Add(this.BatteryTag);
             this.Controls.Add(this.YawLabel);
             this.Controls.Add(this.PitchLabel);
             this.Controls.Add(this.RollLabel);
@@ -356,6 +379,8 @@
         private System.Windows.Forms.Label RollLabel;
         private System.Windows.Forms.Label PitchLabel;
         private System.Windows.Forms.Label YawLabel;
+        private System.Windows.Forms.Label BatteryTag;
+        private System.Windows.Forms.Label BatteryLabel;
     }
 }
 

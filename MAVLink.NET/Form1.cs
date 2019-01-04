@@ -69,6 +69,7 @@ namespace MAVLink.NET
                         RollLabel.BeginInvoke((Action) delegate () { RollLabel.Text = String.Format("{0:f2}", node1.Roll); });
                         PitchLabel.BeginInvoke((Action) delegate () { PitchLabel.Text = String.Format("{0:f2}", node1.Pitch); });
                         YawLabel.BeginInvoke((Action) delegate () { YawLabel.Text = String.Format("{0:f2}", node1.Yaw); });
+                        BatteryLabel.BeginInvoke((Action) delegate () { BatteryLabel.Text = String.Format("{0:d}", node1.BatteryPercentage); });
                         FlightModeLabel.BeginInvoke((Action) delegate () { FlightModeLabel.Text = node1.FlightMode; });
                         SubModeLabel.BeginInvoke((Action) delegate () { SubModeLabel.Text = node1.SubMode; });
                         StatusMessageLabel.BeginInvoke((Action) delegate () { StatusMessageLabel.Text = node1.StatusMessage; });
