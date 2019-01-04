@@ -47,6 +47,12 @@
             this.LongitudeTag = new System.Windows.Forms.Label();
             this.SubModeTag = new System.Windows.Forms.Label();
             this.SubModeLabel = new System.Windows.Forms.Label();
+            this.RollTag = new System.Windows.Forms.Label();
+            this.PitchTag = new System.Windows.Forms.Label();
+            this.YawTag = new System.Windows.Forms.Label();
+            this.RollLabel = new System.Windows.Forms.Label();
+            this.PitchLabel = new System.Windows.Forms.Label();
+            this.YawLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // TakeoffButton
@@ -215,7 +221,7 @@
             this.SubModeTag.AutoSize = true;
             this.SubModeTag.Location = new System.Drawing.Point(166, 325);
             this.SubModeTag.Name = "SubModeTag";
-            this.SubModeTag.Size = new System.Drawing.Size(75, 12);
+            this.SubModeTag.Size = new System.Drawing.Size(89, 12);
             this.SubModeTag.TabIndex = 17;
             this.SubModeTag.Text = "CustomMode: ";
             // 
@@ -225,15 +231,78 @@
             this.SubModeLabel.ForeColor = System.Drawing.Color.Red;
             this.SubModeLabel.Location = new System.Drawing.Point(247, 325);
             this.SubModeLabel.Name = "SubModeLabel";
-            this.SubModeLabel.Size = new System.Drawing.Size(38, 12);
+            this.SubModeLabel.Size = new System.Drawing.Size(90, 12);
             this.SubModeLabel.TabIndex = 18;
             this.SubModeLabel.Text = "SubModeLabel";
+            // 
+            // RollTag
+            // 
+            this.RollTag.AutoSize = true;
+            this.RollTag.Location = new System.Drawing.Point(23, 220);
+            this.RollTag.Name = "RollTag";
+            this.RollTag.Size = new System.Drawing.Size(30, 12);
+            this.RollTag.TabIndex = 19;
+            this.RollTag.Text = "roll: ";
+            // 
+            // PitchTag
+            // 
+            this.PitchTag.AutoSize = true;
+            this.PitchTag.Location = new System.Drawing.Point(23, 238);
+            this.PitchTag.Name = "PitchTag";
+            this.PitchTag.Size = new System.Drawing.Size(40, 12);
+            this.PitchTag.TabIndex = 20;
+            this.PitchTag.Text = "pitch: ";
+            // 
+            // YawTag
+            // 
+            this.YawTag.AutoSize = true;
+            this.YawTag.Location = new System.Drawing.Point(23, 256);
+            this.YawTag.Name = "YawTag";
+            this.YawTag.Size = new System.Drawing.Size(37, 12);
+            this.YawTag.TabIndex = 21;
+            this.YawTag.Text = "yaw: ";
+            // 
+            // RollLabel
+            // 
+            this.RollLabel.AutoSize = true;
+            this.RollLabel.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.RollLabel.Location = new System.Drawing.Point(59, 220);
+            this.RollLabel.Name = "RollLabel";
+            this.RollLabel.Size = new System.Drawing.Size(57, 12);
+            this.RollLabel.TabIndex = 22;
+            this.RollLabel.Text = "RollLabel";
+            // 
+            // PitchLabel
+            // 
+            this.PitchLabel.AutoSize = true;
+            this.PitchLabel.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.PitchLabel.Location = new System.Drawing.Point(59, 238);
+            this.PitchLabel.Name = "PitchLabel";
+            this.PitchLabel.Size = new System.Drawing.Size(64, 12);
+            this.PitchLabel.TabIndex = 23;
+            this.PitchLabel.Text = "PitchLabel";
+            // 
+            // YawLabel
+            // 
+            this.YawLabel.AutoSize = true;
+            this.YawLabel.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.YawLabel.Location = new System.Drawing.Point(59, 256);
+            this.YawLabel.Name = "YawLabel";
+            this.YawLabel.Size = new System.Drawing.Size(61, 12);
+            this.YawLabel.TabIndex = 24;
+            this.YawLabel.Text = "YawLabel";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.YawLabel);
+            this.Controls.Add(this.PitchLabel);
+            this.Controls.Add(this.RollLabel);
+            this.Controls.Add(this.YawTag);
+            this.Controls.Add(this.PitchTag);
+            this.Controls.Add(this.RollTag);
             this.Controls.Add(this.SubModeLabel);
             this.Controls.Add(this.SubModeTag);
             this.Controls.Add(this.LongitudeTag);
@@ -281,6 +350,12 @@
         private System.Windows.Forms.Label LongitudeTag;
         private System.Windows.Forms.Label SubModeTag;
         private System.Windows.Forms.Label SubModeLabel;
+        private System.Windows.Forms.Label RollTag;
+        private System.Windows.Forms.Label PitchTag;
+        private System.Windows.Forms.Label YawTag;
+        private System.Windows.Forms.Label RollLabel;
+        private System.Windows.Forms.Label PitchLabel;
+        private System.Windows.Forms.Label YawLabel;
     }
 }
 

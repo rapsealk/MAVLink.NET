@@ -80,6 +80,10 @@ namespace MAVLink.NET
         public string StatusMessage         = "null";
         public string CommandResultMessage  = "null";
 
+        public float Roll   = 0f;
+        public float Pitch  = 0f;
+        public float Yaw    = 0f;
+
         /**
          * Variables for agent's location.
          */
@@ -187,7 +191,12 @@ namespace MAVLink.NET
                 BatteryPercentage = mBatteryStatus.battery_remaining;
             }
             else if (message.GetType() == mAttitude.GetType())
+            {
                 mAttitude = (Msg_attitude) message;
+                Roll = mAttitude.roll;
+                Pitch = mAttitude.pitch;
+                Yaw = mAttitude.yaw;
+            }
             else if (message.GetType() == mGPS.GetType())
             {
                 mGPS = (Msg_gps_raw_int) message;
@@ -380,9 +389,23 @@ namespace MAVLink.NET
              * # Rally point mission items
              * - There is just one rally point MAV_CMD: MAV_CMD_NAV_RALLY_POINT.
              */
+
+            SetCurrentPositionAsHome();
+
             float[] xs = new float[] { 37.599202f, 37.599246f };
             float[] ys = new float[] { 126.863422f, 126.863236f };
             MissionItemCount = 0;
+            // Takeoff
+            MissionItems[MissionItemCount++] = new Msg_mission_item()
+            {
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID,
+                command             = (ushort) MAV_CMD.MAV_CMD_NAV_TAKEOFF,
+                frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                autocontinue        = 1,
+                current             = 1,
+                seq                 = 1
+            };
             for (int i = 0; i < xs.Length; i++)
             {
                 MissionItems[MissionItemCount++] = new Msg_mission_item()
@@ -392,14 +415,25 @@ namespace MAVLink.NET
                     command             = (ushort) MAV_CMD.MAV_CMD_NAV_WAYPOINT,
                     frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
                     autocontinue        = 1,
-                    current             = (byte) (i == 0 ? 1 : 0),
-                    seq                 = (byte) (i + 1),
+                    current             = 0, // (byte) (i == 0 ? 1 : 0),
+                    seq                 = (byte) (i + 2), // (i + 1),
                     x                   = xs[i],
                     y                   = ys[i],
                     z                   = 5
                 };
             }
             MissionItems[0].param1 = 5; // minimum pitch
+            // Land
+            MissionItems[MissionItemCount++] = new Msg_mission_item()
+            {
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID,
+                command             = (ushort) MAV_CMD.MAV_CMD_NAV_LAND,
+                frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                autocontinue        = 1,
+                current             = 0,
+                seq                 = (ushort) (xs.Length + 2)
+            };
 
             // 1) Firstly, GCS sends MISSION_COUNT including the number of mission items to be uploaded.
             //   - A timeout must be started for the GCS to wait on the response from Drone (MISSION_REQUEST_INT).
@@ -407,7 +441,7 @@ namespace MAVLink.NET
             {
                 target_system       = SYSTEM_ID,
                 target_component    = COMPONENT_ID,
-                count               = 2
+                count               = (ushort) MissionItemCount
             };
             SendPacket(missionCountMessage);
 
@@ -480,6 +514,27 @@ namespace MAVLink.NET
         */
 
         /**
+         * https://mavlink.io/en/messages/common.html#MAV_CMD_DO_SET_HOME
+         */
+        private void SetCurrentPositionAsHome()
+        {
+            Msg_command_long message = new Msg_command_long()
+            {
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID,
+                command             = (byte) MAV_CMD.MAV_CMD_DO_SET_HOME,
+                param1              = 1     // Use current (1 = use current location, 0 = use specified location)
+                // param2: Empty
+                // param3: Empty
+                // param4: Empty
+                // param5: Latitude,
+                // param6: Longitude,
+                // param7: Altitude
+            };
+            SendPacket(message);
+        }
+
+        /**
          * https://mavlink.io/en/messages/common.html#MAV_CMD_NAV_TAKEOFF
          */
         public void TakeoffCommand()
@@ -492,11 +547,11 @@ namespace MAVLink.NET
                 target_component    = COMPONENT_ID,
                 param1              = 2.5f, // Minimum pitch
                 // param2
-                // param3: horizontal navigation by pilot acceptable
+                param3              = 1f,   // horizontal navigation by pilot acceptable
                 // param4: yaw angle    (not supported)
                 // param5: latitude     (not supported)
                 // param6: longitude    (not supported)
-                param7              = 20 // altitude     [meters]
+                param7              = 20    // altitude [meters]
             };
             /*/
             Msg_command_long message = new Msg_command_long()
@@ -559,7 +614,7 @@ namespace MAVLink.NET
             /*/
             Msg_command_long message = new Msg_command_long()
             {
-                command             = (ushort)MAV_CMD.MAV_CMD_NAV_WAYPOINT,
+                command             = (ushort) MAV_CMD.MAV_CMD_NAV_WAYPOINT,
                 target_system       = SYSTEM_ID,
                 target_component    = COMPONENT_ID,
                 // param1: Hold time in decimal seconds. (ignored by fixed wing, time to stay at waypoint for rotary wing)
