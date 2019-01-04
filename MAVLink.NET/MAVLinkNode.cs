@@ -371,7 +371,10 @@ namespace MAVLink.NET
                     frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
                     autocontinue        = 1,
                     current             = (byte) (i == 0 ? 1 : 0),
-                    seq                 = (byte) (i + 1)
+                    seq                 = (byte) (i + 1),
+                    x                   = xs[i],
+                    y                   = ys[i],
+                    z                   = 5
                 };
             }
             MissionItems[0].param1 = 5; // minimum pitch
@@ -386,7 +389,7 @@ namespace MAVLink.NET
             };
             SendPacket(missionCountMessage);
 
-            // 2) Drone receives the message, and prepares to upload mission items.
+            // 2) Drone receives the message, and prepares to upload mission items 
 
             // 3) Drone responds with MISSION_REQUEST_INT requesting the first mission items.
             
