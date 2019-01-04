@@ -22,7 +22,7 @@ namespace MAVLink.NET
             FlightModeComboBox.Items.AddRange(MAVLinkNode.PX4Mode);
 
             MAVManager = new MAVLinkManager();
-            node1 = MAVManager.RegisterAgent("COM10", 57600);
+            node1 = MAVManager.RegisterAgent("COM12", 57600);
 
             MAVManager.Open(0);
 
@@ -67,6 +67,7 @@ namespace MAVLink.NET
                         LatitudeLabel.BeginInvoke((Action) delegate () { LatitudeLabel.Text = String.Format("{0:f}", position.X); });
                         LongitudeLabel.BeginInvoke((Action) delegate () { LongitudeLabel.Text = String.Format("{0:f}", position.Y); });
                         FlightModeLabel.BeginInvoke((Action)delegate () { FlightModeLabel.Text = node1.FlightMode; });
+                        SubModeLabel.BeginInvoke((Action) delegate () { SubModeLabel.Text = node1.SubMode; });
                         StatusMessageLabel.BeginInvoke((Action) delegate () { StatusMessageLabel.Text = node1.StatusMessage; });
                         CommandResultMessageLabel.BeginInvoke((Action) delegate () { CommandResultMessageLabel.Text = node1.CommandResultMessage; });
                     }

@@ -75,6 +75,7 @@ namespace MAVLink.NET
         private int MissionItemCount = 0;
 
         public string FlightMode            = "null";
+        public string SubMode               = "null";
 
         public string StatusMessage         = "null";
         public string CommandResultMessage  = "null";
@@ -83,7 +84,7 @@ namespace MAVLink.NET
          * Variables for agent's location.
          */
         public Vector3 Position;
-        public static double pRatio = 10 * 1000 * 1000;
+        public static double pRatio = 10 * 1000 * 1000; // 10_000_000
 
         /**
          * Variables for desired direction.
@@ -121,7 +122,7 @@ namespace MAVLink.NET
             while (true)
             {
                 Msg_heartbeat hb = new Msg_heartbeat();
-                // Console.WriteLine("OnHeartbeat@" + ++sec);
+
                 if (sec != DateTime.Now.Second)
                 {
                     hb.type = (byte) MAV_TYPE.MAV_TYPE_GCS;
@@ -154,7 +155,23 @@ namespace MAVLink.NET
             if (message.GetType() == mHeartbeat.GetType())
             {
                 mHeartbeat = (Msg_heartbeat) message;
-                FlightMode = PX4Mode[mHeartbeat.custom_mode / 65536];
+                //  0000 0000 0000 0000 | 0000 0000 0000 0000
+                // \_custom_/  \_base_/
+                uint offset = mHeartbeat.custom_mode >> 16;
+                uint base_index = offset % 256;
+                uint custom_index = offset / 256;
+                try
+                {
+                    // FlightMode = PX4Mode[mHeartbeat.custom_mode / 65536];
+                    FlightMode = PX4Mode[base_index];
+                    SubMode = PX4SubMode[custom_index];
+                }
+                catch (IndexOutOfRangeException e)
+                {
+                    // FIXME
+                }
+                Console.WriteLine("heartbeat.custom_mode: " + mHeartbeat.custom_mode);
+                Console.WriteLine("Flight Mode: {0:s}, Sub Mode: {1:s}", FlightMode, SubMode);
             }
             else if (message.GetType() == mSysStatus.GetType())
             {
@@ -473,13 +490,13 @@ namespace MAVLink.NET
                 command             = (ushort) MAV_CMD.MAV_CMD_NAV_TAKEOFF,
                 target_system       = SYSTEM_ID,
                 target_component    = COMPONENT_ID,
-                // param1
+                param1              = 2.5f, // Minimum pitch
                 // param2
                 // param3: horizontal navigation by pilot acceptable
                 // param4: yaw angle    (not supported)
                 // param5: latitude     (not supported)
                 // param6: longitude    (not supported)
-                param7              = 5 // altitude     [meters]
+                param7              = 20 // altitude     [meters]
             };
             /*/
             Msg_command_long message = new Msg_command_long()

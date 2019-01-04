@@ -45,6 +45,8 @@
             this.FlightModeButton = new System.Windows.Forms.Button();
             this.LatitudeTag = new System.Windows.Forms.Label();
             this.LongitudeTag = new System.Windows.Forms.Label();
+            this.SubModeTag = new System.Windows.Forms.Label();
+            this.SubModeLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // TakeoffButton
@@ -118,7 +120,7 @@
             // StatusMessageLabel
             // 
             this.StatusMessageLabel.AutoSize = true;
-            this.StatusMessageLabel.Location = new System.Drawing.Point(164, 347);
+            this.StatusMessageLabel.Location = new System.Drawing.Point(164, 358);
             this.StatusMessageLabel.Name = "StatusMessageLabel";
             this.StatusMessageLabel.Size = new System.Drawing.Size(124, 12);
             this.StatusMessageLabel.TabIndex = 7;
@@ -137,7 +139,7 @@
             // CommandResultMessageLabel
             // 
             this.CommandResultMessageLabel.AutoSize = true;
-            this.CommandResultMessageLabel.Location = new System.Drawing.Point(164, 369);
+            this.CommandResultMessageLabel.Location = new System.Drawing.Point(164, 380);
             this.CommandResultMessageLabel.Name = "CommandResultMessageLabel";
             this.CommandResultMessageLabel.Size = new System.Drawing.Size(183, 12);
             this.CommandResultMessageLabel.TabIndex = 9;
@@ -208,11 +210,32 @@
             this.LongitudeTag.TabIndex = 16;
             this.LongitudeTag.Text = "Lon: ";
             // 
+            // SubModeTag
+            // 
+            this.SubModeTag.AutoSize = true;
+            this.SubModeTag.Location = new System.Drawing.Point(166, 325);
+            this.SubModeTag.Name = "SubModeTag";
+            this.SubModeTag.Size = new System.Drawing.Size(75, 12);
+            this.SubModeTag.TabIndex = 17;
+            this.SubModeTag.Text = "CustomMode: ";
+            // 
+            // SubModeLabel
+            // 
+            this.SubModeLabel.AutoSize = true;
+            this.SubModeLabel.ForeColor = System.Drawing.Color.Red;
+            this.SubModeLabel.Location = new System.Drawing.Point(247, 325);
+            this.SubModeLabel.Name = "SubModeLabel";
+            this.SubModeLabel.Size = new System.Drawing.Size(38, 12);
+            this.SubModeLabel.TabIndex = 18;
+            this.SubModeLabel.Text = "SubModeLabel";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.SubModeLabel);
+            this.Controls.Add(this.SubModeTag);
             this.Controls.Add(this.LongitudeTag);
             this.Controls.Add(this.LatitudeTag);
             this.Controls.Add(this.FlightModeButton);
@@ -256,6 +279,8 @@
         private System.Windows.Forms.Button FlightModeButton;
         private System.Windows.Forms.Label LatitudeTag;
         private System.Windows.Forms.Label LongitudeTag;
+        private System.Windows.Forms.Label SubModeTag;
+        private System.Windows.Forms.Label SubModeLabel;
     }
 }
 
