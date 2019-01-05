@@ -22,11 +22,14 @@ namespace MAVLink.NET
             FlightModeComboBox.Items.AddRange(MAVLinkNode.PX4Mode);
 
             MAVManager = new MAVLinkManager();
-            node1 = MAVManager.RegisterAgent("COM9", 57600);
+            //*
+            node1 = MAVManager.RegisterAgent("COM12", 57600);
 
             MAVManager.Open(0);
 
             UpdateMAVPosition();
+            /*/
+            //*/
         }
 
         private void ArmButton_Click(object sender, EventArgs e)

@@ -411,7 +411,10 @@ namespace MAVLink.NET
                     frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
                     autocontinue        = 1,
                     current             = (byte) (i == 0 ? 1 : 0),
-                    seq                 = (byte) (i + 1)
+                    seq                 = (byte) (i + 1),
+                    x                   = xs[i],
+                    y                   = ys[i],
+                    z                   = 5
                 };
             }
             /* Takeoff
