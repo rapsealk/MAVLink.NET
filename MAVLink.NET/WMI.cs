@@ -12,7 +12,7 @@ namespace MAVLink.NET
 {
     public sealed class WMI : IDisposable
     {
-        //private ManagementEventWatcher _watcher;
+        // private ManagementEventWatcher _watcher;
         private TaskScheduler _taskScheduler;
 
         public ObservableCollection<string> ComPorts { get; private set; }

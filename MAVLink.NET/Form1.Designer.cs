@@ -55,6 +55,8 @@
             this.YawLabel = new System.Windows.Forms.Label();
             this.BatteryTag = new System.Windows.Forms.Label();
             this.BatteryLabel = new System.Windows.Forms.Label();
+            this.AltitudeTag = new System.Windows.Forms.Label();
+            this.AltitudeLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // TakeoffButton
@@ -299,7 +301,7 @@
             this.BatteryTag.AutoSize = true;
             this.BatteryTag.Location = new System.Drawing.Point(23, 311);
             this.BatteryTag.Name = "BatteryTag";
-            this.BatteryTag.Size = new System.Drawing.Size(37, 12);
+            this.BatteryTag.Size = new System.Drawing.Size(52, 12);
             this.BatteryTag.TabIndex = 25;
             this.BatteryTag.Text = "Battery: ";
             // 
@@ -309,15 +311,35 @@
             this.BatteryLabel.ForeColor = System.Drawing.Color.Red;
             this.BatteryLabel.Location = new System.Drawing.Point(75, 311);
             this.BatteryLabel.Name = "BatteryLabel";
-            this.BatteryLabel.Size = new System.Drawing.Size(37, 12);
+            this.BatteryLabel.Size = new System.Drawing.Size(11, 12);
             this.BatteryLabel.TabIndex = 26;
             this.BatteryLabel.Text = "0";
+            // 
+            // AltitudeTag
+            // 
+            this.AltitudeTag.AutoSize = true;
+            this.AltitudeTag.Location = new System.Drawing.Point(449, 277);
+            this.AltitudeTag.Name = "AltitudeTag";
+            this.AltitudeTag.Size = new System.Drawing.Size(34, 12);
+            this.AltitudeTag.TabIndex = 27;
+            this.AltitudeTag.Text = "Alt: ";
+            // 
+            // AltitudeLabel
+            // 
+            this.AltitudeLabel.AutoSize = true;
+            this.AltitudeLabel.Location = new System.Drawing.Point(487, 277);
+            this.AltitudeLabel.Name = "AltitudeLabel";
+            this.AltitudeLabel.Size = new System.Drawing.Size(38, 12);
+            this.AltitudeLabel.TabIndex = 28;
+            this.AltitudeLabel.Text = "AltitudeLabel";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.AltitudeLabel);
+            this.Controls.Add(this.AltitudeTag);
             this.Controls.Add(this.BatteryLabel);
             this.Controls.Add(this.BatteryTag);
             this.Controls.Add(this.YawLabel);
@@ -381,6 +403,8 @@
         private System.Windows.Forms.Label YawLabel;
         private System.Windows.Forms.Label BatteryTag;
         private System.Windows.Forms.Label BatteryLabel;
+        private System.Windows.Forms.Label AltitudeTag;
+        private System.Windows.Forms.Label AltitudeLabel;
     }
 }
 
