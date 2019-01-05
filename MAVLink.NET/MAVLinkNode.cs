@@ -396,10 +396,25 @@ namespace MAVLink.NET
 
             SetCurrentPositionAsHome();
 
-            float[] xs = new float[] { 37.599202f, 37.599246f };
-            float[] ys = new float[] { 126.863422f, 126.863236f };
+            MAV_CMD[] commands = new MAV_CMD[] { MAV_CMD.MAV_CMD_NAV_TAKEOFF, MAV_CMD.MAV_CMD_NAV_WAYPOINT, MAV_CMD.MAV_CMD_NAV_WAYPOINT, MAV_CMD.MAV_CMD_NAV_LAND };
+            float[] xs = new float[] { 37.599158f, 37.599202f, 37.599246f, 37.599290f };
+            float[] ys = new float[] { 126.863608f, 126.863422f, 126.863236f, 126.863050f };
             MissionItemCount = 0;
-            // Takeoff
+
+            for (int i = 0; i < commands.Length; i++)
+            {
+                MissionItems[MissionItemCount++] = new Msg_mission_item()
+                {
+                    target_system       = SYSTEM_ID,
+                    target_component    = COMPONENT_ID,
+                    command             = (ushort) commands[i],
+                    frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                    autocontinue        = 1,
+                    current             = (byte) (i == 0 ? 1 : 0),
+                    seq                 = (byte) (i + 1)
+                };
+            }
+            /* Takeoff
             MissionItems[MissionItemCount++] = new Msg_mission_item()
             {
                 target_system       = SYSTEM_ID,
@@ -438,6 +453,7 @@ namespace MAVLink.NET
                 current             = 0,
                 seq                 = (ushort) (xs.Length + 2)
             };
+            */
 
             // 1) Firstly, GCS sends MISSION_COUNT including the number of mission items to be uploaded.
             //   - A timeout must be started for the GCS to wait on the response from Drone (MISSION_REQUEST_INT).
@@ -452,39 +468,6 @@ namespace MAVLink.NET
             // 2) Drone receives the message, and prepares to upload mission items 
 
             // 3) Drone responds with MISSION_REQUEST_INT requesting the first mission items.
-            
-            /*
-            Msg_mission_item takeoffMessage = new Msg_mission_item()
-            {
-                target_system       = SYSTEM_ID,
-                target_component    = COMPONENT_ID,
-                command             = (byte) MAV_CMD.MAV_CMD_NAV_TAKEOFF,
-                frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                autocontinue        = 1,
-                current             = 1,
-                seq                 = 1,
-                param1              = 5     // minimum pitch
-            };
-            SendPacket(takeoffMessage);
-
-            for (int i = 0; i < 0; i++)
-            {
-                
-                SendPacket(message);
-            }
-
-            Msg_mission_item landMessage = new Msg_mission_item()
-            {
-                target_system       = SYSTEM_ID,
-                target_component    = COMPONENT_ID,
-                command             = (byte) MAV_CMD.MAV_CMD_NAV_TAKEOFF,
-                frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                autocontinue        = 1,
-                current             = 0,
-                seq                 = (ushort) (missionCount + 2)
-            };
-            SendPacket(landMessage);
-            */
         }
 
         /**
