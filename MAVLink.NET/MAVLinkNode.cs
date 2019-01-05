@@ -11,7 +11,7 @@ namespace MAVLink.NET
     class MAVLinkNode
     {
         // PX4_CUSTOM_MAIN_MODE
-        private static readonly string[] PX4Mode =
+        public static readonly string[] PX4Mode =
         {
             "(EMPTY)", "MANUAL", "ALTCTL", "POSCTL", "AUTO", "ACRO", "OFFBOARD", "STABILIZED", "RATTITUDE",
             "SIMPLE"    // FIXME: unused, but reserved for future use.
@@ -26,6 +26,10 @@ namespace MAVLink.NET
         {
             "(EMPTY)", "READY", "TAKEOFF", "LOITER", "MISSION", "RTL", "LAND",
             "RTGS", "FOLLOW_TARGET", "PRECLAND"
+        };
+        private enum PX4FlightSubMode
+        {
+            READY=1, TAKEOFF, LOITER, MISSION, RTL, LAND, RTGS, FOLLOW_TARGET, PRECLAND
         };
         // COMMAND_ACK
         private static readonly string[] ResultMessage =
@@ -43,37 +47,50 @@ namespace MAVLink.NET
 
         public byte PacketSequence { get; private set; }
 
-        private Msg_heartbeat       mHeartbeat              = new Msg_heartbeat();
-        private Msg_sys_status      mSysStatus              = new Msg_sys_status();
-        private Msg_power_status    mPowerStatus            = new Msg_power_status();
-        private Msg_attitude        mAttitude               = new Msg_attitude();
-        private Msg_gps_raw_int     mGPS                    = new Msg_gps_raw_int();
-        private Msg_gps_rtk         mRTK                    = new Msg_gps_rtk();
-        private Msg_vfr_hud         mVfr                    = new Msg_vfr_hud();   // heading, altitude
-        private Msg_raw_pressure    mRawPressure            = new Msg_raw_pressure();
-        private Msg_scaled_pressure mScaledPressure         = new Msg_scaled_pressure();
-        private Msg_command_ack     mCommandAck             = new Msg_command_ack();
-        private Msg_statustext      mStatusText             = new Msg_statustext();
-        private Msg_mission_count   mMissionCount           = new Msg_mission_count();
-        private Msg_mission_request mMissionRequest         = new Msg_mission_request();
-        private Msg_mission_ack     mMissionAck             = new Msg_mission_ack();
+        private Msg_heartbeat               mHeartbeat              = new Msg_heartbeat();
+        private Msg_sys_status              mSysStatus              = new Msg_sys_status();
+        private Msg_power_status            mPowerStatus            = new Msg_power_status();
+        private Msg_battery_status          mBatteryStatus          = new Msg_battery_status();
+        private Msg_attitude                mAttitude               = new Msg_attitude();
+        private Msg_gps_raw_int             mGPS                    = new Msg_gps_raw_int();
+        private Msg_gps_rtk                 mRTK                    = new Msg_gps_rtk();
+        private Msg_vfr_hud                 mVfr                    = new Msg_vfr_hud();   // heading, altitude
+        private Msg_raw_pressure            mRawPressure            = new Msg_raw_pressure();
+        private Msg_scaled_pressure         mScaledPressure         = new Msg_scaled_pressure();
+        private Msg_command_ack             mCommandAck             = new Msg_command_ack();
+        private Msg_statustext              mStatusText             = new Msg_statustext();
+        private Msg_mission_count           mMissionCount           = new Msg_mission_count();
+        private Msg_mission_request         mMissionRequest         = new Msg_mission_request();
+        private Msg_mission_ack             mMissionAck             = new Msg_mission_ack();
+        private Msg_mission_item_reached    mMissionItemReached     = new Msg_mission_item_reached();
 
         public bool _is_leader = false;
 
         private byte _base_mode = 0;
         public byte _is_armed = 0;
 
+        public sbyte BatteryPercentage = 0;
+
         private Msg_mission_item[] MissionItems = new Msg_mission_item[32];
         private int MissionItemCount = 0;
 
+        public string FlightMode            = "null";
+        public string SubMode               = "null";
+
         public string StatusMessage         = "null";
         public string CommandResultMessage  = "null";
+
+        public float Roll   = 0f;
+        public float Pitch  = 0f;
+        public float Yaw    = 0f;
+
+        private static float Radian = (float) (180 / Math.PI);
 
         /**
          * Variables for agent's location.
          */
         public Vector3 Position;
-        public static double pRatio = 10 * 1000 * 1000;
+        public static double pRatio = 10 * 1000 * 1000; // 10_000_000
 
         /**
          * Variables for desired direction.
@@ -111,7 +128,7 @@ namespace MAVLink.NET
             while (true)
             {
                 Msg_heartbeat hb = new Msg_heartbeat();
-                // Console.WriteLine("OnHeartbeat@" + ++sec);
+
                 if (sec != DateTime.Now.Second)
                 {
                     hb.type = (byte) MAV_TYPE.MAV_TYPE_GCS;
@@ -142,16 +159,49 @@ namespace MAVLink.NET
             MavlinkMessage message = packet.Message;
 
             if (message.GetType() == mHeartbeat.GetType())
-                mHeartbeat = (Msg_heartbeat)message;
+            {
+                mHeartbeat = (Msg_heartbeat) message;
+                //  0000 0000 0000 0000 | 0000 0000 0000 0000
+                // \_custom_/  \_base_/
+                uint offset = mHeartbeat.custom_mode >> 16;
+                uint base_index = offset % 256;
+                uint custom_index = offset / 256;
+                try
+                {
+                    // FlightMode = PX4Mode[mHeartbeat.custom_mode / 65536];
+                    FlightMode = PX4Mode[base_index];
+                    SubMode = PX4SubMode[custom_index];
+                }
+                catch (IndexOutOfRangeException e)
+                {
+                    // FIXME
+                }
+                Console.WriteLine("heartbeat.custom_mode: " + mHeartbeat.custom_mode);
+                Console.WriteLine("Flight Mode: {0:s}, Sub Mode: {1:s}", FlightMode, SubMode);
+            }
             else if (message.GetType() == mSysStatus.GetType())
-                mSysStatus = (Msg_sys_status)message;
+            {
+                mSysStatus = (Msg_sys_status) message;
+            }
             else if (message.GetType() == mPowerStatus.GetType())
-                mPowerStatus = (Msg_power_status)message;
+            {
+                mPowerStatus = (Msg_power_status) message;
+            }
+            else if (message.GetType() == mBatteryStatus.GetType())
+            {
+                mBatteryStatus = (Msg_battery_status) message;
+                BatteryPercentage = mBatteryStatus.battery_remaining;
+            }
             else if (message.GetType() == mAttitude.GetType())
-                mAttitude = (Msg_attitude)message;
+            {
+                mAttitude = (Msg_attitude) message;
+                Roll = mAttitude.roll * Radian;
+                Pitch = mAttitude.pitch * Radian;
+                Yaw = mAttitude.yaw * Radian;
+            }
             else if (message.GetType() == mGPS.GetType())
             {
-                mGPS = (Msg_gps_raw_int)message;
+                mGPS = (Msg_gps_raw_int) message;
                 Position.X = mGPS.lat / pRatio;
                 Position.Y = mGPS.lon / pRatio;
                 Position.Z = mGPS.alt / pRatio;
@@ -183,26 +233,26 @@ namespace MAVLink.NET
             }
             else if (message.GetType() == mRTK.GetType())
             {
-                mRTK = (Msg_gps_rtk)message;
+                mRTK = (Msg_gps_rtk) message;
             }
             else if (message.GetType() == mVfr.GetType())
-                mVfr = (Msg_vfr_hud)message;
+                mVfr = (Msg_vfr_hud) message;
             else if (message.GetType() == mRawPressure.GetType())
-                mRawPressure = (Msg_raw_pressure)message;
+                mRawPressure = (Msg_raw_pressure) message;
             else if (message.GetType() == mScaledPressure.GetType())    // TODO: Log press_abs, temperature, press_diff
-                mScaledPressure = (Msg_scaled_pressure)message;
+                mScaledPressure = (Msg_scaled_pressure) message;
             else if (message.GetType() == mCommandAck.GetType())
             {
-                mCommandAck = (Msg_command_ack)message;
+                mCommandAck = (Msg_command_ack) message;
                 CommandResultMessage = ResultMessage[mCommandAck.result];
             }
             else if (message.GetType() == mStatusText.GetType())        // TODO: System status message
-                mStatusText = (Msg_statustext)message;
+                mStatusText = (Msg_statustext) message;
             //else if (message.GetType() == mMissionCount.GetType())      // TODO: Handle mission
             //    mMissionCount = (Msg_mission_count) message;
             else if (message.GetType() == mMissionRequest.GetType())
             {
-                mMissionRequest = (Msg_mission_request)message;
+                mMissionRequest = (Msg_mission_request) message;
                 Console.WriteLine("mMissionRequest.seq: " + mMissionRequest.seq);
                 SendMission(mMissionRequest.seq);
             }
@@ -258,11 +308,12 @@ namespace MAVLink.NET
             SendPacket(message);
         }
 
-        public void ArmDisarmCommand(bool target_arm, System.Windows.Forms.Button button)
+        public void ArmDisarmCommand(bool target_arm, System.Windows.Forms.Button button = null)
         {
             System.Threading.Thread thread = new System.Threading.Thread(() =>
             {
-                button.BeginInvoke((Action) delegate () { button.Enabled = false; });
+                if (button != null)
+                    button.BeginInvoke((Action) delegate () { button.Enabled = false; });
 
                 Msg_command_long message = new Msg_command_long()
                 {
@@ -279,7 +330,8 @@ namespace MAVLink.NET
                     System.Threading.Thread.Sleep(1000);
                 } while (target_arm ^ (_is_armed == 0b1000_0000) && ++trial < 5);
 
-                button.BeginInvoke((Action) delegate () { button.Enabled = true; });
+                if (button != null)
+                    button.BeginInvoke((Action) delegate () { button.Enabled = true; });
             });
             thread.Start();
         }
@@ -341,9 +393,41 @@ namespace MAVLink.NET
              * # Rally point mission items
              * - There is just one rally point MAV_CMD: MAV_CMD_NAV_RALLY_POINT.
              */
-            float[] xs = new float[] { 37.599202f, 37.599246f };
-            float[] ys = new float[] { 126.863422f, 126.863236f };
+
+            SetCurrentPositionAsHome();
+
+            MAV_CMD[] commands = new MAV_CMD[] { MAV_CMD.MAV_CMD_NAV_TAKEOFF, MAV_CMD.MAV_CMD_NAV_WAYPOINT, MAV_CMD.MAV_CMD_NAV_WAYPOINT, MAV_CMD.MAV_CMD_NAV_LAND };
+            float[] xs = new float[] { 37.599158f, 37.599202f, 37.599246f, 37.599290f };
+            float[] ys = new float[] { 126.863608f, 126.863422f, 126.863236f, 126.863050f };
             MissionItemCount = 0;
+
+            for (int i = 0; i < commands.Length; i++)
+            {
+                MissionItems[MissionItemCount++] = new Msg_mission_item()
+                {
+                    target_system       = SYSTEM_ID,
+                    target_component    = COMPONENT_ID,
+                    command             = (ushort) commands[i],
+                    frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                    autocontinue        = 1,
+                    current             = (byte) (i == 0 ? 1 : 0),
+                    seq                 = (byte) (i + 1),
+                    x                   = xs[i],
+                    y                   = ys[i],
+                    z                   = 5
+                };
+            }
+            /* Takeoff
+            MissionItems[MissionItemCount++] = new Msg_mission_item()
+            {
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID,
+                command             = (ushort) MAV_CMD.MAV_CMD_NAV_TAKEOFF,
+                frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                autocontinue        = 1,
+                current             = 1,
+                seq                 = 1
+            };
             for (int i = 0; i < xs.Length; i++)
             {
                 MissionItems[MissionItemCount++] = new Msg_mission_item()
@@ -353,11 +437,26 @@ namespace MAVLink.NET
                     command             = (ushort) MAV_CMD.MAV_CMD_NAV_WAYPOINT,
                     frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
                     autocontinue        = 1,
-                    current             = (byte) (i == 0 ? 1 : 0),
-                    seq                 = (byte) (i + 1)
+                    current             = 0, // (byte) (i == 0 ? 1 : 0),
+                    seq                 = (byte) (i + 2), // (i + 1),
+                    x                   = xs[i],
+                    y                   = ys[i],
+                    z                   = 5
                 };
             }
             MissionItems[0].param1 = 5; // minimum pitch
+            // Land
+            MissionItems[MissionItemCount++] = new Msg_mission_item()
+            {
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID,
+                command             = (ushort) MAV_CMD.MAV_CMD_NAV_LAND,
+                frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                autocontinue        = 1,
+                current             = 0,
+                seq                 = (ushort) (xs.Length + 2)
+            };
+            */
 
             // 1) Firstly, GCS sends MISSION_COUNT including the number of mission items to be uploaded.
             //   - A timeout must be started for the GCS to wait on the response from Drone (MISSION_REQUEST_INT).
@@ -365,46 +464,27 @@ namespace MAVLink.NET
             {
                 target_system       = SYSTEM_ID,
                 target_component    = COMPONENT_ID,
-                count               = 2
+                count               = (ushort) MissionItemCount
             };
             SendPacket(missionCountMessage);
 
-            // 2) Drone receives the message, and prepares to upload mission items.
+            // 2) Drone receives the message, and prepares to upload mission items 
 
             // 3) Drone responds with MISSION_REQUEST_INT requesting the first mission items.
-            
-            /*
-            Msg_mission_item takeoffMessage = new Msg_mission_item()
-            {
-                target_system       = SYSTEM_ID,
-                target_component    = COMPONENT_ID,
-                command             = (byte) MAV_CMD.MAV_CMD_NAV_TAKEOFF,
-                frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                autocontinue        = 1,
-                current             = 1,
-                seq                 = 1,
-                param1              = 5     // minimum pitch
-            };
-            SendPacket(takeoffMessage);
+        }
 
-            for (int i = 0; i < 0; i++)
+        /**
+         * https://docs.px4.io/en/flight_modes/mission.html
+         */
+        public void StartMission()
+        {
+            Msg_set_mode message = new Msg_set_mode()
             {
-                
-                SendPacket(message);
-            }
-
-            Msg_mission_item landMessage = new Msg_mission_item()
-            {
-                target_system       = SYSTEM_ID,
-                target_component    = COMPONENT_ID,
-                command             = (byte) MAV_CMD.MAV_CMD_NAV_TAKEOFF,
-                frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-                autocontinue        = 1,
-                current             = 0,
-                seq                 = (ushort) (missionCount + 2)
+                target_system   = SYSTEM_ID,
+                base_mode       = (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
+                custom_mode     = ((uint) PX4FlightMode.OFFBOARD << 16) + (uint) PX4FlightSubMode.MISSION
             };
-            SendPacket(landMessage);
-            */
+            SendPacket(message);
         }
 
         /*
@@ -424,6 +504,27 @@ namespace MAVLink.NET
         */
 
         /**
+         * https://mavlink.io/en/messages/common.html#MAV_CMD_DO_SET_HOME
+         */
+        private void SetCurrentPositionAsHome()
+        {
+            Msg_command_long message = new Msg_command_long()
+            {
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID,
+                command             = (byte) MAV_CMD.MAV_CMD_DO_SET_HOME,
+                param1              = 1     // Use current (1 = use current location, 0 = use specified location)
+                // param2: Empty
+                // param3: Empty
+                // param4: Empty
+                // param5: Latitude,
+                // param6: Longitude,
+                // param7: Altitude
+            };
+            SendPacket(message);
+        }
+
+        /**
          * https://mavlink.io/en/messages/common.html#MAV_CMD_NAV_TAKEOFF
          */
         public void TakeoffCommand()
@@ -434,13 +535,13 @@ namespace MAVLink.NET
                 command             = (ushort) MAV_CMD.MAV_CMD_NAV_TAKEOFF,
                 target_system       = SYSTEM_ID,
                 target_component    = COMPONENT_ID,
-                // param1
+                param1              = 2.5f, // Minimum pitch
                 // param2
-                // param3: horizontal navigation by pilot acceptable
+                param3              = 1f,   // horizontal navigation by pilot acceptable
                 // param4: yaw angle    (not supported)
                 // param5: latitude     (not supported)
                 // param6: longitude    (not supported)
-                param7              = 5 // altitude     [meters]
+                param7              = 5     // altitude [meters]
             };
             /*/
             Msg_command_long message = new Msg_command_long()
@@ -459,6 +560,8 @@ namespace MAVLink.NET
             };
             //*/
             SendPacket(message);
+
+            ArmDisarmCommand(true);
         }
 
         /**
@@ -503,7 +606,7 @@ namespace MAVLink.NET
             /*/
             Msg_command_long message = new Msg_command_long()
             {
-                command             = (ushort)MAV_CMD.MAV_CMD_NAV_WAYPOINT,
+                command             = (ushort) MAV_CMD.MAV_CMD_NAV_WAYPOINT,
                 target_system       = SYSTEM_ID,
                 target_component    = COMPONENT_ID,
                 // param1: Hold time in decimal seconds. (ignored by fixed wing, time to stay at waypoint for rotary wing)

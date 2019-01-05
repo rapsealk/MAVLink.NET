@@ -19,12 +19,17 @@ namespace MAVLink.NET
         {
             InitializeComponent();
 
+            FlightModeComboBox.Items.AddRange(MAVLinkNode.PX4Mode);
+
             MAVManager = new MAVLinkManager();
-            node1 = MAVManager.RegisterAgent("COM10", 57600);
+            //*
+            node1 = MAVManager.RegisterAgent("COM12", 57600);
 
             MAVManager.Open(0);
 
             UpdateMAVPosition();
+            /*/
+            //*/
         }
 
         private void ArmButton_Click(object sender, EventArgs e)
@@ -62,10 +67,17 @@ namespace MAVLink.NET
                     Vector3 position = node1.Position;
                     try
                     {
-                        LatitudeLabel.BeginInvoke((Action)delegate () { LatitudeLabel.Text = String.Format("{0:f}", position.X); });
-                        LongitudeLabel.BeginInvoke((Action)delegate () { LongitudeLabel.Text = String.Format("{0:f}", position.Y); });
-                        StatusMessageLabel.BeginInvoke((Action)delegate () { StatusMessageLabel.Text = node1.StatusMessage; });
-                        CommandResultMessageLabel.BeginInvoke((Action)delegate () { CommandResultMessageLabel.Text = node1.CommandResultMessage; });
+                        LatitudeLabel.BeginInvoke((Action) delegate () { LatitudeLabel.Text = String.Format("{0:f6}", position.X); });
+                        LongitudeLabel.BeginInvoke((Action) delegate () { LongitudeLabel.Text = String.Format("{0:f6}", position.Y); });
+                        AltitudeLabel.BeginInvoke((Action) delegate () { AltitudeLabel.Text = String.Format("{0:f6}", position.Z); });
+                        RollLabel.BeginInvoke((Action) delegate () { RollLabel.Text = String.Format("{0:f2}", node1.Roll); });
+                        PitchLabel.BeginInvoke((Action) delegate () { PitchLabel.Text = String.Format("{0:f2}", node1.Pitch); });
+                        YawLabel.BeginInvoke((Action) delegate () { YawLabel.Text = String.Format("{0:f2}", node1.Yaw); });
+                        BatteryLabel.BeginInvoke((Action) delegate () { BatteryLabel.Text = String.Format("{0:d}", node1.BatteryPercentage); });
+                        FlightModeLabel.BeginInvoke((Action) delegate () { FlightModeLabel.Text = node1.FlightMode; });
+                        SubModeLabel.BeginInvoke((Action) delegate () { SubModeLabel.Text = node1.SubMode; });
+                        StatusMessageLabel.BeginInvoke((Action) delegate () { StatusMessageLabel.Text = node1.StatusMessage; });
+                        CommandResultMessageLabel.BeginInvoke((Action) delegate () { CommandResultMessageLabel.Text = node1.CommandResultMessage; });
                     }
                     catch (InvalidOperationException e)
                     {
@@ -82,6 +94,19 @@ namespace MAVLink.NET
             ClearMissionButton.BeginInvoke((Action) delegate () { ClearMissionButton.Enabled = false; });
             node1.ClearMission();
             ClearMissionButton.BeginInvoke((Action) delegate () { ClearMissionButton.Enabled = true; });
+        }
+
+        private void MissionStartButton_Click(object sender, EventArgs e)
+        {
+            node1.StartMission();
+        }
+
+        private void FlightModeButton_Click(object sender, EventArgs e)
+        {
+            uint index = (uint) FlightModeComboBox.SelectedIndex;
+            if (index == 0) return;
+
+            node1.SetFlightMode(index);
         }
     }
 }
