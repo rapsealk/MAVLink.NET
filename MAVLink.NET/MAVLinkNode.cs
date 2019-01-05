@@ -308,11 +308,12 @@ namespace MAVLink.NET
             SendPacket(message);
         }
 
-        public void ArmDisarmCommand(bool target_arm, System.Windows.Forms.Button button)
+        public void ArmDisarmCommand(bool target_arm, System.Windows.Forms.Button button = null)
         {
             System.Threading.Thread thread = new System.Threading.Thread(() =>
             {
-                button.BeginInvoke((Action) delegate () { button.Enabled = false; });
+                if (button != null)
+                    button.BeginInvoke((Action) delegate () { button.Enabled = false; });
 
                 Msg_command_long message = new Msg_command_long()
                 {
@@ -329,7 +330,8 @@ namespace MAVLink.NET
                     System.Threading.Thread.Sleep(1000);
                 } while (target_arm ^ (_is_armed == 0b1000_0000) && ++trial < 5);
 
-                button.BeginInvoke((Action) delegate () { button.Enabled = true; });
+                if (button != null)
+                    button.BeginInvoke((Action) delegate () { button.Enabled = true; });
             });
             thread.Start();
         }
@@ -553,7 +555,7 @@ namespace MAVLink.NET
                 // param4: yaw angle    (not supported)
                 // param5: latitude     (not supported)
                 // param6: longitude    (not supported)
-                param7              = 20    // altitude [meters]
+                param7              = 5     // altitude [meters]
             };
             /*/
             Msg_command_long message = new Msg_command_long()
@@ -572,6 +574,8 @@ namespace MAVLink.NET
             };
             //*/
             SendPacket(message);
+
+            ArmDisarmCommand(true);
         }
 
         /**
