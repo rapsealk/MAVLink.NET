@@ -405,7 +405,7 @@
             this.DroneTag_01.Name = "DroneTag_01";
             this.DroneTag_01.Size = new System.Drawing.Size(155, 24);
             this.DroneTag_01.TabIndex = 29;
-            this.DroneTag_01.Text = "DroneTag #1";
+            this.DroneTag_01.Text = "DroneTag #0";
             // 
             // TakeoffButton_02
             // 
@@ -692,7 +692,7 @@
             this.DroneTag_02.Name = "DroneTag_02";
             this.DroneTag_02.Size = new System.Drawing.Size(155, 24);
             this.DroneTag_02.TabIndex = 29;
-            this.DroneTag_02.Text = "DroneTag #2";
+            this.DroneTag_02.Text = "DroneTag #0";
             // 
             // TakeoffButton_03
             // 
@@ -979,7 +979,7 @@
             this.DroneTag_03.Name = "DroneTag_03";
             this.DroneTag_03.Size = new System.Drawing.Size(155, 24);
             this.DroneTag_03.TabIndex = 29;
-            this.DroneTag_03.Text = "DroneTag #3";
+            this.DroneTag_03.Text = "DroneTag #0";
             //
             // FIXME
             //
@@ -1010,6 +1010,8 @@
             SubModeLabels = new System.Windows.Forms.Label[] { SubModeLabel_01, SubModeLabel_02, SubModeLabel_03 };
             FlightModeComboBoxes = new System.Windows.Forms.ComboBox[] { FlightModeComboBox_01, FlightModeComboBox_02, FlightModeComboBox_03 };
             FlightModeButtons = new System.Windows.Forms.Button[] { FlightModeButton_01, FlightModeButton_02, FlightModeButton_03 };
+
+            DroneTags = new System.Windows.Forms.Label[] { DroneTag_01, DroneTag_02, DroneTag_03 };
             // 
             // Form1
             // 
@@ -1228,7 +1230,7 @@
         private System.Windows.Forms.Label[] SubModeLabels;
         private System.Windows.Forms.ComboBox[] FlightModeComboBoxes;
         private System.Windows.Forms.Button[] FlightModeButtons;
-
+        private System.Windows.Forms.Label[] DroneTags;
     }
 }
 

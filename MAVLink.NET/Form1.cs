@@ -156,21 +156,21 @@ namespace MAVLink.NET
 
         private void FlightModeButton_Click_01(object sender, EventArgs e)
         {
-            uint index = (uint)FlightModeComboBox_01.SelectedIndex;
+            uint index = (uint) FlightModeComboBox_01.SelectedIndex;
             if (index == 0) return;
 
             nodes[0].SetFlightMode(index);
         }
         private void FlightModeButton_Click_02(object sender, EventArgs e)
         {
-            uint index = (uint)FlightModeComboBox_01.SelectedIndex;
+            uint index = (uint) FlightModeComboBox_01.SelectedIndex;
             if (index == 0) return;
 
             nodes[1].SetFlightMode(index);
         }
         private void FlightModeButton_Click_03(object sender, EventArgs e)
         {
-            uint index = (uint)FlightModeComboBox_01.SelectedIndex;
+            uint index = (uint) FlightModeComboBox_01.SelectedIndex;
             if (index == 0) return;
 
             nodes[2].SetFlightMode(index);
@@ -200,6 +200,8 @@ namespace MAVLink.NET
                             SubModeLabels[i].BeginInvoke((Action) delegate () { SubModeLabels[i].Text = nodes[i].SubMode; });
                             StatusMessageLabels[i].BeginInvoke((Action) delegate () { StatusMessageLabels[i].Text = nodes[i].StatusMessage; });
                             CommandResultMessageLabels[i].BeginInvoke((Action) delegate () { CommandResultMessageLabels[i].Text = nodes[i].CommandResultMessage; });
+
+                            DroneTags[i].BeginInvoke((Action) delegate () { DroneTags[i].Text = String.Format("DroneTag #{0:d}", nodes[i].SYSTEM_ID); });
                         }
                         catch (InvalidOperationException e)
                         {
