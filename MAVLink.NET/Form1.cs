@@ -13,100 +13,203 @@ namespace MAVLink.NET
     public partial class Form1 : Form
     {
         private MAVLinkManager MAVManager;
-        private MAVLinkNode node1;
+        private MAVLinkNode[] nodes;
 
         public Form1()
         {
             InitializeComponent();
 
-            FlightModeComboBox.Items.AddRange(MAVLinkNode.PX4Mode);
+            foreach (ComboBox flightModeComboBox in FlightModeComboBoxes)
+                flightModeComboBox.Items.AddRange(MAVLinkNode.PX4Mode);
 
             MAVManager = new MAVLinkManager();
+
+            string[] portNames = System.IO.Ports.SerialPort.GetPortNames();
+
+            if (portNames.Length < 3)
+            {
+                Console.Error.WriteLine("Not enough serial ports are ready.");
+                Console.Error.WriteLine("Program is gonna be terminated..");
+
+                this.Close();
+                return;
+            }
+
             //*
-            node1 = MAVManager.RegisterAgent("COM12", 57600);
-
-            MAVManager.Open(0);
-
-            UpdateMAVPosition();
+            int count = 0;
+            nodes = new MAVLinkNode[3];
+            foreach (string portName in portNames.Reverse())
+            {
+                nodes[count++] = MAVManager.RegisterAgent(portName, 57600);
+                if (count == nodes.Length) break;
+            }
             /*/
+            UpdateUI();
             //*/
         }
 
-        private void ArmButton_Click(object sender, EventArgs e)
+        /* TODO: Lambda Generator
+        private Func<object, EventArgs, bool> ArmButton_Click_Generator(int index) {
+            return (sender, e) => nodes[index].ArmDisarmCommand(true, ArmButtons[index]);
+        }
+        */
+
+        private void ArmButton_Click_01(object sender, EventArgs e)
         {
-            node1.ArmDisarmCommand(true, ArmButton);
+            nodes[0].ArmDisarmCommand(true, ArmButton_01);
+        }
+        private void ArmButton_Click_02(object sender, EventArgs e)
+        {
+            nodes[1].ArmDisarmCommand(true, ArmButton_01);
+        }
+        private void ArmButton_Click_03(object sender, EventArgs e)
+        {
+            nodes[2].ArmDisarmCommand(true, ArmButton_01);
         }
         
-        private void DisarmButton_Click(object sender, EventArgs e)
+        private void DisarmButton_Click_01(object sender, EventArgs e)
         {
-            node1.ArmDisarmCommand(false, DisarmButton);
+            nodes[0].ArmDisarmCommand(false, DisarmButton_01);
+        }
+        private void DisarmButton_Click_02(object sender, EventArgs e)
+        {
+            nodes[1].ArmDisarmCommand(false, DisarmButton_01);
+        }
+        private void DisarmButton_Click_03(object sender, EventArgs e)
+        {
+            nodes[2].ArmDisarmCommand(false, DisarmButton_01);
         }
 
-        private void TakeoffButton_Click(object sender, EventArgs e)
+        private void TakeoffButton_Click_01(object sender, EventArgs e)
         {
-            node1.TakeoffCommand();
+            nodes[0].TakeoffCommand();
+        }
+        private void TakeoffButton_Click_02(object sender, EventArgs e)
+        {
+            nodes[1].TakeoffCommand();
+        }
+        private void TakeoffButton_Click_03(object sender, EventArgs e)
+        {
+            nodes[2].TakeoffCommand();
         }
 
-        private void LandButton_Click(object sender, EventArgs e)
+        private void LandButton_Click_01(object sender, EventArgs e)
         {
-            node1.LandCommand();
+            nodes[0].LandCommand();
+        }
+        private void LandButton_Click_02(object sender, EventArgs e)
+        {
+            nodes[1].LandCommand();
+        }
+        private void LandButton_Click_03(object sender, EventArgs e)
+        {
+            nodes[2].LandCommand();
         }
 
-        private void MissionUploadButton_Click(object sender, EventArgs e)
+        private void MissionUploadButton_Click_01(object sender, EventArgs e)
         {
             // node1.NextWP(0, 0);
-            node1.UploadMission();
+            nodes[0].UploadMission();
+        }
+        private void MissionUploadButton_Click_02(object sender, EventArgs e)
+        {
+            // node1.NextWP(0, 0);
+            nodes[1].UploadMission();
+        }
+        private void MissionUploadButton_Click_03(object sender, EventArgs e)
+        {
+            // node1.NextWP(0, 0);
+            nodes[2].UploadMission();
         }
 
-        private void UpdateMAVPosition()
+        private void ClearMissionButton_Click_01(object sender, EventArgs e)
+        {
+            ClearMissionButton_01.BeginInvoke((Action) delegate () { ClearMissionButton_01.Enabled = false; });
+            nodes[0].ClearMission();
+            ClearMissionButton_01.BeginInvoke((Action) delegate () { ClearMissionButton_01.Enabled = true; });
+        }
+        private void ClearMissionButton_Click_02(object sender, EventArgs e)
+        {
+            ClearMissionButton_02.BeginInvoke((Action) delegate () { ClearMissionButton_02.Enabled = false; });
+            nodes[1].ClearMission();
+            ClearMissionButton_02.BeginInvoke((Action) delegate () { ClearMissionButton_02.Enabled = true; });
+        }
+        private void ClearMissionButton_Click_03(object sender, EventArgs e)
+        {
+            ClearMissionButton_03.BeginInvoke((Action) delegate () { ClearMissionButton_03.Enabled = false; });
+            nodes[2].ClearMission();
+            ClearMissionButton_03.BeginInvoke((Action) delegate () { ClearMissionButton_03.Enabled = true; });
+        }
+
+        private void MissionStartButton_Click_01(object sender, EventArgs e)
+        {
+            nodes[0].StartMission();
+        }
+        private void MissionStartButton_Click_02(object sender, EventArgs e)
+        {
+            nodes[1].StartMission();
+        }
+        private void MissionStartButton_Click_03(object sender, EventArgs e)
+        {
+            nodes[2].StartMission();
+        }
+
+        private void FlightModeButton_Click_01(object sender, EventArgs e)
+        {
+            uint index = (uint)FlightModeComboBox_01.SelectedIndex;
+            if (index == 0) return;
+
+            nodes[0].SetFlightMode(index);
+        }
+        private void FlightModeButton_Click_02(object sender, EventArgs e)
+        {
+            uint index = (uint)FlightModeComboBox_01.SelectedIndex;
+            if (index == 0) return;
+
+            nodes[1].SetFlightMode(index);
+        }
+        private void FlightModeButton_Click_03(object sender, EventArgs e)
+        {
+            uint index = (uint)FlightModeComboBox_01.SelectedIndex;
+            if (index == 0) return;
+
+            nodes[2].SetFlightMode(index);
+        }
+
+        private void UpdateUI()
         {
             System.Threading.Thread thread = new System.Threading.Thread(() => {
                 while (true)
                 {
                     System.Threading.Thread.Sleep(1000);
-                    Vector3 position = node1.Position;
-                    try
+
+                    for (int i = 0; i < nodes.Length; i++)
                     {
-                        LatitudeLabel.BeginInvoke((Action) delegate () { LatitudeLabel.Text = String.Format("{0:f6}", position.X); });
-                        LongitudeLabel.BeginInvoke((Action) delegate () { LongitudeLabel.Text = String.Format("{0:f6}", position.Y); });
-                        AltitudeLabel.BeginInvoke((Action) delegate () { AltitudeLabel.Text = String.Format("{0:f6}", position.Z); });
-                        RollLabel.BeginInvoke((Action) delegate () { RollLabel.Text = String.Format("{0:f2}", node1.Roll); });
-                        PitchLabel.BeginInvoke((Action) delegate () { PitchLabel.Text = String.Format("{0:f2}", node1.Pitch); });
-                        YawLabel.BeginInvoke((Action) delegate () { YawLabel.Text = String.Format("{0:f2}", node1.Yaw); });
-                        BatteryLabel.BeginInvoke((Action) delegate () { BatteryLabel.Text = String.Format("{0:d}", node1.BatteryPercentage); });
-                        FlightModeLabel.BeginInvoke((Action) delegate () { FlightModeLabel.Text = node1.FlightMode; });
-                        SubModeLabel.BeginInvoke((Action) delegate () { SubModeLabel.Text = node1.SubMode; });
-                        StatusMessageLabel.BeginInvoke((Action) delegate () { StatusMessageLabel.Text = node1.StatusMessage; });
-                        CommandResultMessageLabel.BeginInvoke((Action) delegate () { CommandResultMessageLabel.Text = node1.CommandResultMessage; });
-                    }
-                    catch (InvalidOperationException e)
-                    {
-                        Console.Error.WriteLine(e.Message);
-                        break;
+                        Vector3 position = nodes[i].Position;
+
+                        try
+                        {
+                            LatitudeLabels[i].BeginInvoke((Action) delegate () { LatitudeLabels[i].Text = String.Format("{0:f6}", position.X); });
+                            LongitudeLabels[i].BeginInvoke((Action) delegate () { LongitudeLabels[i].Text = String.Format("{0:f6}", position.Y); });
+                            AltitudeLabels[i].BeginInvoke((Action) delegate () { AltitudeLabels[i].Text = String.Format("{0:f6}", position.Z); });
+                            RollLabels[i].BeginInvoke((Action) delegate () { RollLabels[i].Text = String.Format("{0:f2}", nodes[i].Roll); });
+                            PitchLabels[i].BeginInvoke((Action) delegate () { PitchLabels[i].Text = String.Format("{0:f2}", nodes[i].Pitch); });
+                            YawLabels[i].BeginInvoke((Action) delegate () { YawLabels[i].Text = String.Format("{0:f2}", nodes[i].Yaw); });
+                            BatteryLabels[i].BeginInvoke((Action) delegate () { BatteryLabels[i].Text = String.Format("{0:f2}", nodes[i].BatteryPercentage); });
+                            FlightModeLabels[i].BeginInvoke((Action) delegate () { FlightModeLabels[i].Text = nodes[i].FlightMode; });
+                            SubModeLabels[i].BeginInvoke((Action) delegate () { SubModeLabels[i].Text = nodes[i].SubMode; });
+                            StatusMessageLabels[i].BeginInvoke((Action) delegate () { StatusMessageLabels[i].Text = nodes[i].StatusMessage; });
+                            CommandResultMessageLabels[i].BeginInvoke((Action) delegate () { CommandResultMessageLabels[i].Text = nodes[i].CommandResultMessage; });
+                        }
+                        catch (InvalidOperationException e)
+                        {
+                            Console.Error.WriteLine(e.Message);
+                            // break;
+                        }
                     }
                 }
             });
             thread.Start();
-        }
-
-        private void ClearMissionButton_Click(object sender, EventArgs e)
-        {
-            ClearMissionButton.BeginInvoke((Action) delegate () { ClearMissionButton.Enabled = false; });
-            node1.ClearMission();
-            ClearMissionButton.BeginInvoke((Action) delegate () { ClearMissionButton.Enabled = true; });
-        }
-
-        private void MissionStartButton_Click(object sender, EventArgs e)
-        {
-            node1.StartMission();
-        }
-
-        private void FlightModeButton_Click(object sender, EventArgs e)
-        {
-            uint index = (uint) FlightModeComboBox.SelectedIndex;
-            if (index == 0) return;
-
-            node1.SetFlightMode(index);
         }
     }
 }

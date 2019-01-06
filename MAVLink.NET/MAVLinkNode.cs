@@ -308,7 +308,7 @@ namespace MAVLink.NET
             SendPacket(message);
         }
 
-        public void ArmDisarmCommand(bool target_arm, System.Windows.Forms.Button button = null)
+        public bool ArmDisarmCommand(bool target_arm, System.Windows.Forms.Button button = null)
         {
             System.Threading.Thread thread = new System.Threading.Thread(() =>
             {
@@ -334,6 +334,8 @@ namespace MAVLink.NET
                     button.BeginInvoke((Action) delegate () { button.Enabled = true; });
             });
             thread.Start();
+
+            return thread.IsAlive;
         }
 
         /*
