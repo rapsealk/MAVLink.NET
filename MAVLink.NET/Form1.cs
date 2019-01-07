@@ -70,6 +70,8 @@ namespace MAVLink.NET
                         LatitudeLabel.BeginInvoke((Action) delegate () { LatitudeLabel.Text = String.Format("{0:f6}", position.X); });
                         LongitudeLabel.BeginInvoke((Action) delegate () { LongitudeLabel.Text = String.Format("{0:f6}", position.Y); });
                         AltitudeLabel.BeginInvoke((Action) delegate () { AltitudeLabel.Text = String.Format("{0:f6}", position.Z); });
+                        HomeLatitudeLabel.BeginInvoke((Action) delegate () { HomeLatitudeLabel.Text = String.Format("{0:f6}", node1.HomePosition.X); });
+                        HomeLongitudeLabel.BeginInvoke((Action) delegate () { HomeLongitudeLabel.Text = String.Format("{0:f6}", node1.HomePosition.Y); });
                         RollLabel.BeginInvoke((Action) delegate () { RollLabel.Text = String.Format("{0:f2}", node1.Roll); });
                         PitchLabel.BeginInvoke((Action) delegate () { PitchLabel.Text = String.Format("{0:f2}", node1.Pitch); });
                         YawLabel.BeginInvoke((Action) delegate () { YawLabel.Text = String.Format("{0:f2}", node1.Yaw); });
@@ -115,6 +117,11 @@ namespace MAVLink.NET
             double longitude = double.Parse(LongitudeTextBox.Text);
 
             node1.NextWP(latitude, longitude);
+        }
+
+        private void HomeButton_Click(object sender, EventArgs e)
+        {
+            node1.SetCurrentPositionAsHome();
         }
     }
 }

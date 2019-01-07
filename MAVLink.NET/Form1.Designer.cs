@@ -60,6 +60,9 @@
             this.LatitudeTextBox = new System.Windows.Forms.TextBox();
             this.LongitudeTextBox = new System.Windows.Forms.TextBox();
             this.WaypointButton = new System.Windows.Forms.Button();
+            this.HomeLatitudeLabel = new System.Windows.Forms.Label();
+            this.HomeLongitudeLabel = new System.Windows.Forms.Label();
+            this.HomeButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // TakeoffButton
@@ -360,11 +363,42 @@
             this.WaypointButton.UseVisualStyleBackColor = true;
             this.WaypointButton.Click += new System.EventHandler(this.WaypointButton_Click);
             // 
+            // HomeLatitudeLabel
+            // 
+            this.HomeLatitudeLabel.AutoSize = true;
+            this.HomeLatitudeLabel.Location = new System.Drawing.Point(551, 119);
+            this.HomeLatitudeLabel.Name = "HomeLatitudeLabel";
+            this.HomeLatitudeLabel.Size = new System.Drawing.Size(113, 12);
+            this.HomeLatitudeLabel.TabIndex = 32;
+            this.HomeLatitudeLabel.Text = "HomeLatitudeLabel";
+            // 
+            // HomeLongitudeLabel
+            // 
+            this.HomeLongitudeLabel.AutoSize = true;
+            this.HomeLongitudeLabel.Location = new System.Drawing.Point(551, 147);
+            this.HomeLongitudeLabel.Name = "HomeLongitudeLabel";
+            this.HomeLongitudeLabel.Size = new System.Drawing.Size(124, 12);
+            this.HomeLongitudeLabel.TabIndex = 33;
+            this.HomeLongitudeLabel.Text = "HomeLongitudeLabel";
+            // 
+            // HomeButton
+            // 
+            this.HomeButton.Location = new System.Drawing.Point(693, 118);
+            this.HomeButton.Name = "HomeButton";
+            this.HomeButton.Size = new System.Drawing.Size(75, 41);
+            this.HomeButton.TabIndex = 34;
+            this.HomeButton.Text = "Update Home";
+            this.HomeButton.UseVisualStyleBackColor = true;
+            this.HomeButton.Click += new System.EventHandler(this.HomeButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.HomeButton);
+            this.Controls.Add(this.HomeLongitudeLabel);
+            this.Controls.Add(this.HomeLatitudeLabel);
             this.Controls.Add(this.WaypointButton);
             this.Controls.Add(this.LongitudeTextBox);
             this.Controls.Add(this.LatitudeTextBox);
@@ -438,6 +472,9 @@
         private System.Windows.Forms.TextBox LatitudeTextBox;
         private System.Windows.Forms.TextBox LongitudeTextBox;
         private System.Windows.Forms.Button WaypointButton;
+        private System.Windows.Forms.Label HomeLatitudeLabel;
+        private System.Windows.Forms.Label HomeLongitudeLabel;
+        private System.Windows.Forms.Button HomeButton;
     }
 }
 

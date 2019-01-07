@@ -55,6 +55,7 @@ namespace MAVLink.NET
         private Msg_gps_raw_int             mGPS                    = new Msg_gps_raw_int();
         private Msg_gps_rtk                 mRTK                    = new Msg_gps_rtk();
         private Msg_vfr_hud                 mVfr                    = new Msg_vfr_hud();   // heading, altitude
+        private Msg_home_position           mHomePosition           = new Msg_home_position();
         private Msg_raw_pressure            mRawPressure            = new Msg_raw_pressure();
         private Msg_scaled_pressure         mScaledPressure         = new Msg_scaled_pressure();
         private Msg_command_ack             mCommandAck             = new Msg_command_ack();
@@ -90,6 +91,7 @@ namespace MAVLink.NET
          * Variables for agent's location.
          */
         public Vector3 Position;
+        public Vector3 HomePosition;
         public static double pRatio = 10 * 1000 * 1000; // 10_000_000
 
         private ulong Gtimestamp = 0;
@@ -107,6 +109,7 @@ namespace MAVLink.NET
             mavlink.PacketReceived += OnMAVPacketReceive;
 
             Position = new Vector3();
+            HomePosition = new Vector3();
             Direction = new Vector3();
 
             this.SYSTEM_ID      = SYSTEM_ID;
@@ -241,6 +244,12 @@ namespace MAVLink.NET
             }
             else if (message.GetType() == mVfr.GetType())
                 mVfr = (Msg_vfr_hud) message;
+            else if (message.GetType() == mHomePosition.GetType())
+            {
+                mHomePosition = (Msg_home_position) message;
+                HomePosition.X = mHomePosition.latitude / pRatio;
+                HomePosition.Y = mHomePosition.longitude / pRatio;
+            }
             else if (message.GetType() == mRawPressure.GetType())
                 mRawPressure = (Msg_raw_pressure) message;
             else if (message.GetType() == mScaledPressure.GetType())    // TODO: Log press_abs, temperature, press_diff
@@ -332,7 +341,7 @@ namespace MAVLink.NET
                 {
                     SendPacket(message);
                     System.Threading.Thread.Sleep(1000);
-                } while (target_arm ^ (_is_armed == 0b1000_0000) && ++trial < 5);
+                } while (target_arm ^ (_is_armed == 128 /* 0b1000_0000 */) && ++trial < 5);
 
                 if (button != null)
                     button.BeginInvoke((Action) delegate () { button.Enabled = true; });
@@ -501,36 +510,20 @@ namespace MAVLink.NET
                 target_system       = SYSTEM_ID,
                 target_component    = COMPONENT_ID,
                 command             = (byte) MAV_CMD.MAV_CMD_DO_SET_HOME,
-                param1              = 1,
-                param2              = 0,
-                param3              = 0,
-                param4              = 0,
-                param5              = latitude,
-                param6              = longitude,
-                param7              = altitude
+                param1              = 1,            // Use current (1 = use current location, 0 = use specified location)
+                param2              = 0,            // Empty
+                param3              = 0,            // Empty
+                param4              = 0,            // Empty
+                param5              = latitude,     // Latitude
+                param6              = longitude,    // Longitude
+                param7              = altitude      // Altitude
             };
             SendPacket(message);
         }
         
-        private void SetCurrentPositionAsHome()
+        public void SetCurrentPositionAsHome()
         {
             UpdateHomeCommand((float) Position.X, (float) Position.Y);
-            /*
-            Msg_command_long message = new Msg_command_long()
-            {
-                target_system       = SYSTEM_ID,
-                target_component    = COMPONENT_ID,
-                command             = (byte) MAV_CMD.MAV_CMD_DO_SET_HOME,
-                param1              = 1     // Use current (1 = use current location, 0 = use specified location)
-                // param2: Empty
-                // param3: Empty
-                // param4: Empty
-                // param5: Latitude,
-                // param6: Longitude,
-                // param7: Altitude
-            };
-            SendPacket(message);
-            */
         }
 
         /**
@@ -625,8 +618,16 @@ namespace MAVLink.NET
                 param6              = (float) longitude,    // Longitude
                 param7              = 5                     // Altitude
             };
+            Msg_set_position_target_global_int message2 = new Msg_set_position_target_global_int()
+            {
+                target_system = SYSTEM_ID,
+                target_component = COMPONENT_ID,
+                coordinate_frame = (byte)MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,
+                lat_int = (int)(latitude * pRatio),
+                lon_int = (int)(longitude * pRatio)
+            };
             //*/
-            SendPacket(message);
+            SendPacket(message2);
         }
     }
 }
