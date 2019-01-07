@@ -64,6 +64,23 @@ namespace MAVLink.NET
             node.heartbeatWorker.RunWorkerAsync();
         }
 
+        public void Close(int index=0)
+        {
+            MAVLinkNode node = MAVLinkNodes[index];
+
+            node.heartbeatWorker.Dispose();
+
+            try
+            {
+                if (node.Serial.IsOpen)
+                    node.Serial.Close();
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e.Message);
+            }
+        }
+
         /**
          * 
          */

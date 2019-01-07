@@ -39,7 +39,7 @@ namespace MAVLink.NET
 
         private Mavlink mavlink;
 
-        public System.IO.Ports.SerialPort Serial;
+        public System.IO.Ports.SerialPort Serial { get; private set; }
         public System.ComponentModel.BackgroundWorker heartbeatWorker;
 
         public byte SYSTEM_ID;
@@ -60,6 +60,7 @@ namespace MAVLink.NET
         private Msg_command_ack             mCommandAck             = new Msg_command_ack();
         private Msg_statustext              mStatusText             = new Msg_statustext();
         private Msg_mission_count           mMissionCount           = new Msg_mission_count();
+        private Msg_mission_current         mMissionCurrent         = new Msg_mission_current();
         private Msg_mission_request         mMissionRequest         = new Msg_mission_request();
         private Msg_mission_ack             mMissionAck             = new Msg_mission_ack();
         private Msg_mission_item_reached    mMissionItemReached     = new Msg_mission_item_reached();
@@ -73,6 +74,7 @@ namespace MAVLink.NET
 
         private Msg_mission_item[] MissionItems = new Msg_mission_item[32];
         private int MissionItemCount = 0;
+        private ushort MissionCurrentSequence = 0;
 
         public string FlightMode            = "null";
         public string SubMode               = "null";
@@ -84,6 +86,8 @@ namespace MAVLink.NET
         public float Pitch  = 0f;
         public float Yaw    = 0f;
 
+        public short HeadingDirection = 0;
+
         private static float Radian = (float) (180 / Math.PI);
 
         /**
@@ -92,10 +96,14 @@ namespace MAVLink.NET
         public Vector3 Position;
         public static double pRatio = 10 * 1000 * 1000; // 10_000_000
 
+        public ulong Gtimestamp     = 0;        // GPS UNIX Timestamp
+        public byte SatelliteNumber = 0;        // Number of visible Satellite
+
         /**
          * Variables for desired direction.
          */
         public Vector3 Direction;
+
 
         public MAVLinkNode(string port, int baud, byte SYSTEM_ID=1, byte COMPONENT_ID=1)
         {
@@ -205,6 +213,8 @@ namespace MAVLink.NET
                 Position.X = mGPS.lat / pRatio;
                 Position.Y = mGPS.lon / pRatio;
                 Position.Z = mGPS.alt / pRatio;
+                Gtimestamp = mGPS.time_usec;
+                SatelliteNumber = mGPS.satellites_visible;
 #if MYSQL
                 // MySQL Update Query
                 MySql.Data.MySqlClient.MySqlConnection conn = DatabaseManager.GetConnection();
@@ -236,7 +246,10 @@ namespace MAVLink.NET
                 mRTK = (Msg_gps_rtk) message;
             }
             else if (message.GetType() == mVfr.GetType())
+            {
                 mVfr = (Msg_vfr_hud) message;
+                HeadingDirection = mVfr.heading;
+            }
             else if (message.GetType() == mRawPressure.GetType())
                 mRawPressure = (Msg_raw_pressure) message;
             else if (message.GetType() == mScaledPressure.GetType())    // TODO: Log press_abs, temperature, press_diff
@@ -248,8 +261,15 @@ namespace MAVLink.NET
             }
             else if (message.GetType() == mStatusText.GetType())        // TODO: System status message
                 mStatusText = (Msg_statustext) message;
-            //else if (message.GetType() == mMissionCount.GetType())      // TODO: Handle mission
-            //    mMissionCount = (Msg_mission_count) message;
+            else if (message.GetType() == mMissionCount.GetType())      // TODO: Handle mission
+            {
+                mMissionCount = (Msg_mission_count) message;
+            }
+            else if (message.GetType() == mMissionCurrent.GetType())
+            {
+                mMissionCurrent = (Msg_mission_current) message;
+                MissionCurrentSequence = mMissionCurrent.seq;
+            }
             else if (message.GetType() == mMissionRequest.GetType())
             {
                 mMissionRequest = (Msg_mission_request) message;

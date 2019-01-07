@@ -60,11 +60,11 @@ namespace MAVLink.NET
         }
         private void ArmButton_Click_02(object sender, EventArgs e)
         {
-            nodes[1].ArmDisarmCommand(true, ArmButton_01);
+            nodes[1].ArmDisarmCommand(true, ArmButton_02);
         }
         private void ArmButton_Click_03(object sender, EventArgs e)
         {
-            nodes[2].ArmDisarmCommand(true, ArmButton_01);
+            nodes[2].ArmDisarmCommand(true, ArmButton_03);
         }
         
         private void DisarmButton_Click_01(object sender, EventArgs e)
@@ -73,11 +73,11 @@ namespace MAVLink.NET
         }
         private void DisarmButton_Click_02(object sender, EventArgs e)
         {
-            nodes[1].ArmDisarmCommand(false, DisarmButton_01);
+            nodes[1].ArmDisarmCommand(false, DisarmButton_02);
         }
         private void DisarmButton_Click_03(object sender, EventArgs e)
         {
-            nodes[2].ArmDisarmCommand(false, DisarmButton_01);
+            nodes[2].ArmDisarmCommand(false, DisarmButton_03);
         }
 
         private void TakeoffButton_Click_01(object sender, EventArgs e)
