@@ -400,9 +400,9 @@ namespace MAVLink.NET
 
             SetCurrentPositionAsHome();
 
-            MAV_CMD[] commands = new MAV_CMD[] { MAV_CMD.MAV_CMD_NAV_TAKEOFF, MAV_CMD.MAV_CMD_NAV_WAYPOINT, MAV_CMD.MAV_CMD_NAV_WAYPOINT, MAV_CMD.MAV_CMD_NAV_LAND };
-            float[] xs = new float[] { 37.599158f, 37.599202f, 37.599246f, 37.599290f };
-            float[] ys = new float[] { 126.863608f, 126.863422f, 126.863236f, 126.863050f };
+            MAV_CMD[] commands = new MAV_CMD[] { /*MAV_CMD.MAV_CMD_NAV_TAKEOFF,*/ MAV_CMD.MAV_CMD_NAV_WAYPOINT, MAV_CMD.MAV_CMD_NAV_WAYPOINT, MAV_CMD.MAV_CMD_NAV_WAYPOINT, MAV_CMD.MAV_CMD_NAV_LAND };
+            float[] xs = new float[] { /*37.599158f,*/ 37.599192f, 37.599243f, 37.599226f, 37.599226f };
+            float[] ys = new float[] { /*126.863608f,*/ 126.863421f, 126.863255f, 126.863392f, 126.863392f };
             MissionItemCount = 0;
 
             for (int i = 0; i < commands.Length; i++)
@@ -491,7 +491,9 @@ namespace MAVLink.NET
             SendPacket(message);
         }
 
-        /*
+        /**
+         * https://mavlink.io/en/messages/common.html#MAV_CMD_DO_SET_HOME
+         */
         public void UpdateHomeCommand(float latitude, float longitude, float altitude=5f)
         {
             Msg_command_long message = new Msg_command_long()
@@ -499,19 +501,21 @@ namespace MAVLink.NET
                 target_system       = SYSTEM_ID,
                 target_component    = COMPONENT_ID,
                 command             = (byte) MAV_CMD.MAV_CMD_DO_SET_HOME,
-                param1              = 0,
+                param1              = 1,
                 param2              = 0,
                 param3              = 0,
-                param4              = 0
+                param4              = 0,
+                param5              = latitude,
+                param6              = longitude,
+                param7              = altitude
             };
+            SendPacket(message);
         }
-        */
-
-        /**
-         * https://mavlink.io/en/messages/common.html#MAV_CMD_DO_SET_HOME
-         */
+        
         private void SetCurrentPositionAsHome()
         {
+            UpdateHomeCommand((float) Position.X, (float) Position.Y);
+            /*
             Msg_command_long message = new Msg_command_long()
             {
                 target_system       = SYSTEM_ID,
@@ -526,6 +530,7 @@ namespace MAVLink.NET
                 // param7: Altitude
             };
             SendPacket(message);
+            */
         }
 
         /**
@@ -574,9 +579,11 @@ namespace MAVLink.NET
 
         /**
          * https://mavlink.io/en/messages/common.html#MAV_CMD_NAV_WAYPOINT
+         * OFFBOARD
          */
         public void NextWP(double latitude, double longitude)
         {
+            SetFlightMode((uint) PX4FlightMode.OFFBOARD);
             /*
             Msg_mission_item message = new Msg_mission_item()
             {
@@ -589,20 +596,6 @@ namespace MAVLink.NET
                 x               = (float) Position.X + 1,
                 y               = (float) Position.Y + 1,
                 z               = 5
-            };
-            /*/
-            Msg_command_long message = new Msg_command_long()
-            {
-                command             = (ushort) MAV_CMD.MAV_CMD_NAV_WAYPOINT,
-                target_system       = SYSTEM_ID,
-                target_component    = COMPONENT_ID,
-                // param1: Hold time in decimal seconds. (ignored by fixed wing, time to stay at waypoint for rotary wing)
-                // param2: Acceptance radius in meters (if the sphere with this radius is hit, the waypoint counts as reached)
-                // param3: 0 to pass through the WP, if > 0 radius in meters to pass by WP. Positive value for clockwise orbit, negative value for counter-clockwise orbit. Allows trajectory control.
-                // param4: Desired yaw angle at waypoint (rotary wing). NaN for unchanged.
-                param5              = (float) latitude,     // Latitude
-                param6              = (float) longitude,    // Longitude
-                param7              = 5                     // Altitude
             };
             Msg_set_position_target_global_int message2 = new Msg_set_position_target_global_int()
             {
@@ -618,8 +611,22 @@ namespace MAVLink.NET
                 target_component=COMPONENT_ID,
                 x=3,y=3,z=5
             };
+            /*/
+            Msg_command_long message = new Msg_command_long()
+            {
+                command             = (ushort) MAV_CMD.MAV_CMD_NAV_WAYPOINT,
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID,
+                param1              = 3,    // Hold time in decimal seconds. (ignored by fixed wing, time to stay at waypoint for rotary wing)
+                // param2: Acceptance radius in meters (if the sphere with this radius is hit, the waypoint counts as reached)
+                // param3: 0 to pass through the WP, if > 0 radius in meters to pass by WP. Positive value for clockwise orbit, negative value for counter-clockwise orbit. Allows trajectory control.
+                // param4: Desired yaw angle at waypoint (rotary wing). NaN for unchanged.
+                param5              = (float) latitude,     // Latitude
+                param6              = (float) longitude,    // Longitude
+                param7              = 5                     // Altitude
+            };
             //*/
-            SendPacket(message3);
+            SendPacket(message);
         }
     }
 }
