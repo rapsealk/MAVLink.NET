@@ -208,7 +208,7 @@ namespace MAVLink.NET
                 Position.Y = mGPS.lon / pRatio;
                 Position.Z = mGPS.alt / pRatio;
                 Gtimestamp = mGPS.time_usec;
-//#if MYSQL
+#if MYSQL
                 // MySQL Update Query
                 MySql.Data.MySqlClient.MySqlConnection conn = DatabaseManager.GetConnection();
                 try
@@ -233,7 +233,7 @@ namespace MAVLink.NET
                 {
                     Console.Error.WriteLine(e.Message);
                 }
-//#endif
+#endif
             }
             else if (message.GetType() == mRTK.GetType())
             {
@@ -533,7 +533,6 @@ namespace MAVLink.NET
          */
         public void TakeoffCommand()
         {
-            //*
             Msg_command_long message = new Msg_command_long()
             {
                 command             = (ushort) MAV_CMD.MAV_CMD_NAV_TAKEOFF,
@@ -541,28 +540,12 @@ namespace MAVLink.NET
                 target_component    = COMPONENT_ID,
                 param1              = 2.5f, // Minimum pitch
                 // param2
-                param3              = 1f,   // horizontal navigation by pilot acceptable
+                param3              = .1f,   // horizontal navigation by pilot acceptable
                 // param4: yaw angle    (not supported)
-                // param5: latitude     (not supported)
-                // param6: longitude    (not supported)
-                param7              = 5     // altitude [meters]
+                param5              = (float) Position.X,   // latitude
+                param6              = (float) Position.Y,   // longitude
+                param7              = 5                     // altitude [meters]
             };
-            /*/
-            Msg_command_long message = new Msg_command_long()
-            {
-                command=(ushort)MAV_CMD.MAV_CMD_NAV_TAKEOFF_LOCAL,
-                target_system=SYSTEM_ID,
-                target_component=COMPONENT_ID,
-                // param1: Minimum pitch (if airspeed sensor present), desired pitch without sensor [rad]
-                // param2: Empty
-                // param3: Takeoff ascend rate [ms^-1]
-                // param4: Yaw angle [rad] (if magnetometer or another yaw estimation source present), ignored without one of these
-                // param5: Y-axis position [m]
-                // param6: X-axis position [m]
-                // param7: Z-axis position [m]
-                param7 = 5
-            };
-            //*/
             SendPacket(message);
 
             ArmDisarmCommand(true);
@@ -621,8 +604,22 @@ namespace MAVLink.NET
                 param6              = (float) longitude,    // Longitude
                 param7              = 5                     // Altitude
             };
+            Msg_set_position_target_global_int message2 = new Msg_set_position_target_global_int()
+            {
+                target_system=SYSTEM_ID,
+                target_component=COMPONENT_ID,
+                coordinate_frame=(byte)MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,
+                lat_int=(int)(latitude*pRatio),
+                lon_int=(int)(longitude*pRatio)
+            };
+            Msg_set_position_target_local_ned message3 = new Msg_set_position_target_local_ned()
+            {
+                target_system=SYSTEM_ID,
+                target_component=COMPONENT_ID,
+                x=3,y=3,z=5
+            };
             //*/
-            SendPacket(message);
+            SendPacket(message3);
         }
     }
 }

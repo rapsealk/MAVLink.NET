@@ -23,7 +23,7 @@ namespace MAVLink.NET
 
             MAVManager = new MAVLinkManager();
             //*
-            node1 = MAVManager.RegisterAgent("COM12", 57600);
+            node1 = MAVManager.RegisterAgent("COM13", 57600);
 
             MAVManager.Open(0);
 
@@ -107,6 +107,14 @@ namespace MAVLink.NET
             if (index == 0) return;
 
             node1.SetFlightMode(index);
+        }
+
+        private void WaypointButton_Click(object sender, EventArgs e)
+        {
+            double latitude = double.Parse(LatitudeTextBox.Text);
+            double longitude = double.Parse(LongitudeTextBox.Text);
+
+            node1.NextWP(latitude, longitude);
         }
     }
 }

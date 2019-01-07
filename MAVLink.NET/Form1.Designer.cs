@@ -57,6 +57,9 @@
             this.BatteryLabel = new System.Windows.Forms.Label();
             this.AltitudeTag = new System.Windows.Forms.Label();
             this.AltitudeLabel = new System.Windows.Forms.Label();
+            this.LatitudeTextBox = new System.Windows.Forms.TextBox();
+            this.LongitudeTextBox = new System.Windows.Forms.TextBox();
+            this.WaypointButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // TakeoffButton
@@ -320,7 +323,7 @@
             this.AltitudeTag.AutoSize = true;
             this.AltitudeTag.Location = new System.Drawing.Point(449, 277);
             this.AltitudeTag.Name = "AltitudeTag";
-            this.AltitudeTag.Size = new System.Drawing.Size(34, 12);
+            this.AltitudeTag.Size = new System.Drawing.Size(27, 12);
             this.AltitudeTag.TabIndex = 27;
             this.AltitudeTag.Text = "Alt: ";
             // 
@@ -329,15 +332,42 @@
             this.AltitudeLabel.AutoSize = true;
             this.AltitudeLabel.Location = new System.Drawing.Point(487, 277);
             this.AltitudeLabel.Name = "AltitudeLabel";
-            this.AltitudeLabel.Size = new System.Drawing.Size(38, 12);
+            this.AltitudeLabel.Size = new System.Drawing.Size(77, 12);
             this.AltitudeLabel.TabIndex = 28;
             this.AltitudeLabel.Text = "AltitudeLabel";
+            // 
+            // LatitudeTextBox
+            // 
+            this.LatitudeTextBox.Location = new System.Drawing.Point(464, 349);
+            this.LatitudeTextBox.Name = "LatitudeTextBox";
+            this.LatitudeTextBox.Size = new System.Drawing.Size(100, 21);
+            this.LatitudeTextBox.TabIndex = 29;
+            // 
+            // LongitudeTextBox
+            // 
+            this.LongitudeTextBox.Location = new System.Drawing.Point(464, 380);
+            this.LongitudeTextBox.Name = "LongitudeTextBox";
+            this.LongitudeTextBox.Size = new System.Drawing.Size(100, 21);
+            this.LongitudeTextBox.TabIndex = 30;
+            // 
+            // WaypointButton
+            // 
+            this.WaypointButton.Location = new System.Drawing.Point(571, 349);
+            this.WaypointButton.Name = "WaypointButton";
+            this.WaypointButton.Size = new System.Drawing.Size(75, 52);
+            this.WaypointButton.TabIndex = 31;
+            this.WaypointButton.Text = "Waypoint";
+            this.WaypointButton.UseVisualStyleBackColor = true;
+            this.WaypointButton.Click += new System.EventHandler(this.WaypointButton_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.WaypointButton);
+            this.Controls.Add(this.LongitudeTextBox);
+            this.Controls.Add(this.LatitudeTextBox);
             this.Controls.Add(this.AltitudeLabel);
             this.Controls.Add(this.AltitudeTag);
             this.Controls.Add(this.BatteryLabel);
@@ -405,6 +435,9 @@
         private System.Windows.Forms.Label BatteryLabel;
         private System.Windows.Forms.Label AltitudeTag;
         private System.Windows.Forms.Label AltitudeLabel;
+        private System.Windows.Forms.TextBox LatitudeTextBox;
+        private System.Windows.Forms.TextBox LongitudeTextBox;
+        private System.Windows.Forms.Button WaypointButton;
     }
 }
 
