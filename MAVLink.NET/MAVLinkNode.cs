@@ -491,11 +491,24 @@ namespace MAVLink.NET
          */
         public void StartMission()
         {
-            Msg_set_mode message = new Msg_set_mode()
+            Msg_set_mode offboardMessage = new Msg_set_mode()
             {
                 target_system   = SYSTEM_ID,
                 base_mode       = (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
                 custom_mode     = ((uint) PX4FlightMode.OFFBOARD << 16) + (uint) PX4FlightSubMode.MISSION
+            };
+            SendPacket(offboardMessage);
+
+            /**
+             * https://mavlink.io/en/messages/common.html#MAV_CMD_MISSION_START
+             */
+            Msg_command_long message = new Msg_command_long()
+            {
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID,
+                command             = (ushort) MAV_CMD.MAV_CMD_MISSION_START
+                // param1 = first_item: the first mission item to run
+                // param2 = last_item: the last mission item to run (after this item is run, the mission ends)
             };
             SendPacket(message);
         }
@@ -598,13 +611,6 @@ namespace MAVLink.NET
                 lat_int=(int)(latitude*pRatio),
                 lon_int=(int)(longitude*pRatio)
             };
-            Msg_set_position_target_local_ned message3 = new Msg_set_position_target_local_ned()
-            {
-                target_system=SYSTEM_ID,
-                target_component=COMPONENT_ID,
-                x=3,y=3,z=5
-            };
-            /*/
             Msg_command_long message = new Msg_command_long()
             {
                 command             = (ushort) MAV_CMD.MAV_CMD_NAV_WAYPOINT,
@@ -626,8 +632,22 @@ namespace MAVLink.NET
                 lat_int = (int)(latitude * pRatio),
                 lon_int = (int)(longitude * pRatio)
             };
+            /*/
+
+            // TODO: convert global position and local position to each other (using home position)
+            Msg_set_position_target_local_ned message = new Msg_set_position_target_local_ned()
+            {
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID,
+                time_boot_ms        = (uint) Gtimestamp,  // time_boot_ms (not used)
+                coordinate_frame    = (byte) MAV_FRAME.MAV_FRAME_LOCAL_NED,
+                type_mask           = 0b0000_1111_1111_1000,    // type mask (only positions enabled)
+                x = 3,
+                y = 3,
+                z = 5
+            };
             //*/
-            SendPacket(message2);
+            SendPacket(message);
         }
     }
 }
