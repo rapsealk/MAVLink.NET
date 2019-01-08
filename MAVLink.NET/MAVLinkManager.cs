@@ -273,5 +273,36 @@ namespace MAVLink.NET
         {
             // TODO: Compute Next Waypoint for each Agent
         }
+
+        public void RunScenario()
+        {
+            //MAVLinkNode leaderNode = null;
+            //foreach (MAVLinkNode node in MAVLinkNodes) if (node.SYSTEM_ID == 2) leaderNode = node;
+            MAVLinkNodes.Sort((x, y) => x.SYSTEM_ID == 2 ? 0 : 1);
+            MAVLinkNode leaderNode = MAVLinkNodes[0];
+
+            // Upload mission to leader.
+            leaderNode.UploadMission();
+
+            // Takeoff drones.
+            foreach (MAVLinkNode node in MAVLinkNodes) node.TakeoffCommand();
+
+            // Start mission.
+            leaderNode.StartMission();
+
+            System.Threading.Thread thread = new System.Threading.Thread(() => {
+
+                while (!leaderNode.HasCompletedMission())
+                {
+                    MAVLinkNode f1 = MAVLinkNodes[1];
+                    MAVLinkNode f2 = MAVLinkNodes[2];
+                    f1.NextWP(f1.Position.X + f1.Direction.X, f1.Position.Y + f1.Direction.Y);
+                    f2.NextWP(f2.Position.X + f2.Direction.X, f2.Position.Y + f2.Direction.Y);
+
+                    System.Threading.Thread.Sleep(1000);
+                }
+            });
+            thread.Start();
+        }
     }
 }

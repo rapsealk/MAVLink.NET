@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MAVLink.NET
@@ -44,8 +38,8 @@ namespace MAVLink.NET
                 if (count == nodes.Length) break;
             }
             /*/
-            UpdateUI();
             //*/
+            UpdateUI();
         }
 
         /* TODO: Lambda Generator
@@ -183,35 +177,81 @@ namespace MAVLink.NET
                 {
                     System.Threading.Thread.Sleep(1000);
 
-                    for (int i = 0; i < nodes.Length; i++)
+                    try
                     {
-                        Vector3 position = nodes[i].Position;
+                        // #1
+                        LatitudeLabel_01.BeginInvoke((Action) delegate () { LatitudeLabel_01.Text = String.Format("{0:f6}", nodes[0].Position.X); });
+                        LongitudeLabel_01.BeginInvoke((Action) delegate () { LongitudeLabel_01.Text = String.Format("{0:f6}", nodes[0].Position.Y); });
+                        AltitudeLabel_01.BeginInvoke((Action) delegate () { AltitudeLabel_01.Text = String.Format("{0:f6}", nodes[0].Position.Z); });
+                        LocalXLabel_01.BeginInvoke((Action) delegate () { LocalXLabel_01.Text = String.Format("{0:f2}", nodes[0].LocalPosition.X); });
+                        LocalYLabel_01.BeginInvoke((Action) delegate () { LocalYLabel_01.Text = String.Format("{0:f2}", nodes[0].LocalPosition.Y); });
+                        LocalYLabel_01.BeginInvoke((Action) delegate () { LocalZLabel_01.Text = String.Format("{0:f2}", nodes[0].LocalPosition.Z); });
+                        HomeLatitudeLabel_01.BeginInvoke((Action) delegate () { HomeLatitudeLabel_01.Text = String.Format("{0:f6}", nodes[0].HomePosition.X); });
+                        HomeLongitude_01.BeginInvoke((Action) delegate () { HomeLongitude_01.Text = String.Format("{0:f6}", nodes[0].HomePosition.Y); });
+                        RollLabel_01.BeginInvoke((Action) delegate () { RollLabel_01.Text = String.Format("{0:f2}", nodes[0].Roll); });
+                        PitchLabel_01.BeginInvoke((Action) delegate () { PitchLabel_01.Text = String.Format("{0:f2}", nodes[0].Pitch); });
+                        YawLabel_01.BeginInvoke((Action) delegate () { YawLabel_01.Text = String.Format("{0:f2}", nodes[0].Yaw); });
+                        BatteryLabel_01.BeginInvoke((Action) delegate () { BatteryLabel_01.Text = String.Format("{0:f2}", nodes[0].BatteryPercentage); });
+                        FlightModeLabel_01.BeginInvoke((Action) delegate () { FlightModeLabel_01.Text = nodes[0].FlightMode; });
+                        SubModeLabel_01.BeginInvoke((Action) delegate () { SubModeLabel_01.Text = nodes[0].SubMode; });
+                        StatusMessageLabel_01.BeginInvoke((Action) delegate () { StatusMessageLabel_01.Text = nodes[0].StatusMessage; });
+                        CommandResultMessageLabel_01.BeginInvoke((Action) delegate () { CommandResultMessageLabel_01.Text = nodes[0].CommandResultMessage; });
 
-                        try
-                        {
-                            LatitudeLabels[i].BeginInvoke((Action) delegate () { LatitudeLabels[i].Text = String.Format("{0:f6}", position.X); });
-                            LongitudeLabels[i].BeginInvoke((Action) delegate () { LongitudeLabels[i].Text = String.Format("{0:f6}", position.Y); });
-                            AltitudeLabels[i].BeginInvoke((Action) delegate () { AltitudeLabels[i].Text = String.Format("{0:f6}", position.Z); });
-                            RollLabels[i].BeginInvoke((Action) delegate () { RollLabels[i].Text = String.Format("{0:f2}", nodes[i].Roll); });
-                            PitchLabels[i].BeginInvoke((Action) delegate () { PitchLabels[i].Text = String.Format("{0:f2}", nodes[i].Pitch); });
-                            YawLabels[i].BeginInvoke((Action) delegate () { YawLabels[i].Text = String.Format("{0:f2}", nodes[i].Yaw); });
-                            BatteryLabels[i].BeginInvoke((Action) delegate () { BatteryLabels[i].Text = String.Format("{0:f2}", nodes[i].BatteryPercentage); });
-                            FlightModeLabels[i].BeginInvoke((Action) delegate () { FlightModeLabels[i].Text = nodes[i].FlightMode; });
-                            SubModeLabels[i].BeginInvoke((Action) delegate () { SubModeLabels[i].Text = nodes[i].SubMode; });
-                            StatusMessageLabels[i].BeginInvoke((Action) delegate () { StatusMessageLabels[i].Text = nodes[i].StatusMessage; });
-                            CommandResultMessageLabels[i].BeginInvoke((Action) delegate () { CommandResultMessageLabels[i].Text = nodes[i].CommandResultMessage; });
+                        DroneTag_01.BeginInvoke((Action) delegate () { DroneTag_01.Text = String.Format("DroneTag #{0:d}", nodes[0].SYSTEM_ID); });
 
-                            DroneTags[i].BeginInvoke((Action) delegate () { DroneTags[i].Text = String.Format("DroneTag #{0:d}", nodes[i].SYSTEM_ID); });
-                        }
-                        catch (InvalidOperationException e)
-                        {
-                            Console.Error.WriteLine(e.Message);
-                            // break;
-                        }
+                        // #2
+                        LatitudeLabel_02.BeginInvoke((Action)delegate () { LatitudeLabel_02.Text = String.Format("{0:f6}", nodes[1].Position.X); });
+                        LongitudeLabel_02.BeginInvoke((Action)delegate () { LongitudeLabel_02.Text = String.Format("{0:f6}", nodes[1].Position.Y); });
+                        AltitudeLabel_02.BeginInvoke((Action)delegate () { AltitudeLabel_02.Text = String.Format("{0:f6}", nodes[1].Position.Z); });
+                        LocalXLabel_02.BeginInvoke((Action)delegate () { LocalXLabel_02.Text = String.Format("{0:f2}", nodes[1].LocalPosition.X); });
+                        LocalYLabel_02.BeginInvoke((Action)delegate () { LocalYLabel_02.Text = String.Format("{0:f2}", nodes[1].LocalPosition.Y); });
+                        LocalYLabel_02.BeginInvoke((Action)delegate () { LocalZLabel_02.Text = String.Format("{0:f2}", nodes[1].LocalPosition.Z); });
+                        HomeLatitudeLabel_02.BeginInvoke((Action)delegate () { HomeLatitudeLabel_02.Text = String.Format("{0:f6}", nodes[1].HomePosition.X); });
+                        HomeLongitudeLabel_02.BeginInvoke((Action)delegate () { HomeLongitudeLabel_02.Text = String.Format("{0:f6}", nodes[1].HomePosition.Y); });
+                        RollLabel_02.BeginInvoke((Action)delegate () { RollLabel_02.Text = String.Format("{0:f2}", nodes[1].Roll); });
+                        PitchLabel_02.BeginInvoke((Action)delegate () { PitchLabel_02.Text = String.Format("{0:f2}", nodes[1].Pitch); });
+                        YawLabel_02.BeginInvoke((Action)delegate () { YawLabel_02.Text = String.Format("{0:f2}", nodes[1].Yaw); });
+                        BatteryLabel_02.BeginInvoke((Action)delegate () { BatteryLabel_02.Text = String.Format("{0:f2}", nodes[1].BatteryPercentage); });
+                        FlightModeLabel_02.BeginInvoke((Action)delegate () { FlightModeLabel_02.Text = nodes[1].FlightMode; });
+                        SubModeLabel_02.BeginInvoke((Action)delegate () { SubModeLabel_02.Text = nodes[1].SubMode; });
+                        StatusMessageLabel_02.BeginInvoke((Action)delegate () { StatusMessageLabel_02.Text = nodes[1].StatusMessage; });
+                        CommandResultMessageLabel_02.BeginInvoke((Action)delegate () { CommandResultMessageLabel_02.Text = nodes[1].CommandResultMessage; });
+
+                        DroneTag_02.BeginInvoke((Action)delegate () { DroneTag_02.Text = String.Format("DroneTag #{0:d}", nodes[1].SYSTEM_ID); });
+
+                        // #3
+                        LatitudeLabel_03.BeginInvoke((Action)delegate () { LatitudeLabel_03.Text = String.Format("{0:f6}", nodes[2].Position.X); });
+                        LongitudeLabel_03.BeginInvoke((Action)delegate () { LongitudeLabel_03.Text = String.Format("{0:f6}", nodes[2].Position.Y); });
+                        AltitudeLabel_03.BeginInvoke((Action)delegate () { AltitudeLabel_03.Text = String.Format("{0:f6}", nodes[2].Position.Z); });
+                        LocalXLabel_03.BeginInvoke((Action)delegate () { LocalXLabel_03.Text = String.Format("{0:f2}", nodes[2].LocalPosition.X); });
+                        LocalYLabel_03.BeginInvoke((Action)delegate () { LocalYLabel_03.Text = String.Format("{0:f2}", nodes[2].LocalPosition.Y); });
+                        LocalYLabel_03.BeginInvoke((Action)delegate () { LocalZLabel_03.Text = String.Format("{0:f2}", nodes[2].LocalPosition.Z); });
+                        HomeLatitudeLabel_03.BeginInvoke((Action)delegate () { HomeLatitudeLabel_03.Text = String.Format("{0:f6}", nodes[2].HomePosition.X); });
+                        HomeLongitudeLabel_03.BeginInvoke((Action)delegate () { HomeLongitudeLabel_03.Text = String.Format("{0:f6}", nodes[2].HomePosition.Y); });
+                        RollLabel_03.BeginInvoke((Action)delegate () { RollLabel_03.Text = String.Format("{0:f2}", nodes[2].Roll); });
+                        PitchLabel_03.BeginInvoke((Action)delegate () { PitchLabel_03.Text = String.Format("{0:f2}", nodes[2].Pitch); });
+                        YawLabel_03.BeginInvoke((Action)delegate () { YawLabel_03.Text = String.Format("{0:f2}", nodes[2].Yaw); });
+                        BatteryLabel_03.BeginInvoke((Action)delegate () { BatteryLabel_03.Text = String.Format("{0:f2}", nodes[2].BatteryPercentage); });
+                        FlightModeLabel_03.BeginInvoke((Action)delegate () { FlightModeLabel_03.Text = nodes[2].FlightMode; });
+                        SubModeLabel_03.BeginInvoke((Action)delegate () { SubModeLabel_03.Text = nodes[2].SubMode; });
+                        StatusMessageLabel_03.BeginInvoke((Action)delegate () { StatusMessageLabel_03.Text = nodes[2].StatusMessage; });
+                        CommandResultMessageLabel_03.BeginInvoke((Action)delegate () { CommandResultMessageLabel_03.Text = nodes[2].CommandResultMessage; });
+
+                        DroneTag_03.BeginInvoke((Action)delegate () { DroneTag_03.Text = String.Format("DroneTag #{0:d}", nodes[2].SYSTEM_ID); });
+                    }
+                    catch (InvalidOperationException e)
+                    {
+                        Console.Error.WriteLine(e.Message);
+                        // break;
                     }
                 }
             });
             thread.Start();
+        }
+
+        private void StartButton_Click(object sender, EventArgs e)
+        {
+            MAVManager.RunScenario();
         }
     }
 }

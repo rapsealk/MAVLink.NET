@@ -118,11 +118,36 @@
             this.AltitudeTag_03 = new System.Windows.Forms.Label();
             this.AltitudeLabel_03 = new System.Windows.Forms.Label();
             this.DroneTag_03 = new System.Windows.Forms.Label();
+            this.HomeLatitudeLabel_03 = new System.Windows.Forms.Label();
+            this.HomeLongitudeLabel_03 = new System.Windows.Forms.Label();
+            this.LocalXLabel_03 = new System.Windows.Forms.Label();
+            this.LocalYLabel_03 = new System.Windows.Forms.Label();
+            this.LocalZLabel_03 = new System.Windows.Forms.Label();
+            this.LocalXTag_03 = new System.Windows.Forms.Label();
+            this.LocalYTag_03 = new System.Windows.Forms.Label();
+            this.LocalZTag_03 = new System.Windows.Forms.Label();
+            this.LocalXLabel_02 = new System.Windows.Forms.Label();
+            this.LocalYLabel_02 = new System.Windows.Forms.Label();
+            this.LocalZLabel_02 = new System.Windows.Forms.Label();
+            this.LocalXTag_02 = new System.Windows.Forms.Label();
+            this.LocalYTag_02 = new System.Windows.Forms.Label();
+            this.LocalZTag_02 = new System.Windows.Forms.Label();
+            this.HomeLongitudeLabel_02 = new System.Windows.Forms.Label();
+            this.HomeLatitudeLabel_02 = new System.Windows.Forms.Label();
+            this.LocalXLabel_01 = new System.Windows.Forms.Label();
+            this.LocalYLabel_01 = new System.Windows.Forms.Label();
+            this.LocalZLabel_01 = new System.Windows.Forms.Label();
+            this.LocalXTag_01 = new System.Windows.Forms.Label();
+            this.LocalYTag_01 = new System.Windows.Forms.Label();
+            this.LocalZTag_01 = new System.Windows.Forms.Label();
+            this.HomeLongitude_01 = new System.Windows.Forms.Label();
+            this.HomeLatitudeLabel_01 = new System.Windows.Forms.Label();
+            this.StartButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // TakeoffButton_01
             // 
-            this.TakeoffButton_01.Location = new System.Drawing.Point(44, 216);
+            this.TakeoffButton_01.Location = new System.Drawing.Point(77, 216);
             this.TakeoffButton_01.Name = "TakeoffButton_01";
             this.TakeoffButton_01.Size = new System.Drawing.Size(89, 23);
             this.TakeoffButton_01.TabIndex = 0;
@@ -132,7 +157,7 @@
             // 
             // LandButton_01
             // 
-            this.LandButton_01.Location = new System.Drawing.Point(166, 216);
+            this.LandButton_01.Location = new System.Drawing.Point(199, 216);
             this.LandButton_01.Name = "LandButton_01";
             this.LandButton_01.Size = new System.Drawing.Size(89, 23);
             this.LandButton_01.TabIndex = 1;
@@ -142,7 +167,7 @@
             // 
             // ArmButton_01
             // 
-            this.ArmButton_01.Location = new System.Drawing.Point(44, 175);
+            this.ArmButton_01.Location = new System.Drawing.Point(77, 175);
             this.ArmButton_01.Name = "ArmButton_01";
             this.ArmButton_01.Size = new System.Drawing.Size(89, 23);
             this.ArmButton_01.TabIndex = 2;
@@ -152,7 +177,7 @@
             // 
             // DisarmButton_01
             // 
-            this.DisarmButton_01.Location = new System.Drawing.Point(166, 175);
+            this.DisarmButton_01.Location = new System.Drawing.Point(199, 175);
             this.DisarmButton_01.Name = "DisarmButton_01";
             this.DisarmButton_01.Size = new System.Drawing.Size(89, 23);
             this.DisarmButton_01.TabIndex = 3;
@@ -164,7 +189,7 @@
             // 
             this.LatitudeLabel_01.AutoSize = true;
             this.LatitudeLabel_01.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.LatitudeLabel_01.Location = new System.Drawing.Point(68, 336);
+            this.LatitudeLabel_01.Location = new System.Drawing.Point(101, 336);
             this.LatitudeLabel_01.Name = "LatitudeLabel_01";
             this.LatitudeLabel_01.Size = new System.Drawing.Size(80, 12);
             this.LatitudeLabel_01.TabIndex = 4;
@@ -174,7 +199,7 @@
             // 
             this.LongitudeLabel_01.AutoSize = true;
             this.LongitudeLabel_01.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.LongitudeLabel_01.Location = new System.Drawing.Point(68, 354);
+            this.LongitudeLabel_01.Location = new System.Drawing.Point(101, 354);
             this.LongitudeLabel_01.Name = "LongitudeLabel_01";
             this.LongitudeLabel_01.Size = new System.Drawing.Size(91, 12);
             this.LongitudeLabel_01.TabIndex = 5;
@@ -182,7 +207,7 @@
             // 
             // MissionUploadButton_01
             // 
-            this.MissionUploadButton_01.Location = new System.Drawing.Point(46, 101);
+            this.MissionUploadButton_01.Location = new System.Drawing.Point(79, 101);
             this.MissionUploadButton_01.Name = "MissionUploadButton_01";
             this.MissionUploadButton_01.Size = new System.Drawing.Size(209, 23);
             this.MissionUploadButton_01.TabIndex = 6;
@@ -193,7 +218,7 @@
             // StatusMessageLabel_01
             // 
             this.StatusMessageLabel_01.AutoSize = true;
-            this.StatusMessageLabel_01.Location = new System.Drawing.Point(42, 471);
+            this.StatusMessageLabel_01.Location = new System.Drawing.Point(101, 471);
             this.StatusMessageLabel_01.Name = "StatusMessageLabel_01";
             this.StatusMessageLabel_01.Size = new System.Drawing.Size(124, 12);
             this.StatusMessageLabel_01.TabIndex = 7;
@@ -201,7 +226,7 @@
             // 
             // ClearMissionButton_01
             // 
-            this.ClearMissionButton_01.Location = new System.Drawing.Point(46, 130);
+            this.ClearMissionButton_01.Location = new System.Drawing.Point(79, 130);
             this.ClearMissionButton_01.Name = "ClearMissionButton_01";
             this.ClearMissionButton_01.Size = new System.Drawing.Size(209, 23);
             this.ClearMissionButton_01.TabIndex = 8;
@@ -212,7 +237,7 @@
             // CommandResultMessageLabel_01
             // 
             this.CommandResultMessageLabel_01.AutoSize = true;
-            this.CommandResultMessageLabel_01.Location = new System.Drawing.Point(42, 493);
+            this.CommandResultMessageLabel_01.Location = new System.Drawing.Point(101, 493);
             this.CommandResultMessageLabel_01.Name = "CommandResultMessageLabel_01";
             this.CommandResultMessageLabel_01.Size = new System.Drawing.Size(183, 12);
             this.CommandResultMessageLabel_01.TabIndex = 9;
@@ -220,7 +245,7 @@
             // 
             // MissionStartButton_01
             // 
-            this.MissionStartButton_01.Location = new System.Drawing.Point(46, 73);
+            this.MissionStartButton_01.Location = new System.Drawing.Point(79, 73);
             this.MissionStartButton_01.Name = "MissionStartButton_01";
             this.MissionStartButton_01.Size = new System.Drawing.Size(209, 23);
             this.MissionStartButton_01.TabIndex = 10;
@@ -231,7 +256,7 @@
             // FlightModeTag_01
             // 
             this.FlightModeTag_01.AutoSize = true;
-            this.FlightModeTag_01.Location = new System.Drawing.Point(44, 249);
+            this.FlightModeTag_01.Location = new System.Drawing.Point(77, 249);
             this.FlightModeTag_01.Name = "FlightModeTag_01";
             this.FlightModeTag_01.Size = new System.Drawing.Size(75, 12);
             this.FlightModeTag_01.TabIndex = 11;
@@ -241,7 +266,7 @@
             // 
             this.FlightModeLabel_01.AutoSize = true;
             this.FlightModeLabel_01.ForeColor = System.Drawing.Color.Red;
-            this.FlightModeLabel_01.Location = new System.Drawing.Point(125, 249);
+            this.FlightModeLabel_01.Location = new System.Drawing.Point(158, 249);
             this.FlightModeLabel_01.Name = "FlightModeLabel_01";
             this.FlightModeLabel_01.Size = new System.Drawing.Size(98, 12);
             this.FlightModeLabel_01.TabIndex = 12;
@@ -250,14 +275,14 @@
             // FlightModeComboBox_01
             // 
             this.FlightModeComboBox_01.FormattingEnabled = true;
-            this.FlightModeComboBox_01.Location = new System.Drawing.Point(46, 296);
+            this.FlightModeComboBox_01.Location = new System.Drawing.Point(79, 296);
             this.FlightModeComboBox_01.Name = "FlightModeComboBox_01";
             this.FlightModeComboBox_01.Size = new System.Drawing.Size(123, 20);
             this.FlightModeComboBox_01.TabIndex = 13;
             // 
             // FlightModeButton_01
             // 
-            this.FlightModeButton_01.Location = new System.Drawing.Point(180, 293);
+            this.FlightModeButton_01.Location = new System.Drawing.Point(213, 293);
             this.FlightModeButton_01.Name = "FlightModeButton_01";
             this.FlightModeButton_01.Size = new System.Drawing.Size(75, 23);
             this.FlightModeButton_01.TabIndex = 14;
@@ -268,7 +293,7 @@
             // LatitudeTag_01
             // 
             this.LatitudeTag_01.AutoSize = true;
-            this.LatitudeTag_01.Location = new System.Drawing.Point(32, 336);
+            this.LatitudeTag_01.Location = new System.Drawing.Point(65, 336);
             this.LatitudeTag_01.Name = "LatitudeTag_01";
             this.LatitudeTag_01.Size = new System.Drawing.Size(30, 12);
             this.LatitudeTag_01.TabIndex = 15;
@@ -277,7 +302,7 @@
             // LongitudeTag_01
             // 
             this.LongitudeTag_01.AutoSize = true;
-            this.LongitudeTag_01.Location = new System.Drawing.Point(32, 354);
+            this.LongitudeTag_01.Location = new System.Drawing.Point(65, 354);
             this.LongitudeTag_01.Name = "LongitudeTag_01";
             this.LongitudeTag_01.Size = new System.Drawing.Size(34, 12);
             this.LongitudeTag_01.TabIndex = 16;
@@ -286,7 +311,7 @@
             // SubModeTag_01
             // 
             this.SubModeTag_01.AutoSize = true;
-            this.SubModeTag_01.Location = new System.Drawing.Point(44, 271);
+            this.SubModeTag_01.Location = new System.Drawing.Point(77, 271);
             this.SubModeTag_01.Name = "SubModeTag_01";
             this.SubModeTag_01.Size = new System.Drawing.Size(89, 12);
             this.SubModeTag_01.TabIndex = 17;
@@ -296,7 +321,7 @@
             // 
             this.SubModeLabel_01.AutoSize = true;
             this.SubModeLabel_01.ForeColor = System.Drawing.Color.Red;
-            this.SubModeLabel_01.Location = new System.Drawing.Point(125, 271);
+            this.SubModeLabel_01.Location = new System.Drawing.Point(158, 271);
             this.SubModeLabel_01.Name = "SubModeLabel_01";
             this.SubModeLabel_01.Size = new System.Drawing.Size(90, 12);
             this.SubModeLabel_01.TabIndex = 18;
@@ -305,7 +330,7 @@
             // RollTag_01
             // 
             this.RollTag_01.AutoSize = true;
-            this.RollTag_01.Location = new System.Drawing.Point(177, 336);
+            this.RollTag_01.Location = new System.Drawing.Point(210, 336);
             this.RollTag_01.Name = "RollTag_01";
             this.RollTag_01.Size = new System.Drawing.Size(30, 12);
             this.RollTag_01.TabIndex = 19;
@@ -314,7 +339,7 @@
             // PitchTag_01
             // 
             this.PitchTag_01.AutoSize = true;
-            this.PitchTag_01.Location = new System.Drawing.Point(177, 354);
+            this.PitchTag_01.Location = new System.Drawing.Point(210, 354);
             this.PitchTag_01.Name = "PitchTag_01";
             this.PitchTag_01.Size = new System.Drawing.Size(40, 12);
             this.PitchTag_01.TabIndex = 20;
@@ -323,7 +348,7 @@
             // YawTag_01
             // 
             this.YawTag_01.AutoSize = true;
-            this.YawTag_01.Location = new System.Drawing.Point(177, 372);
+            this.YawTag_01.Location = new System.Drawing.Point(210, 372);
             this.YawTag_01.Name = "YawTag_01";
             this.YawTag_01.Size = new System.Drawing.Size(37, 12);
             this.YawTag_01.TabIndex = 21;
@@ -333,7 +358,7 @@
             // 
             this.RollLabel_01.AutoSize = true;
             this.RollLabel_01.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.RollLabel_01.Location = new System.Drawing.Point(213, 336);
+            this.RollLabel_01.Location = new System.Drawing.Point(246, 336);
             this.RollLabel_01.Name = "RollLabel_01";
             this.RollLabel_01.Size = new System.Drawing.Size(57, 12);
             this.RollLabel_01.TabIndex = 22;
@@ -343,7 +368,7 @@
             // 
             this.PitchLabel_01.AutoSize = true;
             this.PitchLabel_01.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.PitchLabel_01.Location = new System.Drawing.Point(213, 354);
+            this.PitchLabel_01.Location = new System.Drawing.Point(246, 354);
             this.PitchLabel_01.Name = "PitchLabel_01";
             this.PitchLabel_01.Size = new System.Drawing.Size(64, 12);
             this.PitchLabel_01.TabIndex = 23;
@@ -353,7 +378,7 @@
             // 
             this.YawLabel_01.AutoSize = true;
             this.YawLabel_01.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.YawLabel_01.Location = new System.Drawing.Point(213, 372);
+            this.YawLabel_01.Location = new System.Drawing.Point(246, 372);
             this.YawLabel_01.Name = "YawLabel_01";
             this.YawLabel_01.Size = new System.Drawing.Size(61, 12);
             this.YawLabel_01.TabIndex = 24;
@@ -362,7 +387,7 @@
             // BatteryTag_01
             // 
             this.BatteryTag_01.AutoSize = true;
-            this.BatteryTag_01.Location = new System.Drawing.Point(107, 418);
+            this.BatteryTag_01.Location = new System.Drawing.Point(211, 395);
             this.BatteryTag_01.Name = "BatteryTag_01";
             this.BatteryTag_01.Size = new System.Drawing.Size(52, 12);
             this.BatteryTag_01.TabIndex = 25;
@@ -372,7 +397,7 @@
             // 
             this.BatteryLabel_01.AutoSize = true;
             this.BatteryLabel_01.ForeColor = System.Drawing.Color.Red;
-            this.BatteryLabel_01.Location = new System.Drawing.Point(159, 418);
+            this.BatteryLabel_01.Location = new System.Drawing.Point(263, 395);
             this.BatteryLabel_01.Name = "BatteryLabel_01";
             this.BatteryLabel_01.Size = new System.Drawing.Size(11, 12);
             this.BatteryLabel_01.TabIndex = 26;
@@ -381,7 +406,7 @@
             // AltitudeTag_01
             // 
             this.AltitudeTag_01.AutoSize = true;
-            this.AltitudeTag_01.Location = new System.Drawing.Point(32, 372);
+            this.AltitudeTag_01.Location = new System.Drawing.Point(65, 372);
             this.AltitudeTag_01.Name = "AltitudeTag_01";
             this.AltitudeTag_01.Size = new System.Drawing.Size(27, 12);
             this.AltitudeTag_01.TabIndex = 27;
@@ -391,7 +416,7 @@
             // 
             this.AltitudeLabel_01.AutoSize = true;
             this.AltitudeLabel_01.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.AltitudeLabel_01.Location = new System.Drawing.Point(68, 372);
+            this.AltitudeLabel_01.Location = new System.Drawing.Point(101, 372);
             this.AltitudeLabel_01.Name = "AltitudeLabel_01";
             this.AltitudeLabel_01.Size = new System.Drawing.Size(77, 12);
             this.AltitudeLabel_01.TabIndex = 28;
@@ -401,7 +426,7 @@
             // 
             this.DroneTag_01.AutoSize = true;
             this.DroneTag_01.Font = new System.Drawing.Font("굴림", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.DroneTag_01.Location = new System.Drawing.Point(70, 24);
+            this.DroneTag_01.Location = new System.Drawing.Point(103, 24);
             this.DroneTag_01.Name = "DroneTag_01";
             this.DroneTag_01.Size = new System.Drawing.Size(155, 24);
             this.DroneTag_01.TabIndex = 29;
@@ -409,7 +434,7 @@
             // 
             // TakeoffButton_02
             // 
-            this.TakeoffButton_02.Location = new System.Drawing.Point(381, 216);
+            this.TakeoffButton_02.Location = new System.Drawing.Point(411, 216);
             this.TakeoffButton_02.Name = "TakeoffButton_02";
             this.TakeoffButton_02.Size = new System.Drawing.Size(89, 23);
             this.TakeoffButton_02.TabIndex = 0;
@@ -419,7 +444,7 @@
             // 
             // LandButton_02
             // 
-            this.LandButton_02.Location = new System.Drawing.Point(503, 216);
+            this.LandButton_02.Location = new System.Drawing.Point(533, 216);
             this.LandButton_02.Name = "LandButton_02";
             this.LandButton_02.Size = new System.Drawing.Size(89, 23);
             this.LandButton_02.TabIndex = 1;
@@ -429,7 +454,7 @@
             // 
             // ArmButton_02
             // 
-            this.ArmButton_02.Location = new System.Drawing.Point(381, 175);
+            this.ArmButton_02.Location = new System.Drawing.Point(411, 175);
             this.ArmButton_02.Name = "ArmButton_02";
             this.ArmButton_02.Size = new System.Drawing.Size(89, 23);
             this.ArmButton_02.TabIndex = 2;
@@ -439,7 +464,7 @@
             // 
             // DisarmButton_02
             // 
-            this.DisarmButton_02.Location = new System.Drawing.Point(503, 175);
+            this.DisarmButton_02.Location = new System.Drawing.Point(533, 175);
             this.DisarmButton_02.Name = "DisarmButton_02";
             this.DisarmButton_02.Size = new System.Drawing.Size(89, 23);
             this.DisarmButton_02.TabIndex = 3;
@@ -451,7 +476,7 @@
             // 
             this.LatitudeLabel_02.AutoSize = true;
             this.LatitudeLabel_02.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.LatitudeLabel_02.Location = new System.Drawing.Point(405, 336);
+            this.LatitudeLabel_02.Location = new System.Drawing.Point(435, 336);
             this.LatitudeLabel_02.Name = "LatitudeLabel_02";
             this.LatitudeLabel_02.Size = new System.Drawing.Size(80, 12);
             this.LatitudeLabel_02.TabIndex = 4;
@@ -461,7 +486,7 @@
             // 
             this.LongitudeLabel_02.AutoSize = true;
             this.LongitudeLabel_02.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.LongitudeLabel_02.Location = new System.Drawing.Point(405, 354);
+            this.LongitudeLabel_02.Location = new System.Drawing.Point(435, 354);
             this.LongitudeLabel_02.Name = "LongitudeLabel_02";
             this.LongitudeLabel_02.Size = new System.Drawing.Size(91, 12);
             this.LongitudeLabel_02.TabIndex = 5;
@@ -469,7 +494,7 @@
             // 
             // MissionUploadButton_02
             // 
-            this.MissionUploadButton_02.Location = new System.Drawing.Point(383, 101);
+            this.MissionUploadButton_02.Location = new System.Drawing.Point(413, 101);
             this.MissionUploadButton_02.Name = "MissionUploadButton_02";
             this.MissionUploadButton_02.Size = new System.Drawing.Size(209, 23);
             this.MissionUploadButton_02.TabIndex = 6;
@@ -480,7 +505,7 @@
             // StatusMessageLabel_02
             // 
             this.StatusMessageLabel_02.AutoSize = true;
-            this.StatusMessageLabel_02.Location = new System.Drawing.Point(379, 471);
+            this.StatusMessageLabel_02.Location = new System.Drawing.Point(412, 471);
             this.StatusMessageLabel_02.Name = "StatusMessageLabel_02";
             this.StatusMessageLabel_02.Size = new System.Drawing.Size(124, 12);
             this.StatusMessageLabel_02.TabIndex = 7;
@@ -488,7 +513,7 @@
             // 
             // ClearMissionButton_02
             // 
-            this.ClearMissionButton_02.Location = new System.Drawing.Point(383, 130);
+            this.ClearMissionButton_02.Location = new System.Drawing.Point(413, 130);
             this.ClearMissionButton_02.Name = "ClearMissionButton_02";
             this.ClearMissionButton_02.Size = new System.Drawing.Size(209, 23);
             this.ClearMissionButton_02.TabIndex = 8;
@@ -499,7 +524,7 @@
             // CommandResultMessageLabel_02
             // 
             this.CommandResultMessageLabel_02.AutoSize = true;
-            this.CommandResultMessageLabel_02.Location = new System.Drawing.Point(379, 493);
+            this.CommandResultMessageLabel_02.Location = new System.Drawing.Point(413, 493);
             this.CommandResultMessageLabel_02.Name = "CommandResultMessageLabel_02";
             this.CommandResultMessageLabel_02.Size = new System.Drawing.Size(183, 12);
             this.CommandResultMessageLabel_02.TabIndex = 9;
@@ -507,7 +532,7 @@
             // 
             // MissionStartButton_02
             // 
-            this.MissionStartButton_02.Location = new System.Drawing.Point(383, 73);
+            this.MissionStartButton_02.Location = new System.Drawing.Point(413, 73);
             this.MissionStartButton_02.Name = "MissionStartButton_02";
             this.MissionStartButton_02.Size = new System.Drawing.Size(209, 23);
             this.MissionStartButton_02.TabIndex = 10;
@@ -518,7 +543,7 @@
             // FlightModeTag_02
             // 
             this.FlightModeTag_02.AutoSize = true;
-            this.FlightModeTag_02.Location = new System.Drawing.Point(381, 249);
+            this.FlightModeTag_02.Location = new System.Drawing.Point(411, 249);
             this.FlightModeTag_02.Name = "FlightModeTag_02";
             this.FlightModeTag_02.Size = new System.Drawing.Size(75, 12);
             this.FlightModeTag_02.TabIndex = 11;
@@ -528,7 +553,7 @@
             // 
             this.FlightModeLabel_02.AutoSize = true;
             this.FlightModeLabel_02.ForeColor = System.Drawing.Color.Red;
-            this.FlightModeLabel_02.Location = new System.Drawing.Point(462, 249);
+            this.FlightModeLabel_02.Location = new System.Drawing.Point(492, 249);
             this.FlightModeLabel_02.Name = "FlightModeLabel_02";
             this.FlightModeLabel_02.Size = new System.Drawing.Size(98, 12);
             this.FlightModeLabel_02.TabIndex = 12;
@@ -537,14 +562,14 @@
             // FlightModeComboBox_02
             // 
             this.FlightModeComboBox_02.FormattingEnabled = true;
-            this.FlightModeComboBox_02.Location = new System.Drawing.Point(383, 296);
+            this.FlightModeComboBox_02.Location = new System.Drawing.Point(413, 296);
             this.FlightModeComboBox_02.Name = "FlightModeComboBox_02";
             this.FlightModeComboBox_02.Size = new System.Drawing.Size(123, 20);
             this.FlightModeComboBox_02.TabIndex = 13;
             // 
             // FlightModeButton_02
             // 
-            this.FlightModeButton_02.Location = new System.Drawing.Point(517, 293);
+            this.FlightModeButton_02.Location = new System.Drawing.Point(547, 293);
             this.FlightModeButton_02.Name = "FlightModeButton_02";
             this.FlightModeButton_02.Size = new System.Drawing.Size(75, 23);
             this.FlightModeButton_02.TabIndex = 14;
@@ -555,7 +580,7 @@
             // LatitudeTag_02
             // 
             this.LatitudeTag_02.AutoSize = true;
-            this.LatitudeTag_02.Location = new System.Drawing.Point(369, 336);
+            this.LatitudeTag_02.Location = new System.Drawing.Point(399, 336);
             this.LatitudeTag_02.Name = "LatitudeTag_02";
             this.LatitudeTag_02.Size = new System.Drawing.Size(30, 12);
             this.LatitudeTag_02.TabIndex = 15;
@@ -564,7 +589,7 @@
             // LongitudeTag_02
             // 
             this.LongitudeTag_02.AutoSize = true;
-            this.LongitudeTag_02.Location = new System.Drawing.Point(369, 354);
+            this.LongitudeTag_02.Location = new System.Drawing.Point(399, 354);
             this.LongitudeTag_02.Name = "LongitudeTag_02";
             this.LongitudeTag_02.Size = new System.Drawing.Size(34, 12);
             this.LongitudeTag_02.TabIndex = 16;
@@ -573,7 +598,7 @@
             // SubModeTag_02
             // 
             this.SubModeTag_02.AutoSize = true;
-            this.SubModeTag_02.Location = new System.Drawing.Point(381, 271);
+            this.SubModeTag_02.Location = new System.Drawing.Point(411, 271);
             this.SubModeTag_02.Name = "SubModeTag_02";
             this.SubModeTag_02.Size = new System.Drawing.Size(89, 12);
             this.SubModeTag_02.TabIndex = 17;
@@ -583,7 +608,7 @@
             // 
             this.SubModeLabel_02.AutoSize = true;
             this.SubModeLabel_02.ForeColor = System.Drawing.Color.Red;
-            this.SubModeLabel_02.Location = new System.Drawing.Point(462, 271);
+            this.SubModeLabel_02.Location = new System.Drawing.Point(492, 271);
             this.SubModeLabel_02.Name = "SubModeLabel_02";
             this.SubModeLabel_02.Size = new System.Drawing.Size(90, 12);
             this.SubModeLabel_02.TabIndex = 18;
@@ -592,7 +617,7 @@
             // RollTag_02
             // 
             this.RollTag_02.AutoSize = true;
-            this.RollTag_02.Location = new System.Drawing.Point(514, 336);
+            this.RollTag_02.Location = new System.Drawing.Point(544, 336);
             this.RollTag_02.Name = "RollTag_02";
             this.RollTag_02.Size = new System.Drawing.Size(30, 12);
             this.RollTag_02.TabIndex = 19;
@@ -601,7 +626,7 @@
             // PitchTag_02
             // 
             this.PitchTag_02.AutoSize = true;
-            this.PitchTag_02.Location = new System.Drawing.Point(514, 354);
+            this.PitchTag_02.Location = new System.Drawing.Point(544, 354);
             this.PitchTag_02.Name = "PitchTag_02";
             this.PitchTag_02.Size = new System.Drawing.Size(40, 12);
             this.PitchTag_02.TabIndex = 20;
@@ -610,7 +635,7 @@
             // YawTag_02
             // 
             this.YawTag_02.AutoSize = true;
-            this.YawTag_02.Location = new System.Drawing.Point(514, 372);
+            this.YawTag_02.Location = new System.Drawing.Point(544, 372);
             this.YawTag_02.Name = "YawTag_02";
             this.YawTag_02.Size = new System.Drawing.Size(37, 12);
             this.YawTag_02.TabIndex = 21;
@@ -620,7 +645,7 @@
             // 
             this.RollLabel_02.AutoSize = true;
             this.RollLabel_02.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.RollLabel_02.Location = new System.Drawing.Point(550, 336);
+            this.RollLabel_02.Location = new System.Drawing.Point(580, 336);
             this.RollLabel_02.Name = "RollLabel_02";
             this.RollLabel_02.Size = new System.Drawing.Size(57, 12);
             this.RollLabel_02.TabIndex = 22;
@@ -630,7 +655,7 @@
             // 
             this.PitchLabel_02.AutoSize = true;
             this.PitchLabel_02.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.PitchLabel_02.Location = new System.Drawing.Point(550, 354);
+            this.PitchLabel_02.Location = new System.Drawing.Point(580, 354);
             this.PitchLabel_02.Name = "PitchLabel_02";
             this.PitchLabel_02.Size = new System.Drawing.Size(64, 12);
             this.PitchLabel_02.TabIndex = 23;
@@ -640,7 +665,7 @@
             // 
             this.YawLabel_02.AutoSize = true;
             this.YawLabel_02.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.YawLabel_02.Location = new System.Drawing.Point(550, 372);
+            this.YawLabel_02.Location = new System.Drawing.Point(580, 372);
             this.YawLabel_02.Name = "YawLabel_02";
             this.YawLabel_02.Size = new System.Drawing.Size(61, 12);
             this.YawLabel_02.TabIndex = 24;
@@ -649,7 +674,7 @@
             // BatteryTag_02
             // 
             this.BatteryTag_02.AutoSize = true;
-            this.BatteryTag_02.Location = new System.Drawing.Point(444, 418);
+            this.BatteryTag_02.Location = new System.Drawing.Point(544, 395);
             this.BatteryTag_02.Name = "BatteryTag_02";
             this.BatteryTag_02.Size = new System.Drawing.Size(52, 12);
             this.BatteryTag_02.TabIndex = 25;
@@ -659,7 +684,7 @@
             // 
             this.BatteryLabel_02.AutoSize = true;
             this.BatteryLabel_02.ForeColor = System.Drawing.Color.Red;
-            this.BatteryLabel_02.Location = new System.Drawing.Point(496, 418);
+            this.BatteryLabel_02.Location = new System.Drawing.Point(596, 395);
             this.BatteryLabel_02.Name = "BatteryLabel_02";
             this.BatteryLabel_02.Size = new System.Drawing.Size(11, 12);
             this.BatteryLabel_02.TabIndex = 26;
@@ -668,7 +693,7 @@
             // AltitudeTag_02
             // 
             this.AltitudeTag_02.AutoSize = true;
-            this.AltitudeTag_02.Location = new System.Drawing.Point(369, 372);
+            this.AltitudeTag_02.Location = new System.Drawing.Point(399, 372);
             this.AltitudeTag_02.Name = "AltitudeTag_02";
             this.AltitudeTag_02.Size = new System.Drawing.Size(27, 12);
             this.AltitudeTag_02.TabIndex = 27;
@@ -678,7 +703,7 @@
             // 
             this.AltitudeLabel_02.AutoSize = true;
             this.AltitudeLabel_02.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.AltitudeLabel_02.Location = new System.Drawing.Point(405, 372);
+            this.AltitudeLabel_02.Location = new System.Drawing.Point(435, 372);
             this.AltitudeLabel_02.Name = "AltitudeLabel_02";
             this.AltitudeLabel_02.Size = new System.Drawing.Size(77, 12);
             this.AltitudeLabel_02.TabIndex = 28;
@@ -688,7 +713,7 @@
             // 
             this.DroneTag_02.AutoSize = true;
             this.DroneTag_02.Font = new System.Drawing.Font("굴림", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.DroneTag_02.Location = new System.Drawing.Point(407, 24);
+            this.DroneTag_02.Location = new System.Drawing.Point(437, 24);
             this.DroneTag_02.Name = "DroneTag_02";
             this.DroneTag_02.Size = new System.Drawing.Size(155, 24);
             this.DroneTag_02.TabIndex = 29;
@@ -696,7 +721,7 @@
             // 
             // TakeoffButton_03
             // 
-            this.TakeoffButton_03.Location = new System.Drawing.Point(722, 216);
+            this.TakeoffButton_03.Location = new System.Drawing.Point(741, 216);
             this.TakeoffButton_03.Name = "TakeoffButton_03";
             this.TakeoffButton_03.Size = new System.Drawing.Size(89, 23);
             this.TakeoffButton_03.TabIndex = 0;
@@ -706,7 +731,7 @@
             // 
             // LandButton_03
             // 
-            this.LandButton_03.Location = new System.Drawing.Point(844, 216);
+            this.LandButton_03.Location = new System.Drawing.Point(863, 216);
             this.LandButton_03.Name = "LandButton_03";
             this.LandButton_03.Size = new System.Drawing.Size(89, 23);
             this.LandButton_03.TabIndex = 1;
@@ -716,7 +741,7 @@
             // 
             // ArmButton_03
             // 
-            this.ArmButton_03.Location = new System.Drawing.Point(722, 175);
+            this.ArmButton_03.Location = new System.Drawing.Point(741, 175);
             this.ArmButton_03.Name = "ArmButton_03";
             this.ArmButton_03.Size = new System.Drawing.Size(89, 23);
             this.ArmButton_03.TabIndex = 2;
@@ -726,7 +751,7 @@
             // 
             // DisarmButton_03
             // 
-            this.DisarmButton_03.Location = new System.Drawing.Point(844, 175);
+            this.DisarmButton_03.Location = new System.Drawing.Point(863, 175);
             this.DisarmButton_03.Name = "DisarmButton_03";
             this.DisarmButton_03.Size = new System.Drawing.Size(89, 23);
             this.DisarmButton_03.TabIndex = 3;
@@ -738,7 +763,7 @@
             // 
             this.LatitudeLabel_03.AutoSize = true;
             this.LatitudeLabel_03.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.LatitudeLabel_03.Location = new System.Drawing.Point(746, 336);
+            this.LatitudeLabel_03.Location = new System.Drawing.Point(765, 336);
             this.LatitudeLabel_03.Name = "LatitudeLabel_03";
             this.LatitudeLabel_03.Size = new System.Drawing.Size(80, 12);
             this.LatitudeLabel_03.TabIndex = 4;
@@ -748,7 +773,7 @@
             // 
             this.LongitudeLabel_03.AutoSize = true;
             this.LongitudeLabel_03.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.LongitudeLabel_03.Location = new System.Drawing.Point(746, 354);
+            this.LongitudeLabel_03.Location = new System.Drawing.Point(765, 354);
             this.LongitudeLabel_03.Name = "LongitudeLabel_03";
             this.LongitudeLabel_03.Size = new System.Drawing.Size(91, 12);
             this.LongitudeLabel_03.TabIndex = 5;
@@ -756,7 +781,7 @@
             // 
             // MissionUploadButton_03
             // 
-            this.MissionUploadButton_03.Location = new System.Drawing.Point(724, 101);
+            this.MissionUploadButton_03.Location = new System.Drawing.Point(743, 101);
             this.MissionUploadButton_03.Name = "MissionUploadButton_03";
             this.MissionUploadButton_03.Size = new System.Drawing.Size(209, 23);
             this.MissionUploadButton_03.TabIndex = 6;
@@ -767,7 +792,7 @@
             // StatusMessageLabel_03
             // 
             this.StatusMessageLabel_03.AutoSize = true;
-            this.StatusMessageLabel_03.Location = new System.Drawing.Point(720, 471);
+            this.StatusMessageLabel_03.Location = new System.Drawing.Point(739, 471);
             this.StatusMessageLabel_03.Name = "StatusMessageLabel_03";
             this.StatusMessageLabel_03.Size = new System.Drawing.Size(124, 12);
             this.StatusMessageLabel_03.TabIndex = 7;
@@ -775,7 +800,7 @@
             // 
             // ClearMissionButton_03
             // 
-            this.ClearMissionButton_03.Location = new System.Drawing.Point(724, 130);
+            this.ClearMissionButton_03.Location = new System.Drawing.Point(743, 130);
             this.ClearMissionButton_03.Name = "ClearMissionButton_03";
             this.ClearMissionButton_03.Size = new System.Drawing.Size(209, 23);
             this.ClearMissionButton_03.TabIndex = 8;
@@ -786,7 +811,7 @@
             // CommandResultMessageLabel_03
             // 
             this.CommandResultMessageLabel_03.AutoSize = true;
-            this.CommandResultMessageLabel_03.Location = new System.Drawing.Point(720, 493);
+            this.CommandResultMessageLabel_03.Location = new System.Drawing.Point(739, 493);
             this.CommandResultMessageLabel_03.Name = "CommandResultMessageLabel_03";
             this.CommandResultMessageLabel_03.Size = new System.Drawing.Size(183, 12);
             this.CommandResultMessageLabel_03.TabIndex = 9;
@@ -794,7 +819,7 @@
             // 
             // MissionStartButton_03
             // 
-            this.MissionStartButton_03.Location = new System.Drawing.Point(724, 73);
+            this.MissionStartButton_03.Location = new System.Drawing.Point(743, 73);
             this.MissionStartButton_03.Name = "MissionStartButton_03";
             this.MissionStartButton_03.Size = new System.Drawing.Size(209, 23);
             this.MissionStartButton_03.TabIndex = 10;
@@ -805,7 +830,7 @@
             // FlightModeTag_03
             // 
             this.FlightModeTag_03.AutoSize = true;
-            this.FlightModeTag_03.Location = new System.Drawing.Point(722, 249);
+            this.FlightModeTag_03.Location = new System.Drawing.Point(741, 249);
             this.FlightModeTag_03.Name = "FlightModeTag_03";
             this.FlightModeTag_03.Size = new System.Drawing.Size(75, 12);
             this.FlightModeTag_03.TabIndex = 11;
@@ -815,7 +840,7 @@
             // 
             this.FlightModeLabel_03.AutoSize = true;
             this.FlightModeLabel_03.ForeColor = System.Drawing.Color.Red;
-            this.FlightModeLabel_03.Location = new System.Drawing.Point(803, 249);
+            this.FlightModeLabel_03.Location = new System.Drawing.Point(822, 249);
             this.FlightModeLabel_03.Name = "FlightModeLabel_03";
             this.FlightModeLabel_03.Size = new System.Drawing.Size(98, 12);
             this.FlightModeLabel_03.TabIndex = 12;
@@ -824,14 +849,14 @@
             // FlightModeComboBox_03
             // 
             this.FlightModeComboBox_03.FormattingEnabled = true;
-            this.FlightModeComboBox_03.Location = new System.Drawing.Point(724, 296);
+            this.FlightModeComboBox_03.Location = new System.Drawing.Point(743, 296);
             this.FlightModeComboBox_03.Name = "FlightModeComboBox_03";
             this.FlightModeComboBox_03.Size = new System.Drawing.Size(123, 20);
             this.FlightModeComboBox_03.TabIndex = 13;
             // 
             // FlightModeButton_03
             // 
-            this.FlightModeButton_03.Location = new System.Drawing.Point(858, 293);
+            this.FlightModeButton_03.Location = new System.Drawing.Point(877, 293);
             this.FlightModeButton_03.Name = "FlightModeButton_03";
             this.FlightModeButton_03.Size = new System.Drawing.Size(75, 23);
             this.FlightModeButton_03.TabIndex = 14;
@@ -842,7 +867,7 @@
             // LatitudeTag_03
             // 
             this.LatitudeTag_03.AutoSize = true;
-            this.LatitudeTag_03.Location = new System.Drawing.Point(710, 336);
+            this.LatitudeTag_03.Location = new System.Drawing.Point(729, 336);
             this.LatitudeTag_03.Name = "LatitudeTag_03";
             this.LatitudeTag_03.Size = new System.Drawing.Size(30, 12);
             this.LatitudeTag_03.TabIndex = 15;
@@ -851,7 +876,7 @@
             // LongitudeTag_03
             // 
             this.LongitudeTag_03.AutoSize = true;
-            this.LongitudeTag_03.Location = new System.Drawing.Point(710, 354);
+            this.LongitudeTag_03.Location = new System.Drawing.Point(729, 354);
             this.LongitudeTag_03.Name = "LongitudeTag_03";
             this.LongitudeTag_03.Size = new System.Drawing.Size(34, 12);
             this.LongitudeTag_03.TabIndex = 16;
@@ -860,7 +885,7 @@
             // SubModeTag_03
             // 
             this.SubModeTag_03.AutoSize = true;
-            this.SubModeTag_03.Location = new System.Drawing.Point(722, 271);
+            this.SubModeTag_03.Location = new System.Drawing.Point(741, 271);
             this.SubModeTag_03.Name = "SubModeTag_03";
             this.SubModeTag_03.Size = new System.Drawing.Size(89, 12);
             this.SubModeTag_03.TabIndex = 17;
@@ -870,7 +895,7 @@
             // 
             this.SubModeLabel_03.AutoSize = true;
             this.SubModeLabel_03.ForeColor = System.Drawing.Color.Red;
-            this.SubModeLabel_03.Location = new System.Drawing.Point(803, 271);
+            this.SubModeLabel_03.Location = new System.Drawing.Point(822, 271);
             this.SubModeLabel_03.Name = "SubModeLabel_03";
             this.SubModeLabel_03.Size = new System.Drawing.Size(90, 12);
             this.SubModeLabel_03.TabIndex = 18;
@@ -879,7 +904,7 @@
             // RollTag_03
             // 
             this.RollTag_03.AutoSize = true;
-            this.RollTag_03.Location = new System.Drawing.Point(855, 336);
+            this.RollTag_03.Location = new System.Drawing.Point(874, 336);
             this.RollTag_03.Name = "RollTag_03";
             this.RollTag_03.Size = new System.Drawing.Size(30, 12);
             this.RollTag_03.TabIndex = 19;
@@ -888,7 +913,7 @@
             // PitchTag_03
             // 
             this.PitchTag_03.AutoSize = true;
-            this.PitchTag_03.Location = new System.Drawing.Point(855, 354);
+            this.PitchTag_03.Location = new System.Drawing.Point(874, 354);
             this.PitchTag_03.Name = "PitchTag_03";
             this.PitchTag_03.Size = new System.Drawing.Size(40, 12);
             this.PitchTag_03.TabIndex = 20;
@@ -897,7 +922,7 @@
             // YawTag_03
             // 
             this.YawTag_03.AutoSize = true;
-            this.YawTag_03.Location = new System.Drawing.Point(855, 372);
+            this.YawTag_03.Location = new System.Drawing.Point(874, 372);
             this.YawTag_03.Name = "YawTag_03";
             this.YawTag_03.Size = new System.Drawing.Size(37, 12);
             this.YawTag_03.TabIndex = 21;
@@ -907,7 +932,7 @@
             // 
             this.RollLabel_03.AutoSize = true;
             this.RollLabel_03.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.RollLabel_03.Location = new System.Drawing.Point(891, 336);
+            this.RollLabel_03.Location = new System.Drawing.Point(910, 336);
             this.RollLabel_03.Name = "RollLabel_03";
             this.RollLabel_03.Size = new System.Drawing.Size(57, 12);
             this.RollLabel_03.TabIndex = 22;
@@ -917,7 +942,7 @@
             // 
             this.PitchLabel_03.AutoSize = true;
             this.PitchLabel_03.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.PitchLabel_03.Location = new System.Drawing.Point(891, 354);
+            this.PitchLabel_03.Location = new System.Drawing.Point(910, 354);
             this.PitchLabel_03.Name = "PitchLabel_03";
             this.PitchLabel_03.Size = new System.Drawing.Size(64, 12);
             this.PitchLabel_03.TabIndex = 23;
@@ -927,7 +952,7 @@
             // 
             this.YawLabel_03.AutoSize = true;
             this.YawLabel_03.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.YawLabel_03.Location = new System.Drawing.Point(891, 372);
+            this.YawLabel_03.Location = new System.Drawing.Point(910, 372);
             this.YawLabel_03.Name = "YawLabel_03";
             this.YawLabel_03.Size = new System.Drawing.Size(61, 12);
             this.YawLabel_03.TabIndex = 24;
@@ -936,7 +961,7 @@
             // BatteryTag_03
             // 
             this.BatteryTag_03.AutoSize = true;
-            this.BatteryTag_03.Location = new System.Drawing.Point(785, 418);
+            this.BatteryTag_03.Location = new System.Drawing.Point(874, 395);
             this.BatteryTag_03.Name = "BatteryTag_03";
             this.BatteryTag_03.Size = new System.Drawing.Size(52, 12);
             this.BatteryTag_03.TabIndex = 25;
@@ -946,7 +971,7 @@
             // 
             this.BatteryLabel_03.AutoSize = true;
             this.BatteryLabel_03.ForeColor = System.Drawing.Color.Red;
-            this.BatteryLabel_03.Location = new System.Drawing.Point(837, 418);
+            this.BatteryLabel_03.Location = new System.Drawing.Point(926, 395);
             this.BatteryLabel_03.Name = "BatteryLabel_03";
             this.BatteryLabel_03.Size = new System.Drawing.Size(11, 12);
             this.BatteryLabel_03.TabIndex = 26;
@@ -955,7 +980,7 @@
             // AltitudeTag_03
             // 
             this.AltitudeTag_03.AutoSize = true;
-            this.AltitudeTag_03.Location = new System.Drawing.Point(710, 372);
+            this.AltitudeTag_03.Location = new System.Drawing.Point(729, 372);
             this.AltitudeTag_03.Name = "AltitudeTag_03";
             this.AltitudeTag_03.Size = new System.Drawing.Size(27, 12);
             this.AltitudeTag_03.TabIndex = 27;
@@ -965,7 +990,7 @@
             // 
             this.AltitudeLabel_03.AutoSize = true;
             this.AltitudeLabel_03.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.AltitudeLabel_03.Location = new System.Drawing.Point(746, 372);
+            this.AltitudeLabel_03.Location = new System.Drawing.Point(765, 372);
             this.AltitudeLabel_03.Name = "AltitudeLabel_03";
             this.AltitudeLabel_03.Size = new System.Drawing.Size(77, 12);
             this.AltitudeLabel_03.TabIndex = 28;
@@ -975,49 +1000,277 @@
             // 
             this.DroneTag_03.AutoSize = true;
             this.DroneTag_03.Font = new System.Drawing.Font("굴림", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.DroneTag_03.Location = new System.Drawing.Point(748, 24);
+            this.DroneTag_03.Location = new System.Drawing.Point(767, 24);
             this.DroneTag_03.Name = "DroneTag_03";
             this.DroneTag_03.Size = new System.Drawing.Size(155, 24);
             this.DroneTag_03.TabIndex = 29;
             this.DroneTag_03.Text = "DroneTag #0";
-            //
-            // FIXME
-            //
-            TakeoffButtons = new System.Windows.Forms.Button[] { TakeoffButton_01, TakeoffButton_02, TakeoffButton_03 };
-            LandButtons = new System.Windows.Forms.Button[] { LandButton_01, LandButton_02, LandButton_03 };
-
-            ArmButtons = new System.Windows.Forms.Button[] { ArmButton_01, ArmButton_02, ArmButton_03 };
-            DisarmButtons = new System.Windows.Forms.Button[] { DisarmButton_01, DisarmButton_02, DisarmButton_03 };
-
-            LatitudeLabels = new System.Windows.Forms.Label[] { LatitudeLabel_01, LatitudeLabel_02, LatitudeLabel_03 };
-            LongitudeLabels = new System.Windows.Forms.Label[] { LongitudeLabel_01, LongitudeLabel_02, LongitudeLabel_03 };
-            AltitudeLabels = new System.Windows.Forms.Label[] { AltitudeLabel_01, AltitudeLabel_02, AltitudeLabel_03 };
-
-            RollLabels = new System.Windows.Forms.Label[] { RollLabel_01, RollLabel_02, RollLabel_03 };
-            PitchLabels = new System.Windows.Forms.Label[] { PitchLabel_01, PitchLabel_02, PitchLabel_03 };
-            YawLabels = new System.Windows.Forms.Label[] { YawLabel_01, YawLabel_02, YawLabel_03 };
-
-            BatteryLabels = new System.Windows.Forms.Label[] { BatteryLabel_01, BatteryLabel_02, BatteryLabel_03 };
-
-            MissionUploadButtons = new System.Windows.Forms.Button[] { MissionStartButton_01, MissionStartButton_02, MissionStartButton_03 };
-            ClearMissionButtons = new System.Windows.Forms.Button[] { ClearMissionButton_01, ClearMissionButton_02, ClearMissionButton_03 };
-            MissionStartButtons = new System.Windows.Forms.Button[] { MissionStartButton_01, MissionStartButton_02, MissionStartButton_03 };
-
-            StatusMessageLabels = new System.Windows.Forms.Label[] { StatusMessageLabel_01, StatusMessageLabel_02, StatusMessageLabel_03 };
-            CommandResultMessageLabels = new System.Windows.Forms.Label[] { CommandResultMessageLabel_01, CommandResultMessageLabel_02, CommandResultMessageLabel_03 };
-
-            FlightModeLabels = new System.Windows.Forms.Label[] { FlightModeLabel_01, FlightModeLabel_02, FlightModeLabel_03 };
-            SubModeLabels = new System.Windows.Forms.Label[] { SubModeLabel_01, SubModeLabel_02, SubModeLabel_03 };
-            FlightModeComboBoxes = new System.Windows.Forms.ComboBox[] { FlightModeComboBox_01, FlightModeComboBox_02, FlightModeComboBox_03 };
-            FlightModeButtons = new System.Windows.Forms.Button[] { FlightModeButton_01, FlightModeButton_02, FlightModeButton_03 };
-
-            DroneTags = new System.Windows.Forms.Label[] { DroneTag_01, DroneTag_02, DroneTag_03 };
+            // 
+            // HomeLatitudeLabel_03
+            // 
+            this.HomeLatitudeLabel_03.AutoSize = true;
+            this.HomeLatitudeLabel_03.Location = new System.Drawing.Point(875, 417);
+            this.HomeLatitudeLabel_03.Name = "HomeLatitudeLabel_03";
+            this.HomeLatitudeLabel_03.Size = new System.Drawing.Size(131, 12);
+            this.HomeLatitudeLabel_03.TabIndex = 32;
+            this.HomeLatitudeLabel_03.Text = "HomeLatitudeLabel_03";
+            // 
+            // HomeLongitudeLabel_03
+            // 
+            this.HomeLongitudeLabel_03.AutoSize = true;
+            this.HomeLongitudeLabel_03.Location = new System.Drawing.Point(875, 431);
+            this.HomeLongitudeLabel_03.Name = "HomeLongitudeLabel_03";
+            this.HomeLongitudeLabel_03.Size = new System.Drawing.Size(142, 12);
+            this.HomeLongitudeLabel_03.TabIndex = 33;
+            this.HomeLongitudeLabel_03.Text = "HomeLongitudeLabel_03";
+            // 
+            // LocalXLabel_03
+            // 
+            this.LocalXLabel_03.AutoSize = true;
+            this.LocalXLabel_03.ForeColor = System.Drawing.Color.Black;
+            this.LocalXLabel_03.Location = new System.Drawing.Point(765, 395);
+            this.LocalXLabel_03.Name = "LocalXLabel_03";
+            this.LocalXLabel_03.Size = new System.Drawing.Size(93, 12);
+            this.LocalXLabel_03.TabIndex = 40;
+            this.LocalXLabel_03.Text = "LocalXLabel_03";
+            // 
+            // LocalYLabel_03
+            // 
+            this.LocalYLabel_03.AutoSize = true;
+            this.LocalYLabel_03.ForeColor = System.Drawing.Color.Black;
+            this.LocalYLabel_03.Location = new System.Drawing.Point(765, 413);
+            this.LocalYLabel_03.Name = "LocalYLabel_03";
+            this.LocalYLabel_03.Size = new System.Drawing.Size(93, 12);
+            this.LocalYLabel_03.TabIndex = 39;
+            this.LocalYLabel_03.Text = "LocalYLabel_03";
+            // 
+            // LocalZLabel_03
+            // 
+            this.LocalZLabel_03.AutoSize = true;
+            this.LocalZLabel_03.ForeColor = System.Drawing.Color.Black;
+            this.LocalZLabel_03.Location = new System.Drawing.Point(765, 431);
+            this.LocalZLabel_03.Name = "LocalZLabel_03";
+            this.LocalZLabel_03.Size = new System.Drawing.Size(93, 12);
+            this.LocalZLabel_03.TabIndex = 38;
+            this.LocalZLabel_03.Text = "LocalZLabel_03";
+            // 
+            // LocalXTag_03
+            // 
+            this.LocalXTag_03.AutoSize = true;
+            this.LocalXTag_03.Location = new System.Drawing.Point(729, 395);
+            this.LocalXTag_03.Name = "LocalXTag_03";
+            this.LocalXTag_03.Size = new System.Drawing.Size(20, 12);
+            this.LocalXTag_03.TabIndex = 37;
+            this.LocalXTag_03.Text = "x: ";
+            // 
+            // LocalYTag_03
+            // 
+            this.LocalYTag_03.AutoSize = true;
+            this.LocalYTag_03.Location = new System.Drawing.Point(729, 413);
+            this.LocalYTag_03.Name = "LocalYTag_03";
+            this.LocalYTag_03.Size = new System.Drawing.Size(20, 12);
+            this.LocalYTag_03.TabIndex = 36;
+            this.LocalYTag_03.Text = "y: ";
+            // 
+            // LocalZTag_03
+            // 
+            this.LocalZTag_03.AutoSize = true;
+            this.LocalZTag_03.Location = new System.Drawing.Point(729, 431);
+            this.LocalZTag_03.Name = "LocalZTag_03";
+            this.LocalZTag_03.Size = new System.Drawing.Size(20, 12);
+            this.LocalZTag_03.TabIndex = 35;
+            this.LocalZTag_03.Text = "z: ";
+            // 
+            // LocalXLabel_02
+            // 
+            this.LocalXLabel_02.AutoSize = true;
+            this.LocalXLabel_02.ForeColor = System.Drawing.Color.Black;
+            this.LocalXLabel_02.Location = new System.Drawing.Point(435, 395);
+            this.LocalXLabel_02.Name = "LocalXLabel_02";
+            this.LocalXLabel_02.Size = new System.Drawing.Size(93, 12);
+            this.LocalXLabel_02.TabIndex = 48;
+            this.LocalXLabel_02.Text = "LocalXLabel_02";
+            // 
+            // LocalYLabel_02
+            // 
+            this.LocalYLabel_02.AutoSize = true;
+            this.LocalYLabel_02.ForeColor = System.Drawing.Color.Black;
+            this.LocalYLabel_02.Location = new System.Drawing.Point(435, 413);
+            this.LocalYLabel_02.Name = "LocalYLabel_02";
+            this.LocalYLabel_02.Size = new System.Drawing.Size(93, 12);
+            this.LocalYLabel_02.TabIndex = 47;
+            this.LocalYLabel_02.Text = "LocalYLabel_02";
+            // 
+            // LocalZLabel_02
+            // 
+            this.LocalZLabel_02.AutoSize = true;
+            this.LocalZLabel_02.ForeColor = System.Drawing.Color.Black;
+            this.LocalZLabel_02.Location = new System.Drawing.Point(435, 431);
+            this.LocalZLabel_02.Name = "LocalZLabel_02";
+            this.LocalZLabel_02.Size = new System.Drawing.Size(93, 12);
+            this.LocalZLabel_02.TabIndex = 46;
+            this.LocalZLabel_02.Text = "LocalZLabel_02";
+            // 
+            // LocalXTag_02
+            // 
+            this.LocalXTag_02.AutoSize = true;
+            this.LocalXTag_02.Location = new System.Drawing.Point(399, 395);
+            this.LocalXTag_02.Name = "LocalXTag_02";
+            this.LocalXTag_02.Size = new System.Drawing.Size(20, 12);
+            this.LocalXTag_02.TabIndex = 45;
+            this.LocalXTag_02.Text = "x: ";
+            // 
+            // LocalYTag_02
+            // 
+            this.LocalYTag_02.AutoSize = true;
+            this.LocalYTag_02.Location = new System.Drawing.Point(399, 413);
+            this.LocalYTag_02.Name = "LocalYTag_02";
+            this.LocalYTag_02.Size = new System.Drawing.Size(20, 12);
+            this.LocalYTag_02.TabIndex = 44;
+            this.LocalYTag_02.Text = "y: ";
+            // 
+            // LocalZTag_02
+            // 
+            this.LocalZTag_02.AutoSize = true;
+            this.LocalZTag_02.Location = new System.Drawing.Point(399, 431);
+            this.LocalZTag_02.Name = "LocalZTag_02";
+            this.LocalZTag_02.Size = new System.Drawing.Size(20, 12);
+            this.LocalZTag_02.TabIndex = 43;
+            this.LocalZTag_02.Text = "z: ";
+            // 
+            // HomeLongitudeLabel_02
+            // 
+            this.HomeLongitudeLabel_02.AutoSize = true;
+            this.HomeLongitudeLabel_02.Location = new System.Drawing.Point(545, 431);
+            this.HomeLongitudeLabel_02.Name = "HomeLongitudeLabel_02";
+            this.HomeLongitudeLabel_02.Size = new System.Drawing.Size(142, 12);
+            this.HomeLongitudeLabel_02.TabIndex = 42;
+            this.HomeLongitudeLabel_02.Text = "HomeLongitudeLabel_02";
+            // 
+            // HomeLatitudeLabel_02
+            // 
+            this.HomeLatitudeLabel_02.AutoSize = true;
+            this.HomeLatitudeLabel_02.Location = new System.Drawing.Point(545, 417);
+            this.HomeLatitudeLabel_02.Name = "HomeLatitudeLabel_02";
+            this.HomeLatitudeLabel_02.Size = new System.Drawing.Size(131, 12);
+            this.HomeLatitudeLabel_02.TabIndex = 41;
+            this.HomeLatitudeLabel_02.Text = "HomeLatitudeLabel_02";
+            // 
+            // LocalXLabel_01
+            // 
+            this.LocalXLabel_01.AutoSize = true;
+            this.LocalXLabel_01.ForeColor = System.Drawing.Color.Black;
+            this.LocalXLabel_01.Location = new System.Drawing.Point(108, 399);
+            this.LocalXLabel_01.Name = "LocalXLabel_01";
+            this.LocalXLabel_01.Size = new System.Drawing.Size(93, 12);
+            this.LocalXLabel_01.TabIndex = 56;
+            this.LocalXLabel_01.Text = "LocalXLabel_01";
+            // 
+            // LocalYLabel_01
+            // 
+            this.LocalYLabel_01.AutoSize = true;
+            this.LocalYLabel_01.ForeColor = System.Drawing.Color.Black;
+            this.LocalYLabel_01.Location = new System.Drawing.Point(108, 417);
+            this.LocalYLabel_01.Name = "LocalYLabel_01";
+            this.LocalYLabel_01.Size = new System.Drawing.Size(93, 12);
+            this.LocalYLabel_01.TabIndex = 55;
+            this.LocalYLabel_01.Text = "LocalYLabel_01";
+            // 
+            // LocalZLabel_01
+            // 
+            this.LocalZLabel_01.AutoSize = true;
+            this.LocalZLabel_01.ForeColor = System.Drawing.Color.Black;
+            this.LocalZLabel_01.Location = new System.Drawing.Point(108, 435);
+            this.LocalZLabel_01.Name = "LocalZLabel_01";
+            this.LocalZLabel_01.Size = new System.Drawing.Size(93, 12);
+            this.LocalZLabel_01.TabIndex = 54;
+            this.LocalZLabel_01.Text = "LocalZLabel_01";
+            // 
+            // LocalXTag_01
+            // 
+            this.LocalXTag_01.AutoSize = true;
+            this.LocalXTag_01.Location = new System.Drawing.Point(72, 399);
+            this.LocalXTag_01.Name = "LocalXTag_01";
+            this.LocalXTag_01.Size = new System.Drawing.Size(20, 12);
+            this.LocalXTag_01.TabIndex = 53;
+            this.LocalXTag_01.Text = "x: ";
+            // 
+            // LocalYTag_01
+            // 
+            this.LocalYTag_01.AutoSize = true;
+            this.LocalYTag_01.Location = new System.Drawing.Point(72, 417);
+            this.LocalYTag_01.Name = "LocalYTag_01";
+            this.LocalYTag_01.Size = new System.Drawing.Size(20, 12);
+            this.LocalYTag_01.TabIndex = 52;
+            this.LocalYTag_01.Text = "y: ";
+            // 
+            // LocalZTag_01
+            // 
+            this.LocalZTag_01.AutoSize = true;
+            this.LocalZTag_01.Location = new System.Drawing.Point(72, 435);
+            this.LocalZTag_01.Name = "LocalZTag_01";
+            this.LocalZTag_01.Size = new System.Drawing.Size(20, 12);
+            this.LocalZTag_01.TabIndex = 51;
+            this.LocalZTag_01.Text = "z: ";
+            // 
+            // HomeLongitude_01
+            // 
+            this.HomeLongitude_01.AutoSize = true;
+            this.HomeLongitude_01.Location = new System.Drawing.Point(218, 435);
+            this.HomeLongitude_01.Name = "HomeLongitude_01";
+            this.HomeLongitude_01.Size = new System.Drawing.Size(111, 12);
+            this.HomeLongitude_01.TabIndex = 50;
+            this.HomeLongitude_01.Text = "HomeLongitude_01";
+            // 
+            // HomeLatitudeLabel_01
+            // 
+            this.HomeLatitudeLabel_01.AutoSize = true;
+            this.HomeLatitudeLabel_01.Location = new System.Drawing.Point(218, 421);
+            this.HomeLatitudeLabel_01.Name = "HomeLatitudeLabel_01";
+            this.HomeLatitudeLabel_01.Size = new System.Drawing.Size(131, 12);
+            this.HomeLatitudeLabel_01.TabIndex = 49;
+            this.HomeLatitudeLabel_01.Text = "HomeLatitudeLabel_01";
+            // 
+            // StartButton
+            // 
+            this.StartButton.Location = new System.Drawing.Point(1071, 429);
+            this.StartButton.Name = "StartButton";
+            this.StartButton.Size = new System.Drawing.Size(164, 76);
+            this.StartButton.TabIndex = 57;
+            this.StartButton.Text = "StartButton";
+            this.StartButton.UseVisualStyleBackColor = true;
+            this.StartButton.Click += new System.EventHandler(this.StartButton_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(992, 555);
+            this.ClientSize = new System.Drawing.Size(1295, 540);
+            this.Controls.Add(this.StartButton);
+            this.Controls.Add(this.LocalXLabel_01);
+            this.Controls.Add(this.LocalYLabel_01);
+            this.Controls.Add(this.LocalZLabel_01);
+            this.Controls.Add(this.LocalXTag_01);
+            this.Controls.Add(this.LocalYTag_01);
+            this.Controls.Add(this.LocalZTag_01);
+            this.Controls.Add(this.HomeLongitude_01);
+            this.Controls.Add(this.HomeLatitudeLabel_01);
+            this.Controls.Add(this.LocalXLabel_02);
+            this.Controls.Add(this.LocalYLabel_02);
+            this.Controls.Add(this.LocalZLabel_02);
+            this.Controls.Add(this.LocalXTag_02);
+            this.Controls.Add(this.LocalYTag_02);
+            this.Controls.Add(this.LocalZTag_02);
+            this.Controls.Add(this.HomeLongitudeLabel_02);
+            this.Controls.Add(this.HomeLatitudeLabel_02);
+            this.Controls.Add(this.LocalXLabel_03);
+            this.Controls.Add(this.LocalYLabel_03);
+            this.Controls.Add(this.LocalZLabel_03);
+            this.Controls.Add(this.LocalXTag_03);
+            this.Controls.Add(this.LocalYTag_03);
+            this.Controls.Add(this.LocalZTag_03);
+            this.Controls.Add(this.HomeLongitudeLabel_03);
+            this.Controls.Add(this.HomeLatitudeLabel_03);
             this.Controls.Add(this.DroneTag_03);
             this.Controls.Add(this.AltitudeLabel_03);
             this.Controls.Add(this.DroneTag_02);
@@ -1116,7 +1369,7 @@
         }
 
         #endregion
-
+        
         private System.Windows.Forms.Button TakeoffButton_01;
         private System.Windows.Forms.Button LandButton_01;
         private System.Windows.Forms.Button ArmButton_01;
@@ -1147,6 +1400,14 @@
         private System.Windows.Forms.Label AltitudeTag_01;
         private System.Windows.Forms.Label AltitudeLabel_01;
         private System.Windows.Forms.Label DroneTag_01;
+        private System.Windows.Forms.Label LocalXLabel_01;
+        private System.Windows.Forms.Label LocalYLabel_01;
+        private System.Windows.Forms.Label LocalZLabel_01;
+        private System.Windows.Forms.Label LocalXTag_01;
+        private System.Windows.Forms.Label LocalYTag_01;
+        private System.Windows.Forms.Label LocalZTag_01;
+        private System.Windows.Forms.Label HomeLongitude_01;
+        private System.Windows.Forms.Label HomeLatitudeLabel_01;
 
         private System.Windows.Forms.Button TakeoffButton_02;
         private System.Windows.Forms.Button LandButton_02;
@@ -1178,6 +1439,14 @@
         private System.Windows.Forms.Label AltitudeTag_02;
         private System.Windows.Forms.Label AltitudeLabel_02;
         private System.Windows.Forms.Label DroneTag_02;
+        private System.Windows.Forms.Label LocalXLabel_02;
+        private System.Windows.Forms.Label LocalYLabel_02;
+        private System.Windows.Forms.Label LocalZLabel_02;
+        private System.Windows.Forms.Label LocalXTag_02;
+        private System.Windows.Forms.Label LocalYTag_02;
+        private System.Windows.Forms.Label LocalZTag_02;
+        private System.Windows.Forms.Label HomeLongitudeLabel_02;
+        private System.Windows.Forms.Label HomeLatitudeLabel_02;
 
         private System.Windows.Forms.Button TakeoffButton_03;
         private System.Windows.Forms.Button LandButton_03;
@@ -1209,6 +1478,14 @@
         private System.Windows.Forms.Label AltitudeTag_03;
         private System.Windows.Forms.Label AltitudeLabel_03;
         private System.Windows.Forms.Label DroneTag_03;
+        private System.Windows.Forms.Label HomeLatitudeLabel_03;
+        private System.Windows.Forms.Label HomeLongitudeLabel_03;
+        private System.Windows.Forms.Label LocalXLabel_03;
+        private System.Windows.Forms.Label LocalYLabel_03;
+        private System.Windows.Forms.Label LocalZLabel_03;
+        private System.Windows.Forms.Label LocalXTag_03;
+        private System.Windows.Forms.Label LocalYTag_03;
+        private System.Windows.Forms.Label LocalZTag_03;
 
         private System.Windows.Forms.Button[] TakeoffButtons;
         private System.Windows.Forms.Button[] LandButtons;
@@ -1231,6 +1508,13 @@
         private System.Windows.Forms.ComboBox[] FlightModeComboBoxes;
         private System.Windows.Forms.Button[] FlightModeButtons;
         private System.Windows.Forms.Label[] DroneTags;
+        private System.Windows.Forms.Label[] LocalXLabels;
+        private System.Windows.Forms.Label[] LocalYLabels;
+        private System.Windows.Forms.Label[] LocalZLabels;
+        private System.Windows.Forms.Label[] HomeLatitudeLabels;
+        private System.Windows.Forms.Label[] HomeLongitudeLabels;
+
+        private System.Windows.Forms.Button StartButton;
     }
 }
 
