@@ -10,6 +10,9 @@ namespace MAVLink.NET
     {
         private List<MAVLinkNode> MAVLinkNodes;
 
+        private const double Lat2LonScale = 1.2493498129938325118272112550467;
+        private const double Lon2LatScale = 0.8004163362410785091197462331483;
+
         private const double Degree2Radian = 0.01745329251994329576923690768489;
         
         private enum FORMATION_MODE
@@ -124,8 +127,6 @@ namespace MAVLink.NET
          ****************************************/
         public void Flocking()
         {
-            Vector3[] nextWaypoint = new Vector3[MAVLinkNodes.Count];
-
             double kAlignment   = 1;
             double kSeperation  = 1;
             double kCohesion    = 1;
@@ -172,11 +173,13 @@ namespace MAVLink.NET
             {
                 //MAVLinkNodes[1].State = 1;
                 // TODO: Formation (Row, Column, Triangle)
+                Triangle();
             }
             else
             {
                 //MAVLinkNodes[1].State = 2;
                 // TODO: Formation (Row, Column, Triangle)
+                Triangle();
             }
 
             if (distance[1, 2] < 0.25 || distance[2, 0] < 0.25)
@@ -196,17 +199,25 @@ namespace MAVLink.NET
             {
                 //MAVLinkNodes[2].State = 1;
                 // TODO: Formation (Row, Column, Triangle)
+                Triangle();
             }
             else
             {
                 // MAVLinkNodes[2].State = 2;
                 // TODO: Formation (Row, Column, Triangle)
+                Triangle();
             }
 
             /* TODO: Set next waypoint
-            nextWaypoint[1] = WorldCoordinateGPS(MAVLinkNodes[1].Direction);
-            nextWaypoint[2] = WorldCoordinateGPS(MAVLinkNodes[2].Direction);
+            nextWaypoint[1] = WorldCoordinate2GPS(MAVLinkNodes[1].Direction);
+            nextWaypoint[2] = WorldCoordinate2GPS(MAVLinkNodes[2].Direction);
             */
+            MAVLinkNodes[1].NextWP(MAVLinkNodes[1].Direction.X, MAVLinkNodes[1].Direction.Y);
+            MAVLinkNodes[2].NextWP(MAVLinkNodes[2].Direction.X, MAVLinkNodes[2].Direction.Y);
+
+            Console.WriteLine("Node[0]: {0:f6}, {1:f6}", MAVLinkNodes[0].Position.X, MAVLinkNodes[0].Position.Y);
+            Console.WriteLine("Node[1]: {0:f6}, {1:f6}", MAVLinkNodes[1].Direction.X, MAVLinkNodes[1].Direction.Y);
+            Console.WriteLine("Node[2]: {0:f6}, {1:f6}", MAVLinkNodes[2].Direction.X, MAVLinkNodes[2].Direction.Y);
         }
 
         public void Row()
@@ -269,10 +280,21 @@ namespace MAVLink.NET
             MAVLinkNodes[2].Direction = leaderPosition + bVector + rVector;
         }
 
+        /*
+        public Vector3 WorldCoordinate2GPS(Vector3 coordinate)
+        {
+            double x = (coordinate.X / 10000) + kZero;
+            double y = coordinate.Y / 10000;
+
+        }
+        */
+
+        /*
         public void ComputeNextPosition()
         {
             // TODO: Compute Next Waypoint for each Agent
         }
+        */
 
         public void RunScenario()
         {
@@ -282,10 +304,10 @@ namespace MAVLink.NET
             MAVLinkNode leaderNode = MAVLinkNodes[0];
 
             // Upload mission to leader.
-            leaderNode.UploadMission();
+            // leaderNode.UploadMission();
 
             // Takeoff drones.
-            foreach (MAVLinkNode node in MAVLinkNodes) node.TakeoffCommand();
+            // foreach (MAVLinkNode node in MAVLinkNodes) node.TakeoffCommand();
 
             // Start mission.
             leaderNode.StartMission();
@@ -294,11 +316,13 @@ namespace MAVLink.NET
 
                 while (!leaderNode.HasCompletedMission())
                 {
+                    Flocking();
+                    /*
                     MAVLinkNode f1 = MAVLinkNodes[1];
                     MAVLinkNode f2 = MAVLinkNodes[2];
                     f1.NextWP(f1.Position.X + f1.Direction.X, f1.Position.Y + f1.Direction.Y);
                     f2.NextWP(f2.Position.X + f2.Direction.X, f2.Position.Y + f2.Direction.Y);
-
+                    */
                     System.Threading.Thread.Sleep(1000);
                 }
             });

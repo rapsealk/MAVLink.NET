@@ -37,6 +37,7 @@ namespace MAVLink.NET
                 nodes[count++] = MAVManager.RegisterAgent(portName, 57600);
                 if (count == nodes.Length) break;
             }
+            for (int i = 0; i < 3; i++) MAVManager.Open(i);
             /*/
             //*/
             UpdateUI();
@@ -252,6 +253,24 @@ namespace MAVLink.NET
         private void StartButton_Click(object sender, EventArgs e)
         {
             MAVManager.RunScenario();
+        }
+
+        private void DisarmAllButton_Click(object sender, EventArgs e)
+        {
+            foreach (MAVLinkNode node in nodes)
+                node.ArmDisarmCommand(false);
+        }
+
+        private void LandAllButton_Click(object sender, EventArgs e)
+        {
+            foreach (MAVLinkNode node in nodes)
+                node.LandCommand();
+        }
+
+        private void TakeoffAllButton_Click(object sender, EventArgs e)
+        {
+            foreach (MAVLinkNode node in nodes)
+                node.TakeoffCommand();
         }
     }
 }
