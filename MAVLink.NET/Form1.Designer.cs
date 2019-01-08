@@ -57,6 +57,18 @@
             this.BatteryLabel = new System.Windows.Forms.Label();
             this.AltitudeTag = new System.Windows.Forms.Label();
             this.AltitudeLabel = new System.Windows.Forms.Label();
+            this.LatitudeTextBox = new System.Windows.Forms.TextBox();
+            this.LongitudeTextBox = new System.Windows.Forms.TextBox();
+            this.WaypointButton = new System.Windows.Forms.Button();
+            this.HomeLatitudeLabel = new System.Windows.Forms.Label();
+            this.HomeLongitudeLabel = new System.Windows.Forms.Label();
+            this.HomeButton = new System.Windows.Forms.Button();
+            this.LocalXLabel = new System.Windows.Forms.Label();
+            this.LocalYLabel = new System.Windows.Forms.Label();
+            this.LocalZLabel = new System.Windows.Forms.Label();
+            this.LocalXTag = new System.Windows.Forms.Label();
+            this.LocalYTag = new System.Windows.Forms.Label();
+            this.LocalZTag = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // TakeoffButton
@@ -320,7 +332,7 @@
             this.AltitudeTag.AutoSize = true;
             this.AltitudeTag.Location = new System.Drawing.Point(449, 277);
             this.AltitudeTag.Name = "AltitudeTag";
-            this.AltitudeTag.Size = new System.Drawing.Size(34, 12);
+            this.AltitudeTag.Size = new System.Drawing.Size(27, 12);
             this.AltitudeTag.TabIndex = 27;
             this.AltitudeTag.Text = "Alt: ";
             // 
@@ -329,15 +341,136 @@
             this.AltitudeLabel.AutoSize = true;
             this.AltitudeLabel.Location = new System.Drawing.Point(487, 277);
             this.AltitudeLabel.Name = "AltitudeLabel";
-            this.AltitudeLabel.Size = new System.Drawing.Size(38, 12);
+            this.AltitudeLabel.Size = new System.Drawing.Size(77, 12);
             this.AltitudeLabel.TabIndex = 28;
             this.AltitudeLabel.Text = "AltitudeLabel";
+            // 
+            // LatitudeTextBox
+            // 
+            this.LatitudeTextBox.Location = new System.Drawing.Point(464, 349);
+            this.LatitudeTextBox.Name = "LatitudeTextBox";
+            this.LatitudeTextBox.Size = new System.Drawing.Size(100, 21);
+            this.LatitudeTextBox.TabIndex = 29;
+            // 
+            // LongitudeTextBox
+            // 
+            this.LongitudeTextBox.Location = new System.Drawing.Point(464, 380);
+            this.LongitudeTextBox.Name = "LongitudeTextBox";
+            this.LongitudeTextBox.Size = new System.Drawing.Size(100, 21);
+            this.LongitudeTextBox.TabIndex = 30;
+            // 
+            // WaypointButton
+            // 
+            this.WaypointButton.Location = new System.Drawing.Point(571, 349);
+            this.WaypointButton.Name = "WaypointButton";
+            this.WaypointButton.Size = new System.Drawing.Size(75, 52);
+            this.WaypointButton.TabIndex = 31;
+            this.WaypointButton.Text = "Waypoint";
+            this.WaypointButton.UseVisualStyleBackColor = true;
+            this.WaypointButton.Click += new System.EventHandler(this.WaypointButton_Click);
+            // 
+            // HomeLatitudeLabel
+            // 
+            this.HomeLatitudeLabel.AutoSize = true;
+            this.HomeLatitudeLabel.Location = new System.Drawing.Point(551, 119);
+            this.HomeLatitudeLabel.Name = "HomeLatitudeLabel";
+            this.HomeLatitudeLabel.Size = new System.Drawing.Size(113, 12);
+            this.HomeLatitudeLabel.TabIndex = 32;
+            this.HomeLatitudeLabel.Text = "HomeLatitudeLabel";
+            // 
+            // HomeLongitudeLabel
+            // 
+            this.HomeLongitudeLabel.AutoSize = true;
+            this.HomeLongitudeLabel.Location = new System.Drawing.Point(551, 147);
+            this.HomeLongitudeLabel.Name = "HomeLongitudeLabel";
+            this.HomeLongitudeLabel.Size = new System.Drawing.Size(124, 12);
+            this.HomeLongitudeLabel.TabIndex = 33;
+            this.HomeLongitudeLabel.Text = "HomeLongitudeLabel";
+            // 
+            // HomeButton
+            // 
+            this.HomeButton.Location = new System.Drawing.Point(693, 118);
+            this.HomeButton.Name = "HomeButton";
+            this.HomeButton.Size = new System.Drawing.Size(75, 41);
+            this.HomeButton.TabIndex = 34;
+            this.HomeButton.Text = "Update Home";
+            this.HomeButton.UseVisualStyleBackColor = true;
+            this.HomeButton.Click += new System.EventHandler(this.HomeButton_Click);
+            // 
+            // LocalXLabel
+            // 
+            this.LocalXLabel.AutoSize = true;
+            this.LocalXLabel.ForeColor = System.Drawing.Color.Black;
+            this.LocalXLabel.Location = new System.Drawing.Point(59, 147);
+            this.LocalXLabel.Name = "LocalXLabel";
+            this.LocalXLabel.Size = new System.Drawing.Size(38, 12);
+            this.LocalXLabel.TabIndex = 40;
+            this.LocalXLabel.Text = "LocalXLabel";
+            // 
+            // LocalYLabel
+            // 
+            this.LocalYLabel.AutoSize = true;
+            this.LocalYLabel.ForeColor = System.Drawing.Color.Black;
+            this.LocalYLabel.Location = new System.Drawing.Point(59, 165);
+            this.LocalYLabel.Name = "LocalYLabel";
+            this.LocalYLabel.Size = new System.Drawing.Size(38, 12);
+            this.LocalYLabel.TabIndex = 39;
+            this.LocalYLabel.Text = "LocalYLabel";
+            // 
+            // LocalZLabel
+            // 
+            this.LocalZLabel.AutoSize = true;
+            this.LocalZLabel.ForeColor = System.Drawing.Color.Black;
+            this.LocalZLabel.Location = new System.Drawing.Point(59, 183);
+            this.LocalZLabel.Name = "LocalZLabel";
+            this.LocalZLabel.Size = new System.Drawing.Size(38, 12);
+            this.LocalZLabel.TabIndex = 38;
+            this.LocalZLabel.Text = "LocalZLabel";
+            // 
+            // LocalXTag
+            // 
+            this.LocalXTag.AutoSize = true;
+            this.LocalXTag.Location = new System.Drawing.Point(23, 147);
+            this.LocalXTag.Name = "LocalXTag";
+            this.LocalXTag.Size = new System.Drawing.Size(37, 12);
+            this.LocalXTag.TabIndex = 37;
+            this.LocalXTag.Text = "x: ";
+            // 
+            // LocalYTag
+            // 
+            this.LocalYTag.AutoSize = true;
+            this.LocalYTag.Location = new System.Drawing.Point(23, 165);
+            this.LocalYTag.Name = "LocalYTag";
+            this.LocalYTag.Size = new System.Drawing.Size(40, 12);
+            this.LocalYTag.TabIndex = 36;
+            this.LocalYTag.Text = "y: ";
+            // 
+            // LocalZTag
+            // 
+            this.LocalZTag.AutoSize = true;
+            this.LocalZTag.Location = new System.Drawing.Point(23, 183);
+            this.LocalZTag.Name = "LocalZTag";
+            this.LocalZTag.Size = new System.Drawing.Size(30, 12);
+            this.LocalZTag.TabIndex = 35;
+            this.LocalZTag.Text = "z: ";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.LocalXLabel);
+            this.Controls.Add(this.LocalYLabel);
+            this.Controls.Add(this.LocalZLabel);
+            this.Controls.Add(this.LocalXTag);
+            this.Controls.Add(this.LocalYTag);
+            this.Controls.Add(this.LocalZTag);
+            this.Controls.Add(this.HomeButton);
+            this.Controls.Add(this.HomeLongitudeLabel);
+            this.Controls.Add(this.HomeLatitudeLabel);
+            this.Controls.Add(this.WaypointButton);
+            this.Controls.Add(this.LongitudeTextBox);
+            this.Controls.Add(this.LatitudeTextBox);
             this.Controls.Add(this.AltitudeLabel);
             this.Controls.Add(this.AltitudeTag);
             this.Controls.Add(this.BatteryLabel);
@@ -405,6 +538,18 @@
         private System.Windows.Forms.Label BatteryLabel;
         private System.Windows.Forms.Label AltitudeTag;
         private System.Windows.Forms.Label AltitudeLabel;
+        private System.Windows.Forms.TextBox LatitudeTextBox;
+        private System.Windows.Forms.TextBox LongitudeTextBox;
+        private System.Windows.Forms.Button WaypointButton;
+        private System.Windows.Forms.Label HomeLatitudeLabel;
+        private System.Windows.Forms.Label HomeLongitudeLabel;
+        private System.Windows.Forms.Button HomeButton;
+        private System.Windows.Forms.Label LocalXLabel;
+        private System.Windows.Forms.Label LocalYLabel;
+        private System.Windows.Forms.Label LocalZLabel;
+        private System.Windows.Forms.Label LocalXTag;
+        private System.Windows.Forms.Label LocalYTag;
+        private System.Windows.Forms.Label LocalZTag;
     }
 }
 
