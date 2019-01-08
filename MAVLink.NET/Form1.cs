@@ -75,6 +75,9 @@ namespace MAVLink.NET
                         RollLabel.BeginInvoke((Action) delegate () { RollLabel.Text = String.Format("{0:f2}", node1.Roll); });
                         PitchLabel.BeginInvoke((Action) delegate () { PitchLabel.Text = String.Format("{0:f2}", node1.Pitch); });
                         YawLabel.BeginInvoke((Action) delegate () { YawLabel.Text = String.Format("{0:f2}", node1.Yaw); });
+                        LocalXLabel.BeginInvoke((Action) delegate () { LocalXLabel.Text = String.Format("{0:f2}", node1.LocalPosition.X); });
+                        LocalYLabel.BeginInvoke((Action) delegate () { LocalYLabel.Text = String.Format("{0:f2}", node1.LocalPosition.Y); });
+                        LocalZLabel.BeginInvoke((Action) delegate () { LocalZLabel.Text = String.Format("{0:f2}", node1.LocalPosition.Z); });
                         BatteryLabel.BeginInvoke((Action) delegate () { BatteryLabel.Text = String.Format("{0:d}", node1.BatteryPercentage); });
                         FlightModeLabel.BeginInvoke((Action) delegate () { FlightModeLabel.Text = node1.FlightMode; });
                         SubModeLabel.BeginInvoke((Action) delegate () { SubModeLabel.Text = node1.SubMode; });
@@ -115,7 +118,7 @@ namespace MAVLink.NET
         {
             double latitude = double.Parse(LatitudeTextBox.Text);
             double longitude = double.Parse(LongitudeTextBox.Text);
-
+            Console.WriteLine("lat: {0:f6}, lon: {1:f6}", latitude, longitude);
             node1.NextWP(latitude, longitude);
         }
 

@@ -63,6 +63,12 @@
             this.HomeLatitudeLabel = new System.Windows.Forms.Label();
             this.HomeLongitudeLabel = new System.Windows.Forms.Label();
             this.HomeButton = new System.Windows.Forms.Button();
+            this.LocalXLabel = new System.Windows.Forms.Label();
+            this.LocalYLabel = new System.Windows.Forms.Label();
+            this.LocalZLabel = new System.Windows.Forms.Label();
+            this.LocalXTag = new System.Windows.Forms.Label();
+            this.LocalYTag = new System.Windows.Forms.Label();
+            this.LocalZTag = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // TakeoffButton
@@ -391,11 +397,74 @@
             this.HomeButton.UseVisualStyleBackColor = true;
             this.HomeButton.Click += new System.EventHandler(this.HomeButton_Click);
             // 
+            // LocalXLabel
+            // 
+            this.LocalXLabel.AutoSize = true;
+            this.LocalXLabel.ForeColor = System.Drawing.Color.Black;
+            this.LocalXLabel.Location = new System.Drawing.Point(59, 147);
+            this.LocalXLabel.Name = "LocalXLabel";
+            this.LocalXLabel.Size = new System.Drawing.Size(38, 12);
+            this.LocalXLabel.TabIndex = 40;
+            this.LocalXLabel.Text = "LocalXLabel";
+            // 
+            // LocalYLabel
+            // 
+            this.LocalYLabel.AutoSize = true;
+            this.LocalYLabel.ForeColor = System.Drawing.Color.Black;
+            this.LocalYLabel.Location = new System.Drawing.Point(59, 165);
+            this.LocalYLabel.Name = "LocalYLabel";
+            this.LocalYLabel.Size = new System.Drawing.Size(38, 12);
+            this.LocalYLabel.TabIndex = 39;
+            this.LocalYLabel.Text = "LocalYLabel";
+            // 
+            // LocalZLabel
+            // 
+            this.LocalZLabel.AutoSize = true;
+            this.LocalZLabel.ForeColor = System.Drawing.Color.Black;
+            this.LocalZLabel.Location = new System.Drawing.Point(59, 183);
+            this.LocalZLabel.Name = "LocalZLabel";
+            this.LocalZLabel.Size = new System.Drawing.Size(38, 12);
+            this.LocalZLabel.TabIndex = 38;
+            this.LocalZLabel.Text = "LocalZLabel";
+            // 
+            // LocalXTag
+            // 
+            this.LocalXTag.AutoSize = true;
+            this.LocalXTag.Location = new System.Drawing.Point(23, 147);
+            this.LocalXTag.Name = "LocalXTag";
+            this.LocalXTag.Size = new System.Drawing.Size(37, 12);
+            this.LocalXTag.TabIndex = 37;
+            this.LocalXTag.Text = "x: ";
+            // 
+            // LocalYTag
+            // 
+            this.LocalYTag.AutoSize = true;
+            this.LocalYTag.Location = new System.Drawing.Point(23, 165);
+            this.LocalYTag.Name = "LocalYTag";
+            this.LocalYTag.Size = new System.Drawing.Size(40, 12);
+            this.LocalYTag.TabIndex = 36;
+            this.LocalYTag.Text = "y: ";
+            // 
+            // LocalZTag
+            // 
+            this.LocalZTag.AutoSize = true;
+            this.LocalZTag.Location = new System.Drawing.Point(23, 183);
+            this.LocalZTag.Name = "LocalZTag";
+            this.LocalZTag.Size = new System.Drawing.Size(30, 12);
+            this.LocalZTag.TabIndex = 35;
+            this.LocalZTag.Text = "z: ";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.LocalXLabel);
+            this.Controls.Add(this.LocalYLabel);
+            this.Controls.Add(this.LocalZLabel);
+            this.Controls.Add(this.LocalXTag);
+            this.Controls.Add(this.LocalYTag);
+            this.Controls.Add(this.LocalZTag);
             this.Controls.Add(this.HomeButton);
             this.Controls.Add(this.HomeLongitudeLabel);
             this.Controls.Add(this.HomeLatitudeLabel);
@@ -475,6 +544,12 @@
         private System.Windows.Forms.Label HomeLatitudeLabel;
         private System.Windows.Forms.Label HomeLongitudeLabel;
         private System.Windows.Forms.Button HomeButton;
+        private System.Windows.Forms.Label LocalXLabel;
+        private System.Windows.Forms.Label LocalYLabel;
+        private System.Windows.Forms.Label LocalZLabel;
+        private System.Windows.Forms.Label LocalXTag;
+        private System.Windows.Forms.Label LocalYTag;
+        private System.Windows.Forms.Label LocalZTag;
     }
 }
 
