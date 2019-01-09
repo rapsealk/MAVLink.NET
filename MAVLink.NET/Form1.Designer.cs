@@ -147,6 +147,10 @@
             this.LandAllButton = new System.Windows.Forms.Button();
             this.TakeoffAllButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
+            //
+            //
+            //
+            this.FlightModeComboBoxes = new System.Windows.Forms.ComboBox[] { FlightModeComboBox_01, FlightModeComboBox_02, FlightModeComboBox_03 };
             // 
             // TakeoffButton_01
             // 
