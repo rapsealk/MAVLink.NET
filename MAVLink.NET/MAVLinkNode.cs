@@ -158,13 +158,12 @@ namespace MAVLink.NET
 
         private void OnMAVPacketReceive(object sender, MavlinkPacket packet)
         {
-            //if (packet.SystemId != SYSTEM_ID || packet.ComponentId != COMPONENT_ID)
-            //    return;
-
             uint psize = mavlink.PacketsReceived;
             SYSTEM_ID = (byte) packet.SystemId;
             COMPONENT_ID = (byte) packet.ComponentId;
             PacketSequence = packet.SequenceNumber;
+
+            _is_leader = (SYSTEM_ID == 2);
             
             MavlinkMessage message = packet.Message;
 
@@ -259,15 +258,17 @@ namespace MAVLink.NET
             }
             else if (message.GetType() == mStatusText.GetType())        // TODO: System status message
                 mStatusText = (Msg_statustext) message;
-            else if (message.GetType() == mMissionCount.GetType())      // TODO: Handle mission
+            else if (message.GetType() == mMissionCount.GetType())      // Response to MISSION_REQUEST_LIST
             {
                 mMissionCount = (Msg_mission_count) message;
+                MissionItemCount = mMissionCount.count;
+                Console.WriteLine("[SYSTEM #{0:d}] Msg_mission_count: {1:d}", SYSTEM_ID, mMissionCount.count);
             }
             else if (message.GetType() == mMissionCurrent.GetType())
             {
                 mMissionCurrent = (Msg_mission_current) message;
                 MissionCurrentSequence = mMissionCurrent.seq;
-                Console.WriteLine("MissionCurrentSequence: " + MissionCurrentSequence);
+                Console.WriteLine("[SYSTEM #{0:d}] MissionCurrentSequence: " + MissionCurrentSequence, SYSTEM_ID);
                 DatabaseManager.UpdateNextCommand(SYSTEM_ID, MissionCurrentSequence);
             }
             else if (message.GetType() == mMissionRequest.GetType())
@@ -279,11 +280,10 @@ namespace MAVLink.NET
             else if (message.GetType() == mMissionAck.GetType())
             {
                 mMissionAck = (Msg_mission_ack) message;
-                Console.WriteLine("Mission Ack: " + (mMissionAck.type == (byte) MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED));
+                Console.WriteLine("[SYSTEM #{0:d}] Mission Ack: " + (mMissionAck.type == (byte) MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED), SYSTEM_ID);
             
                 // Follower: set_position as a single mission.
-                if (SYSTEM_ID != 2)
-                // if (!_is_leader)
+                if (!_is_leader)
                 {
                     Msg_command_long smessage = new Msg_command_long()
                     {
@@ -450,10 +450,26 @@ namespace MAVLink.NET
         }
 
         /**
+         * https://mavlink.io/en/services/mission.html#download_mission
+         */
+        public void DownloadMission()
+        {
+            Msg_mission_request_list message = new Msg_mission_request_list()
+            {
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID
+            };
+            SendPacket(message);
+        }
+
+        /**
          * https://docs.px4.io/en/flight_modes/mission.html
          */
         public void StartMission()
         {
+            // To clarify the number of uploaded missions.
+            DownloadMission();
+
             Msg_set_mode offboardMessage = new Msg_set_mode()
             {
                 target_system   = SYSTEM_ID,
