@@ -13,7 +13,9 @@ namespace MAVLink.NET
         private const double Lat2LonScale = 1.2493498129938325118272112550467;
         private const double Lon2LatScale = 0.8004163362410785091197462331483;
 
-        private const double Degree2Radian = 0.01745329251994329576923690768489;
+        private const double Degree2Radian = (Math.PI / 180);
+
+        private const double World2Local = 10000;
         
         private enum FORMATION_MODE
         {
@@ -138,7 +140,10 @@ namespace MAVLink.NET
 
             double[,] distance = new double[3, 3];
             for (int i = 0; i < MAVLinkNodes.Count; i++) for (int j = 0; j < MAVLinkNodes.Count; j++)
-                distance[i, j] = (MAVLinkNodes[i].Position - MAVLinkNodes[j].Position).Size();
+                {
+                    distance[i, j] = (MAVLinkNodes[i].Position * World2Local - MAVLinkNodes[j].Position * World2Local).Size();
+                    Console.WriteLine("distance[{0:d}][{1:d}]: {2:f6}", i, j, distance[i, j]);
+                }
 
             Vector3 aVector2 = Alignment();
             Vector3 sVector2 = Separate(MAVLinkNodes[1].Position, MAVLinkNodes[0].Position, MAVLinkNodes[2].Position);
@@ -167,7 +172,7 @@ namespace MAVLink.NET
                 sVector2 *= kSeperation;
                 cVector2 *= kCohesion;
 
-                MAVLinkNodes[1].Direction = MAVLinkNodes[1].Position + (aVector2 + sVector2 + cVector2).Normalized();
+                MAVLinkNodes[1].Direction = MAVLinkNodes[1].Position + (aVector2 + sVector2 + cVector2).Normalized();   // * World2Local
             }
             else if ((distance[1, 0] >= 0.25 && distance[1, 0] < 0.5) && (distance[1, 2] >= 0.25 && distance[1, 2] < 0.5))
             {
@@ -193,7 +198,7 @@ namespace MAVLink.NET
                 sVector3 *= kSeperation;
                 cVector3 *= kCohesion;
 
-                MAVLinkNodes[2].Direction = MAVLinkNodes[2].Position + (aVector3 + sVector3 + cVector3).Normalized();
+                MAVLinkNodes[2].Direction = MAVLinkNodes[2].Position + (aVector3 + sVector3 + cVector3).Normalized();   // * World2Local
             }
             else if ((distance[1, 2] >= 0.25 && distance[1, 2] < 0.5) && (distance[2, 0] >= 0.25 && distance[2, 0] < 0.5))
             {
