@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MavLink;
 
 namespace MAVLink.NET
@@ -75,7 +71,7 @@ namespace MAVLink.NET
 
         private Msg_mission_item[] MissionItems = new Msg_mission_item[32];
         private int MissionItemCount = 0;
-        private ushort MissionCurrentSequence = 0;
+        private ushort MissionCurrentSequence = ushort.MaxValue;
 
         public string FlightMode            = "null";
         public string SubMode               = "null";
@@ -188,7 +184,7 @@ namespace MAVLink.NET
                 Console.WriteLine("heartbeat.custom_mode: " + mHeartbeat.custom_mode);
                 Console.WriteLine("Flight Mode: {0:s}, Sub Mode: {1:s}", FlightMode, SubMode);
 
-                DatabaseManager.UpdateFlightMode(SYSTEM_ID, FlightMode);
+                //DatabaseManager.UpdateFlightMode(SYSTEM_ID, FlightMode);
             }
             else if (message.GetType() == mSysStatus.GetType())
             {
@@ -203,7 +199,7 @@ namespace MAVLink.NET
                 mBatteryStatus = (Msg_battery_status) message;
                 BatteryPercentage = mBatteryStatus.battery_remaining;
 
-                DatabaseManager.UpdateBattery(SYSTEM_ID, BatteryPercentage);
+                //DatabaseManager.UpdateBattery(SYSTEM_ID, BatteryPercentage);
             }
             else if (message.GetType() == mAttitude.GetType())
             {
@@ -221,7 +217,7 @@ namespace MAVLink.NET
                 Gtimestamp = mGPS.time_usec;
                 SatelliteNumber = mGPS.satellites_visible;
 
-                DatabaseManager.UpdatePosition(SYSTEM_ID, Position.X, Position.Y, Position.Z, SatelliteNumber, Gtimestamp);
+                //DatabaseManager.UpdatePosition(SYSTEM_ID, Position.X, Position.Y, Position.Z, SatelliteNumber, Gtimestamp);
             }
             else if (message.GetType() == mRTK.GetType())
             {
@@ -232,7 +228,7 @@ namespace MAVLink.NET
                 mVfr = (Msg_vfr_hud) message;
                 HeadingDirection = mVfr.heading;
 
-                DatabaseManager.UpdateHeadingDirection(SYSTEM_ID, HeadingDirection);
+                //DatabaseManager.UpdateHeadingDirection(SYSTEM_ID, HeadingDirection);
             }
             else if (message.GetType() == mHomePosition.GetType())
             {
@@ -269,7 +265,7 @@ namespace MAVLink.NET
                 mMissionCurrent = (Msg_mission_current) message;
                 MissionCurrentSequence = mMissionCurrent.seq;
                 Console.WriteLine("[SYSTEM #{0:d}] MissionCurrentSequence: " + MissionCurrentSequence, SYSTEM_ID);
-                DatabaseManager.UpdateNextCommand(SYSTEM_ID, MissionCurrentSequence);
+                //DatabaseManager.UpdateNextCommand(SYSTEM_ID, MissionCurrentSequence);
             }
             else if (message.GetType() == mMissionRequest.GetType())
             {

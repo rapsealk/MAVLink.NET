@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MAVLink.NET
 {
@@ -229,7 +226,8 @@ namespace MAVLink.NET
         {
             double scale = 0.1;
 
-            Vector3 fVector = MAVLinkNodes[0].Direction.Normalized();
+            //Vector3 fVector = MAVLinkNodes[0].Direction.Normalized();
+            Vector3 fVector = MAVLinkNodes[0].Position.Normalized();
             Vector3 bVector = fVector * -1;
 
             // 리더의 앞과 오른쪽 벡터 계산
@@ -244,7 +242,8 @@ namespace MAVLink.NET
         {
             double scale = 0.1;
 
-            Vector3 fVector = MAVLinkNodes[0].Direction.Normalized();
+            //Vector3 fVector = MAVLinkNodes[0].Direction.Normalized();
+            Vector3 fVector = MAVLinkNodes[0].Position.Normalized();
 
             double x = Math.Cos(-90 * Degree2Radian) * fVector.X - Math.Sin(-90 * Degree2Radian) * fVector.Y;
             double y = Math.Sin(-90 * Degree2Radian) * fVector.X + Math.Cos(-90 * Degree2Radian) * fVector.Y;
@@ -265,7 +264,9 @@ namespace MAVLink.NET
         {
             double scale = 0.1;
 
-            Vector3 fVector = MAVLinkNodes[0].Direction.Normalized();
+            // TODO: NaN
+            // Vector3 fVector = MAVLinkNodes[0].Direction.Normalized();
+            Vector3 fVector = MAVLinkNodes[0].Position.Normalized();
 
             double x = Math.Cos(-90 * Degree2Radian) * fVector.X - Math.Sin(-90 * Degree2Radian) * fVector.Y;
             double y = Math.Sin(-90 * Degree2Radian) * fVector.X + Math.Cos(-90 * Degree2Radian) * fVector.Y;
@@ -281,6 +282,8 @@ namespace MAVLink.NET
             lVector *= (scale * 2);
 
             Vector3 leaderPosition = MAVLinkNodes[0].Position;
+            //MAVLinkNodes[1].Direction = leaderPosition + bVector + lVector;
+            //MAVLinkNodes[2].Direction = leaderPosition + bVector + rVector;
             MAVLinkNodes[1].Direction = leaderPosition + bVector + lVector;
             MAVLinkNodes[2].Direction = leaderPosition + bVector + rVector;
         }
@@ -330,6 +333,9 @@ namespace MAVLink.NET
                     */
                     System.Threading.Thread.Sleep(1000);
                 }
+
+                foreach (MAVLinkNode node in MAVLinkNodes)
+                    node.LandCommand();
             });
             thread.Start();
         }

@@ -243,7 +243,7 @@ namespace MAVLink.NET
                     catch (InvalidOperationException e)
                     {
                         Console.Error.WriteLine(e.Message);
-                        // break;
+                        break;
                     }
                 }
             });
