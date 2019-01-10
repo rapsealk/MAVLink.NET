@@ -264,6 +264,13 @@ namespace MAVLink.NET
             {
                 mMissionCurrent = (Msg_mission_current) message;
                 MissionCurrentSequence = mMissionCurrent.seq;
+                Msg_mission_item currentItem = MissionItems[MissionCurrentSequence];
+                if (_is_leader && currentItem != null)
+                {
+                    Direction.X = currentItem.x - Position.X;
+                    Direction.Y = currentItem.y - Position.Y;
+                    Direction.Z = currentItem.z - Position.Z;
+                }
                 Console.WriteLine("[SYSTEM #{0:d}] MissionCurrentSequence: " + MissionCurrentSequence, SYSTEM_ID);
                 //DatabaseManager.UpdateNextCommand(SYSTEM_ID, MissionCurrentSequence);
             }

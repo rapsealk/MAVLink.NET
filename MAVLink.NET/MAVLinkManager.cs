@@ -12,7 +12,7 @@ namespace MAVLink.NET
 
         private const double Degree2Radian = (Math.PI / 180);
 
-        private const double World2Local = 10000;
+        private const double World2Local = 100000;
         
         private enum FORMATION_MODE
         {
@@ -169,7 +169,7 @@ namespace MAVLink.NET
                 sVector2 *= kSeperation;
                 cVector2 *= kCohesion;
 
-                MAVLinkNodes[1].Direction = MAVLinkNodes[1].Position + (aVector2 + sVector2 + cVector2).Normalized();   // * World2Local
+                MAVLinkNodes[1].Direction = MAVLinkNodes[1].Position + (aVector2 + sVector2 + cVector2).Normalized() / World2Local;
             }
             else if ((distance[1, 0] >= 0.25 && distance[1, 0] < 0.5) && (distance[1, 2] >= 0.25 && distance[1, 2] < 0.5))
             {
@@ -195,7 +195,7 @@ namespace MAVLink.NET
                 sVector3 *= kSeperation;
                 cVector3 *= kCohesion;
 
-                MAVLinkNodes[2].Direction = MAVLinkNodes[2].Position + (aVector3 + sVector3 + cVector3).Normalized();   // * World2Local
+                MAVLinkNodes[2].Direction = MAVLinkNodes[2].Position + (aVector3 + sVector3 + cVector3).Normalized() / World2Local;
             }
             else if ((distance[1, 2] >= 0.25 && distance[1, 2] < 0.5) && (distance[2, 0] >= 0.25 && distance[2, 0] < 0.5))
             {
@@ -210,16 +210,16 @@ namespace MAVLink.NET
                 Triangle();
             }
 
+            Console.WriteLine("Node[0]: {0:f6}, {1:f6}", MAVLinkNodes[0].Position.X, MAVLinkNodes[0].Position.Y);
+            Console.WriteLine("Node[1]: {0:f6}, {1:f6}", MAVLinkNodes[1].Direction.X, MAVLinkNodes[1].Direction.Y);
+            Console.WriteLine("Node[2]: {0:f6}, {1:f6}", MAVLinkNodes[2].Direction.X, MAVLinkNodes[2].Direction.Y);
+
             /* TODO: Set next waypoint
             nextWaypoint[1] = WorldCoordinate2GPS(MAVLinkNodes[1].Direction);
             nextWaypoint[2] = WorldCoordinate2GPS(MAVLinkNodes[2].Direction);
             */
             MAVLinkNodes[1].NextWP(MAVLinkNodes[1].Direction.X, MAVLinkNodes[1].Direction.Y);
             MAVLinkNodes[2].NextWP(MAVLinkNodes[2].Direction.X, MAVLinkNodes[2].Direction.Y);
-
-            Console.WriteLine("Node[0]: {0:f6}, {1:f6}", MAVLinkNodes[0].Position.X, MAVLinkNodes[0].Position.Y);
-            Console.WriteLine("Node[1]: {0:f6}, {1:f6}", MAVLinkNodes[1].Direction.X, MAVLinkNodes[1].Direction.Y);
-            Console.WriteLine("Node[2]: {0:f6}, {1:f6}", MAVLinkNodes[2].Direction.X, MAVLinkNodes[2].Direction.Y);
         }
 
         public void Row()
@@ -262,7 +262,8 @@ namespace MAVLink.NET
 
         public void Triangle()
         {
-            double scale = 0.1;
+            Console.WriteLine("Triangle");
+            double scale = 0.00001; // 0.1;
 
             // TODO: NaN
             // Vector3 fVector = MAVLinkNodes[0].Direction.Normalized();
@@ -331,7 +332,7 @@ namespace MAVLink.NET
                     f1.NextWP(f1.Position.X + f1.Direction.X, f1.Position.Y + f1.Direction.Y);
                     f2.NextWP(f2.Position.X + f2.Direction.X, f2.Position.Y + f2.Direction.Y);
                     */
-                    System.Threading.Thread.Sleep(1000);
+                    System.Threading.Thread.Sleep(3000);
                 }
 
                 foreach (MAVLinkNode node in MAVLinkNodes)
