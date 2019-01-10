@@ -1,9 +1,4 @@
-﻿//#define MYSQL
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using MavLink;
 
 namespace MAVLink.NET
@@ -39,7 +34,7 @@ namespace MAVLink.NET
 
         private Mavlink mavlink;
 
-        public System.IO.Ports.SerialPort Serial;
+        public System.IO.Ports.SerialPort Serial { get; private set; }
         public System.ComponentModel.BackgroundWorker heartbeatWorker;
 
         public byte SYSTEM_ID;
@@ -62,6 +57,7 @@ namespace MAVLink.NET
         private Msg_command_ack             mCommandAck             = new Msg_command_ack();
         private Msg_statustext              mStatusText             = new Msg_statustext();
         private Msg_mission_count           mMissionCount           = new Msg_mission_count();
+        private Msg_mission_current         mMissionCurrent         = new Msg_mission_current();
         private Msg_mission_request         mMissionRequest         = new Msg_mission_request();
         private Msg_mission_ack             mMissionAck             = new Msg_mission_ack();
         private Msg_mission_item_reached    mMissionItemReached     = new Msg_mission_item_reached();
@@ -75,6 +71,7 @@ namespace MAVLink.NET
 
         private Msg_mission_item[] MissionItems = new Msg_mission_item[32];
         private int MissionItemCount = 0;
+        private ushort MissionCurrentSequence = ushort.MaxValue;
 
         public string FlightMode            = "null";
         public string SubMode               = "null";
@@ -86,6 +83,8 @@ namespace MAVLink.NET
         public float Pitch  = 0f;
         public float Yaw    = 0f;
 
+        public short HeadingDirection = 0;
+
         private static float Radian = (float) (180 / Math.PI);
 
         /**
@@ -96,12 +95,14 @@ namespace MAVLink.NET
         public Vector3 LocalPosition;
         public static double pRatio = 10 * 1000 * 1000; // 10_000_000
 
-        private ulong Gtimestamp = 0;
+        public ulong Gtimestamp     = 0;        // GPS UNIX Timestamp (start from boot)
+        public byte SatelliteNumber = 0;        // Number of visible Satellite
 
         /**
          * Variables for desired direction.
          */
         public Vector3 Direction;
+
 
         public MAVLinkNode(string port, int baud, byte SYSTEM_ID=1, byte COMPONENT_ID=1)
         {
@@ -153,13 +154,12 @@ namespace MAVLink.NET
 
         private void OnMAVPacketReceive(object sender, MavlinkPacket packet)
         {
-            //if (packet.SystemId != SYSTEM_ID || packet.ComponentId != COMPONENT_ID)
-            //    return;
-
             uint psize = mavlink.PacketsReceived;
             SYSTEM_ID = (byte) packet.SystemId;
             COMPONENT_ID = (byte) packet.ComponentId;
             PacketSequence = packet.SequenceNumber;
+
+            _is_leader = (SYSTEM_ID == 2);
             
             MavlinkMessage message = packet.Message;
 
@@ -183,6 +183,8 @@ namespace MAVLink.NET
                 }
                 Console.WriteLine("heartbeat.custom_mode: " + mHeartbeat.custom_mode);
                 Console.WriteLine("Flight Mode: {0:s}, Sub Mode: {1:s}", FlightMode, SubMode);
+
+                //DatabaseManager.UpdateFlightMode(SYSTEM_ID, FlightMode);
             }
             else if (message.GetType() == mSysStatus.GetType())
             {
@@ -196,6 +198,8 @@ namespace MAVLink.NET
             {
                 mBatteryStatus = (Msg_battery_status) message;
                 BatteryPercentage = mBatteryStatus.battery_remaining;
+
+                //DatabaseManager.UpdateBattery(SYSTEM_ID, BatteryPercentage);
             }
             else if (message.GetType() == mAttitude.GetType())
             {
@@ -211,39 +215,21 @@ namespace MAVLink.NET
                 Position.Y = mGPS.lon / pRatio;
                 Position.Z = mGPS.alt / pRatio;
                 Gtimestamp = mGPS.time_usec;
-#if MYSQL
-                // MySQL Update Query
-                MySql.Data.MySqlClient.MySqlConnection conn = DatabaseManager.GetConnection();
-                try
-                {
-                    conn.Open();
+                SatelliteNumber = mGPS.satellites_visible;
 
-                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand()
-                    {
-                        Connection  = conn,
-                        CommandText = "UPDATE realtime SET Lattitude=@lat, Longitude=@lon WHERE UAV_ID=@id"
-                    };
-                    command.Parameters.AddWithValue("@lat", Position.X);
-                    command.Parameters.AddWithValue("@lon", Position.Y);
-                    Console.WriteLine("Gtimestamp: " + Gtimestamp);
-                    //command.Parameters.AddWithValue("@timestamp", new DateTime((long) Gtimestamp * 1000 * 1000));
-                    command.Parameters.AddWithValue("@id", SYSTEM_ID);
-                    command.ExecuteNonQuery();
-
-                    conn.Close();
-                }
-                catch (MySql.Data.MySqlClient.MySqlException e)
-                {
-                    Console.Error.WriteLine(e.Message);
-                }
-#endif
+                //DatabaseManager.UpdatePosition(SYSTEM_ID, Position.X, Position.Y, Position.Z, SatelliteNumber, Gtimestamp);
             }
             else if (message.GetType() == mRTK.GetType())
             {
                 mRTK = (Msg_gps_rtk) message;
             }
             else if (message.GetType() == mVfr.GetType())
+            {
                 mVfr = (Msg_vfr_hud) message;
+                HeadingDirection = mVfr.heading;
+
+                //DatabaseManager.UpdateHeadingDirection(SYSTEM_ID, HeadingDirection);
+            }
             else if (message.GetType() == mHomePosition.GetType())
             {
                 mHomePosition = (Msg_home_position) message;
@@ -268,8 +254,26 @@ namespace MAVLink.NET
             }
             else if (message.GetType() == mStatusText.GetType())        // TODO: System status message
                 mStatusText = (Msg_statustext) message;
-            //else if (message.GetType() == mMissionCount.GetType())      // TODO: Handle mission
-            //    mMissionCount = (Msg_mission_count) message;
+            else if (message.GetType() == mMissionCount.GetType())      // Response to MISSION_REQUEST_LIST
+            {
+                mMissionCount = (Msg_mission_count) message;
+                MissionItemCount = mMissionCount.count;
+                Console.WriteLine("[SYSTEM #{0:d}] Msg_mission_count: {1:d}", SYSTEM_ID, mMissionCount.count);
+            }
+            else if (message.GetType() == mMissionCurrent.GetType())
+            {
+                mMissionCurrent = (Msg_mission_current) message;
+                MissionCurrentSequence = mMissionCurrent.seq;
+                Msg_mission_item currentItem = MissionItems[MissionCurrentSequence];
+                if (_is_leader && currentItem != null)
+                {
+                    Direction.X = currentItem.x - Position.X;
+                    Direction.Y = currentItem.y - Position.Y;
+                    Direction.Z = currentItem.z - Position.Z;
+                }
+                Console.WriteLine("[SYSTEM #{0:d}] MissionCurrentSequence: " + MissionCurrentSequence, SYSTEM_ID);
+                //DatabaseManager.UpdateNextCommand(SYSTEM_ID, MissionCurrentSequence);
+            }
             else if (message.GetType() == mMissionRequest.GetType())
             {
                 mMissionRequest = (Msg_mission_request) message;
@@ -279,7 +283,7 @@ namespace MAVLink.NET
             else if (message.GetType() == mMissionAck.GetType())
             {
                 mMissionAck = (Msg_mission_ack) message;
-                Console.WriteLine("Mission Ack: " + (mMissionAck.type == (byte) MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED));
+                Console.WriteLine("[SYSTEM #{0:d}] Mission Ack: " + (mMissionAck.type == (byte) MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED), SYSTEM_ID);
             
                 // Follower: set_position as a single mission.
                 if (!_is_leader)
@@ -342,7 +346,7 @@ namespace MAVLink.NET
             SendPacket(message);
         }
 
-        public void ArmDisarmCommand(bool target_arm, System.Windows.Forms.Button button = null)
+        public bool ArmDisarmCommand(bool target_arm, System.Windows.Forms.Button button = null)
         {
             System.Threading.Thread thread = new System.Threading.Thread(() =>
             {
@@ -368,6 +372,8 @@ namespace MAVLink.NET
                     button.BeginInvoke((Action) delegate () { button.Enabled = true; });
             });
             thread.Start();
+
+            return thread.IsAlive;
         }
         
         public void ClearMission()
@@ -446,11 +452,59 @@ namespace MAVLink.NET
             // 3) Drone responds with MISSION_REQUEST_INT requesting the first mission items.
         }
 
+        public void UploadMissions(MissionPlanItem[] items)
+        {
+            MissionItemCount = 0;
+
+            for (int i = 0; i < items.Length; i++)
+            {
+                MissionPlanItem item = items[i];
+
+                MissionItems[MissionItemCount++] = new Msg_mission_item()
+                {
+                    target_system       = SYSTEM_ID,
+                    target_component    = COMPONENT_ID,
+                    command             = (ushort) item.type,
+                    frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                    autocontinue        = 1,
+                    current             = (byte) (i == 0 ? 1 : 0),
+                    seq                 = (byte) (i + 1),
+                    x                   = (float) item.Position.X,
+                    y                   = (float) item.Position.Y,
+                    z                   = 5f
+                };
+            }
+
+            Msg_mission_count missionCountMessage = new Msg_mission_count()
+            {
+                target_system = SYSTEM_ID,
+                target_component = COMPONENT_ID,
+                count = (ushort) MissionItemCount
+            };
+            SendPacket(missionCountMessage);
+        }
+
+        /**
+         * https://mavlink.io/en/services/mission.html#download_mission
+         */
+        public void DownloadMission()
+        {
+            Msg_mission_request_list message = new Msg_mission_request_list()
+            {
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID
+            };
+            SendPacket(message);
+        }
+
         /**
          * https://docs.px4.io/en/flight_modes/mission.html
          */
         public void StartMission()
         {
+            // To clarify the number of uploaded missions.
+            DownloadMission();
+
             Msg_set_mode offboardMessage = new Msg_set_mode()
             {
                 target_system   = SYSTEM_ID,
@@ -471,6 +525,11 @@ namespace MAVLink.NET
                 // param2 = last_item: the last mission item to run (after this item is run, the mission ends)
             };
             SendPacket(message);
+        }
+
+        public bool HasCompletedMission()
+        {
+            return MissionItemCount == MissionCurrentSequence;
         }
 
         /**
