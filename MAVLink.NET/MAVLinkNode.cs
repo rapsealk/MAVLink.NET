@@ -3,6 +3,17 @@ using MavLink;
 
 namespace MAVLink.NET
 {
+    /**
+     * The class MAVLinkNode is for having communication with UAV (Unmanned Aerial Vehicle) agent.
+     * This class is implemented with MAVLink Protocol for PX4 based FCU (Flight Control Unit).
+     * If you are not familiar to MAVLink, visit here (https://mavlink.io/en/).
+     * 
+     * The connection between the agent and this class is built through radio telemetry.
+     * 
+     * This class supports functions below -
+     * 1) Track agent's current flight mode. (based on PX4 compatible modes)
+     * 2) 
+     */
     class MAVLinkNode
     {
         // PX4_CUSTOM_MAIN_MODE
