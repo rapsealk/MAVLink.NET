@@ -452,6 +452,38 @@ namespace MAVLink.NET
             // 3) Drone responds with MISSION_REQUEST_INT requesting the first mission items.
         }
 
+        public void UploadMissions(MissionPlanItem[] items)
+        {
+            MissionItemCount = 0;
+
+            for (int i = 0; i < items.Length; i++)
+            {
+                MissionPlanItem item = items[i];
+
+                MissionItems[MissionItemCount++] = new Msg_mission_item()
+                {
+                    target_system       = SYSTEM_ID,
+                    target_component    = COMPONENT_ID,
+                    command             = (ushort) item.type,
+                    frame               = (byte) MAV_FRAME.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                    autocontinue        = 1,
+                    current             = (byte) (i == 0 ? 1 : 0),
+                    seq                 = (byte) (i + 1),
+                    x                   = (float) item.Position.X,
+                    y                   = (float) item.Position.Y,
+                    z                   = 5f
+                };
+            }
+
+            Msg_mission_count missionCountMessage = new Msg_mission_count()
+            {
+                target_system = SYSTEM_ID,
+                target_component = COMPONENT_ID,
+                count = (ushort) MissionItemCount
+            };
+            SendPacket(missionCountMessage);
+        }
+
         /**
          * https://mavlink.io/en/services/mission.html#download_mission
          */
