@@ -27,6 +27,12 @@ namespace MAVLink.NET
             MAVLinkNodes = new List<MAVLinkNode>();
         }
 
+        ~MAVLinkManager()
+        {
+            foreach (MAVLinkNode node in MAVLinkNodes)
+                node.Serial.Close();
+        }
+
         public MAVLinkNode RegisterAgent(string port, int baud, byte systemId=1, byte componentId=1)
         {
             MAVLinkNode node = new MAVLinkNode(port, baud, systemId, componentId);
