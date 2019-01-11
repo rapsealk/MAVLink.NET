@@ -5,14 +5,14 @@ namespace MAVLink.NET
 {
     class MAVLinkManager
     {
-        private List<MAVLinkNode> MAVLinkNodes;
+        public static List<MAVLinkNode> MAVLinkNodes = new List<MAVLinkNode>();
 
-        private const double Lat2LonScale = 1.2493498129938325118272112550467;
-        private const double Lon2LatScale = 0.8004163362410785091197462331483;
+        private static readonly double Lat2LonScale = 1.2493498129938325118272112550467;
+        private static readonly double Lon2LatScale = 0.8004163362410785091197462331483;
 
-        private const double Degree2Radian = (Math.PI / 180);
+        private static readonly double Degree2Radian = (Math.PI / 180);
 
-        private const double World2Local = 100000;
+        private static readonly double World2Local = 100000;
         
         private enum FORMATION_MODE
         {
@@ -22,6 +22,7 @@ namespace MAVLink.NET
             TRIANGLE    = 3
         }
 
+        /*
         public MAVLinkManager()
         {
             MAVLinkNodes = new List<MAVLinkNode>();
@@ -32,29 +33,37 @@ namespace MAVLink.NET
             foreach (MAVLinkNode node in MAVLinkNodes)
                 node.Serial.Close();
         }
+        */
 
-        public MAVLinkNode RegisterAgent(string port, int baud, byte systemId=1, byte componentId=1)
+        public static MAVLinkNode RegisterAgent(string port, int baud, byte systemId=1, byte componentId=1)
         {
             MAVLinkNode node = new MAVLinkNode(port, baud, systemId, componentId);
             MAVLinkNodes.Add(node);
 
-            // TODO: move leader to the first index
-            //MAVLinkNodes.Sort((x, y) => x._is_leader ? 0 : 1);
-
             return node;
         }
 
-        public void RegisterAgent(MAVLinkNode node)
+        public static void RegisterAgent(MAVLinkNode node)
         {
             MAVLinkNodes.Add(node);
+        }
 
-            //MAVLinkNodes.Sort((x, y) => x._is_leader ? 0 : 1);
+        public static MAVLinkNode FindNodeWithPortName(string portName)
+        {
+            MAVLinkNode node = null;
+            foreach (MAVLinkNode mavlinkNode in MAVLinkNodes)
+                if (mavlinkNode.PortName.Equals(portName))
+                {
+                    node = mavlinkNode;
+                    break;
+                }
+            return node;
         }
 
         /****************************************
          * Serial
          ****************************************/
-        public void Open(int index=0)
+        public static void Open(int index=0)
         {
             MAVLinkNode node = MAVLinkNodes[index];
 
@@ -68,11 +77,15 @@ namespace MAVLink.NET
                 Console.Error.WriteLine(e.Message);
                 return;
             }
+            catch (NullReferenceException e)
+            {
+                Console.Error.WriteLine(e.Message);
+            }
 
             node.heartbeatWorker.RunWorkerAsync();
         }
 
-        public void Close(int index=0)
+        public static void Close(int index=0)
         {
             MAVLinkNode node = MAVLinkNodes[index];
 
@@ -89,10 +102,16 @@ namespace MAVLink.NET
             }
         }
 
+        public static void CloseAll()
+        {
+            foreach (MAVLinkNode node in MAVLinkNodes)
+                node.Serial.Close();
+        }
+
         /**
          * 
          */
-        public void IsLeader(int index=0)
+        public static void IsLeader(int index=0)
         {
             foreach (MAVLinkNode node in MAVLinkNodes)
                 node._is_leader = false;
@@ -102,14 +121,14 @@ namespace MAVLink.NET
         /****************************************
          * Reynold
          ****************************************/
-        public Vector3 Alignment()
+        public static Vector3 Alignment()
         {
             double x = MAVLinkNodes[0].Direction.X;
             double y = MAVLinkNodes[0].Direction.Y;
             return new Vector3(x, y);
         }
 
-        public Vector3 Separate(Vector3 self, Vector3 other1, Vector3 other2)
+        public static Vector3 Separate(Vector3 self, Vector3 other1, Vector3 other2)
         {
             Vector3 vector1 = (self - other1);
             Vector3 vector2 = (self - other2);
@@ -122,7 +141,7 @@ namespace MAVLink.NET
             return vector1 + vector2;
         }
 
-        public Vector3 Cohesion(Vector3 position, Vector3 center)
+        public static Vector3 Cohesion(Vector3 position, Vector3 center)
         {
             return center - position;
         }
@@ -130,7 +149,7 @@ namespace MAVLink.NET
         /****************************************
          * Formation
          ****************************************/
-        public void Flocking()
+        public static void Flocking()
         {
             double kAlignment   = 1;
             double kSeperation  = 1;
@@ -228,7 +247,7 @@ namespace MAVLink.NET
             MAVLinkNodes[2].NextWP(MAVLinkNodes[2].Direction.X, MAVLinkNodes[2].Direction.Y);
         }
 
-        public void Row()
+        public static void Row()
         {
             double scale = 0.1;
 
@@ -244,7 +263,7 @@ namespace MAVLink.NET
             MAVLinkNodes[2].Direction = leaderPosition + (bVector * 3);
         }
 
-        public void Column()
+        public static void Column()
         {
             double scale = 0.1;
 
@@ -266,7 +285,7 @@ namespace MAVLink.NET
             MAVLinkNodes[2].Direction = leaderPosition + rVector;
         }
 
-        public void Triangle()
+        public static void Triangle()
         {
             Console.WriteLine("Triangle");
             double scale = 0.00001; // 0.1;
@@ -311,7 +330,7 @@ namespace MAVLink.NET
         }
         */
 
-        public void RunScenario()
+        public static void RunScenario()
         {
             //MAVLinkNode leaderNode = null;
             //foreach (MAVLinkNode node in MAVLinkNodes) if (node.SYSTEM_ID == 2) leaderNode = node;

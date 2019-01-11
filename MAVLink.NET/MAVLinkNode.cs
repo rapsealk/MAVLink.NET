@@ -48,6 +48,9 @@ namespace MAVLink.NET
         public System.IO.Ports.SerialPort Serial { get; private set; }
         public System.ComponentModel.BackgroundWorker heartbeatWorker;
 
+        public string PortName;
+        public int BaudRate;
+
         public byte SYSTEM_ID;
         public byte COMPONENT_ID;
 
@@ -125,6 +128,9 @@ namespace MAVLink.NET
             HomePosition    = new Vector3();
             LocalPosition   = new Vector3();
             Direction       = new Vector3();
+
+            this.PortName = port;
+            this.BaudRate = baud;
 
             this.SYSTEM_ID      = SYSTEM_ID;
             this.COMPONENT_ID   = COMPONENT_ID;
@@ -531,6 +537,8 @@ namespace MAVLink.NET
             };
             SendPacket(offboardMessage);
 
+            ChangeSpeed(1.0f);
+
             /**
              * https://mavlink.io/en/messages/common.html#MAV_CMD_MISSION_START
              */
@@ -548,6 +556,27 @@ namespace MAVLink.NET
         public bool HasCompletedMission()
         {
             return (MissionItemCount - 1) == MissionReachedSequence;
+        }
+
+        /**
+         * https://mavlink.io/en/messages/common.html#MAV_CMD_DO_CHANGE_SPEED
+         */
+        public void ChangeSpeed(float speed=-1f)
+        {
+            Msg_command_long message = new Msg_command_long()
+            {
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID,
+                command             = (ushort) MAV_CMD.MAV_CMD_DO_CHANGE_SPEED,
+                param1              = 0,        // Speed type (0 = Airspeed, 1 = Ground Speed, 2 = Climb Speed, 3 = Descent Speed)
+                param2              = speed,    // Speed (m/s, -1 indicates no change)
+                param3              = -1,       // Throttle (Percent, -1 indicates no change)
+                param4              = 0,        // 0 = absolute, 1 = relative
+                param5              = 0,        // Empty
+                param6              = 0,        // Empty
+                param7              = 0         // Empty
+            };
+            SendPacket(message);
         }
 
         /**
