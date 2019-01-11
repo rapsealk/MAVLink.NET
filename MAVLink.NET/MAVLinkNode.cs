@@ -83,6 +83,7 @@ namespace MAVLink.NET
         private Msg_mission_item[] MissionItems = new Msg_mission_item[32];
         private int MissionItemCount = 0;
         private ushort MissionCurrentSequence = ushort.MaxValue;
+        private ushort MissionReachedSequence = ushort.MaxValue;
 
         public string FlightMode            = "null";
         public string SubMode               = "null";
@@ -309,6 +310,12 @@ namespace MAVLink.NET
                     };
                     SendPacket(smessage);
                 }
+            }
+            else if (message.GetType() == mMissionItemReached.GetType())
+            {
+                mMissionItemReached = (Msg_mission_item_reached) message;
+                MissionReachedSequence = mMissionItemReached.seq;
+                Console.WriteLine("[SYSTEM #{0:d}] Mission reached: {1:d}", SYSTEM_ID, MissionReachedSequence);
             }
 
             _is_armed = (byte) (mHeartbeat.base_mode & (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED);
@@ -540,7 +547,7 @@ namespace MAVLink.NET
 
         public bool HasCompletedMission()
         {
-            return MissionItemCount == MissionCurrentSequence;
+            return (MissionItemCount - 1) == MissionReachedSequence;
         }
 
         /**
