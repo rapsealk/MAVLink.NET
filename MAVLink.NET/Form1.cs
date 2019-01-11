@@ -8,12 +8,17 @@ namespace MAVLink.NET
     {
         private MAVLinkNode[] nodes;
 
+        private string[] FormationModes = { "Triangle", "Row", "Column" };
+        private MAVLinkManager.FORMATION[] Formations = { MAVLinkManager.FORMATION.TRIANGLE, MAVLinkManager.FORMATION.ROW, MAVLinkManager.FORMATION.COLUMN };
+
         public Form1()
         {
             InitializeComponent();
 
             foreach (ComboBox flightModeComboBox in FlightModeComboBoxes)
                 flightModeComboBox.Items.AddRange(MAVLinkNode.PX4Mode);
+
+            FormationModeComboBox.Items.AddRange(FormationModes);
 
             string[] portNames = System.IO.Ports.SerialPort.GetPortNames();
 
@@ -275,6 +280,11 @@ namespace MAVLink.NET
         {
             foreach (MAVLinkNode node in nodes)
                 node.TakeoffCommand();
+        }
+
+        private void FormationModeButton_Click(object sender, EventArgs e)
+        {
+            MAVLinkManager.FormationMode = Formations[FormationModeComboBox.SelectedIndex];
         }
     }
 }
