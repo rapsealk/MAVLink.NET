@@ -391,6 +391,8 @@ namespace MAVLink.NET
             // Takeoff drones.
             // foreach (MAVLinkNode node in MAVLinkNodes) node.TakeoffCommand();
 
+            leaderNode.ChangeSpeed(1.0f);
+
             // Start mission.
             leaderNode.StartMission();
 
@@ -399,17 +401,13 @@ namespace MAVLink.NET
                 while (!leaderNode.HasCompletedMission())
                 {
                     Flocking();
-                    /*
-                    MAVLinkNode f1 = MAVLinkNodes[1];
-                    MAVLinkNode f2 = MAVLinkNodes[2];
-                    f1.NextWP(f1.Position.X + f1.Direction.X, f1.Position.Y + f1.Direction.Y);
-                    f2.NextWP(f2.Position.X + f2.Direction.X, f2.Position.Y + f2.Direction.Y);
-                    */
-                    System.Threading.Thread.Sleep(3000);
+                    System.Threading.Thread.Sleep(2000);
                 }
 
                 foreach (MAVLinkNode node in MAVLinkNodes)
                     node.LandCommand();
+
+                leaderNode.ResetMissionReachedSequence();
             });
             thread.Start();
         }

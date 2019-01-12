@@ -537,7 +537,7 @@ namespace MAVLink.NET
             };
             SendPacket(offboardMessage);
 
-            ChangeSpeed(1.0f);
+            ChangeSpeed(0.5f);
 
             /**
              * https://mavlink.io/en/messages/common.html#MAV_CMD_MISSION_START
@@ -556,6 +556,11 @@ namespace MAVLink.NET
         public bool HasCompletedMission()
         {
             return (MissionItemCount - 1) == MissionReachedSequence;
+        }
+
+        public void ResetMissionReachedSequence()
+        {
+            MissionReachedSequence = ushort.MaxValue;
         }
 
         /**
