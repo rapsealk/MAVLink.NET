@@ -6,8 +6,10 @@ namespace MAVLink.NET
 {
     public partial class Form1 : Form
     {
-        private MAVLinkManager MAVManager;
         private MAVLinkNode[] nodes;
+
+        private string[] FormationModes = { "Triangle", "Row", "Column" };
+        private MAVLinkManager.FORMATION[] Formations = { MAVLinkManager.FORMATION.TRIANGLE, MAVLinkManager.FORMATION.ROW, MAVLinkManager.FORMATION.COLUMN };
 
         public Form1()
         {
@@ -16,9 +18,11 @@ namespace MAVLink.NET
             foreach (ComboBox flightModeComboBox in FlightModeComboBoxes)
                 flightModeComboBox.Items.AddRange(MAVLinkNode.PX4Mode);
 
-            MAVManager = new MAVLinkManager();
+            FormationModeComboBox.Items.AddRange(FormationModes);
 
             string[] portNames = System.IO.Ports.SerialPort.GetPortNames();
+
+            foreach (string portName in portNames) Console.WriteLine("po: {0:s}", portName);
 
             if (portNames.Length < 3)
             {
@@ -34,13 +38,18 @@ namespace MAVLink.NET
             nodes = new MAVLinkNode[3];
             foreach (string portName in portNames.Reverse())
             {
-                nodes[count++] = MAVManager.RegisterAgent(portName, 57600);
+                nodes[count++] = MAVLinkManager.RegisterAgent(portName, 57600);
                 if (count == nodes.Length) break;
             }
-            for (int i = 0; i < 3; i++) MAVManager.Open(i);
+            for (int i = 0; i < 3; i++) MAVLinkManager.Open(i);
             /*/
             //*/
             UpdateUI();
+        }
+
+        ~Form1()
+        {
+            MAVLinkManager.CloseAll();
         }
 
         /* TODO: Lambda Generator
@@ -252,7 +261,7 @@ namespace MAVLink.NET
 
         private void StartButton_Click(object sender, EventArgs e)
         {
-            MAVManager.RunScenario();
+            MAVLinkManager.RunScenario();
         }
 
         private void DisarmAllButton_Click(object sender, EventArgs e)
@@ -271,6 +280,11 @@ namespace MAVLink.NET
         {
             foreach (MAVLinkNode node in nodes)
                 node.TakeoffCommand();
+        }
+
+        private void FormationModeButton_Click(object sender, EventArgs e)
+        {
+            MAVLinkManager.FormationMode = Formations[FormationModeComboBox.SelectedIndex];
         }
     }
 }

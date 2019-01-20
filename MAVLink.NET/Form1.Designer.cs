@@ -146,6 +146,8 @@
             this.DisarmAllButton = new System.Windows.Forms.Button();
             this.LandAllButton = new System.Windows.Forms.Button();
             this.TakeoffAllButton = new System.Windows.Forms.Button();
+            this.FormationModeComboBox = new System.Windows.Forms.ComboBox();
+            this.FormationModeButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             //
             //
@@ -1396,11 +1398,31 @@
             this.TakeoffAllButton.UseVisualStyleBackColor = true;
             this.TakeoffAllButton.Click += new System.EventHandler(this.TakeoffAllButton_Click);
             // 
+            // FormationModeComboBox
+            // 
+            this.FormationModeComboBox.FormattingEnabled = true;
+            this.FormationModeComboBox.Location = new System.Drawing.Point(1530, 140);
+            this.FormationModeComboBox.Name = "FormationModeComboBox";
+            this.FormationModeComboBox.Size = new System.Drawing.Size(121, 26);
+            this.FormationModeComboBox.TabIndex = 61;
+            // 
+            // FormationModeButton
+            // 
+            this.FormationModeButton.Location = new System.Drawing.Point(1667, 142);
+            this.FormationModeButton.Name = "FormationModeButton";
+            this.FormationModeButton.Size = new System.Drawing.Size(75, 23);
+            this.FormationModeButton.TabIndex = 62;
+            this.FormationModeButton.Text = "Formation";
+            this.FormationModeButton.UseVisualStyleBackColor = true;
+            this.FormationModeButton.Click += new System.EventHandler(this.FormationModeButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1850, 810);
+            this.Controls.Add(this.FormationModeButton);
+            this.Controls.Add(this.FormationModeComboBox);
             this.Controls.Add(this.TakeoffAllButton);
             this.Controls.Add(this.LandAllButton);
             this.Controls.Add(this.DisarmAllButton);
@@ -1677,6 +1699,8 @@
         private System.Windows.Forms.Button DisarmAllButton;
         private System.Windows.Forms.Button LandAllButton;
         private System.Windows.Forms.Button TakeoffAllButton;
+        private System.Windows.Forms.ComboBox FormationModeComboBox;
+        private System.Windows.Forms.Button FormationModeButton;
     }
 }
 

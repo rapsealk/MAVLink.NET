@@ -1,4 +1,4 @@
-﻿#define MYSQL
+﻿//#define MYSQL
 using System;
 using System.Collections.Generic;
 using System.Linq;

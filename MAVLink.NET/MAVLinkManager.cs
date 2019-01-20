@@ -5,7 +5,7 @@ namespace MAVLink.NET
 {
     class MAVLinkManager
     {
-        private List<MAVLinkNode> MAVLinkNodes;
+        public static List<MAVLinkNode> MAVLinkNodes = new List<MAVLinkNode>();
 
         private const double Lat2LonScale = 1.2493498129938325118272112550467;
         private const double Lon2LatScale = 0.8004163362410785091197462331483;
@@ -14,41 +14,58 @@ namespace MAVLink.NET
 
         private const double World2Local = 100000;
         
-        private enum FORMATION_MODE
+        public enum FORMATION
         {
-            FLOCKING    = 0,
+            TRIANGLE    = 0,
             ROW         = 1,
             COLUMN      = 2,
-            TRIANGLE    = 3
+            FLOCKING    = 3
         }
 
+        public static FORMATION FormationMode = FORMATION.TRIANGLE;
+
+        /*
         public MAVLinkManager()
         {
             MAVLinkNodes = new List<MAVLinkNode>();
         }
 
-        public MAVLinkNode RegisterAgent(string port, int baud, byte systemId=1, byte componentId=1)
+        ~MAVLinkManager()
+        {
+            foreach (MAVLinkNode node in MAVLinkNodes)
+                node.Serial.Close();
+        }
+        */
+
+        public static MAVLinkNode RegisterAgent(string port, int baud, byte systemId=1, byte componentId=1)
         {
             MAVLinkNode node = new MAVLinkNode(port, baud, systemId, componentId);
             MAVLinkNodes.Add(node);
 
-            // TODO: move leader to the first index
-            //MAVLinkNodes.Sort((x, y) => x._is_leader ? 0 : 1);
-
             return node;
         }
 
-        public void RegisterAgent(MAVLinkNode node)
+        public static void RegisterAgent(MAVLinkNode node)
         {
             MAVLinkNodes.Add(node);
+        }
 
-            //MAVLinkNodes.Sort((x, y) => x._is_leader ? 0 : 1);
+        public static MAVLinkNode FindNodeWithPortName(string portName)
+        {
+            MAVLinkNode node = null;
+            foreach (MAVLinkNode mavlinkNode in MAVLinkNodes)
+                if (mavlinkNode.PortName.Equals(portName))
+                {
+                    node = mavlinkNode;
+                    break;
+                }
+            return node;
         }
 
         /****************************************
          * Serial
          ****************************************/
-        public void Open(int index=0)
+        public static void Open(int index=0)
         {
             MAVLinkNode node = MAVLinkNodes[index];
 
@@ -62,11 +79,15 @@ namespace MAVLink.NET
                 Console.Error.WriteLine(e.Message);
                 return;
             }
+            catch (NullReferenceException e)
+            {
+                Console.Error.WriteLine(e.Message);
+            }
 
             node.heartbeatWorker.RunWorkerAsync();
         }
 
-        public void Close(int index=0)
+        public static void Close(int index=0)
         {
             MAVLinkNode node = MAVLinkNodes[index];
 
@@ -83,10 +104,16 @@ namespace MAVLink.NET
             }
         }
 
+        public static void CloseAll()
+        {
+            foreach (MAVLinkNode node in MAVLinkNodes)
+                node.Serial.Close();
+        }
+
         /**
          * 
          */
-        public void IsLeader(int index=0)
+        public static void IsLeader(int index=0)
         {
             foreach (MAVLinkNode node in MAVLinkNodes)
                 node._is_leader = false;
@@ -96,14 +123,14 @@ namespace MAVLink.NET
         /****************************************
          * Reynold
          ****************************************/
-        public Vector3 Alignment()
+        public static Vector3 Alignment()
         {
             double x = MAVLinkNodes[0].Direction.X;
             double y = MAVLinkNodes[0].Direction.Y;
             return new Vector3(x, y);
         }
 
-        public Vector3 Separate(Vector3 self, Vector3 other1, Vector3 other2)
+        public static Vector3 Separate(Vector3 self, Vector3 other1, Vector3 other2)
         {
             Vector3 vector1 = (self - other1);
             Vector3 vector2 = (self - other2);
@@ -116,7 +143,7 @@ namespace MAVLink.NET
             return vector1 + vector2;
         }
 
-        public Vector3 Cohesion(Vector3 position, Vector3 center)
+        public static Vector3 Cohesion(Vector3 position, Vector3 center)
         {
             return center - position;
         }
@@ -124,7 +151,7 @@ namespace MAVLink.NET
         /****************************************
          * Formation
          ****************************************/
-        public void Flocking()
+        public static void Flocking()
         {
             double kAlignment   = 1;
             double kSeperation  = 1;
@@ -142,25 +169,16 @@ namespace MAVLink.NET
                     Console.WriteLine("distance[{0:d}][{1:d}]: {2:f6}", i, j, distance[i, j]);
                 }
 
-            Vector3 aVector2 = Alignment();
-            Vector3 sVector2 = Separate(MAVLinkNodes[1].Position, MAVLinkNodes[0].Position, MAVLinkNodes[2].Position);
-            Vector3 cVector2 = Cohesion(MAVLinkNodes[1].Position, flockCenter);
+            Vector3 aVector2 = Alignment().Normalized();
+            Vector3 sVector2 = Separate(MAVLinkNodes[1].Position, MAVLinkNodes[0].Position, MAVLinkNodes[2].Position).Normalized();
+            Vector3 cVector2 = Cohesion(MAVLinkNodes[1].Position, flockCenter).Normalized();
 
-            Vector3 aVector3 = Alignment();
-            Vector3 sVector3 = Separate(MAVLinkNodes[2].Position, MAVLinkNodes[0].Position, MAVLinkNodes[1].Position);
-            Vector3 cVector3 = Cohesion(MAVLinkNodes[2].Position, flockCenter);
-
-            aVector2.Normalize();
-            sVector2.Normalize();
-            cVector2.Normalize();
-
-            aVector3.Normalize();
-            sVector3.Normalize();
-            cVector3.Normalize();
+            Vector3 aVector3 = Alignment().Normalized();
+            Vector3 sVector3 = Separate(MAVLinkNodes[2].Position, MAVLinkNodes[0].Position, MAVLinkNodes[1].Position).Normalized();
+            Vector3 cVector3 = Cohesion(MAVLinkNodes[2].Position, flockCenter).Normalized();
 
             if (distance[1, 2] < 0.25 || distance[1, 0] < 0.25)
             {
-                //MAVLinkNodes[1].State = 0;
                 kAlignment = 0.2;
                 kSeperation = 1;
                 kCohesion = 0;
@@ -173,20 +191,39 @@ namespace MAVLink.NET
             }
             else if ((distance[1, 0] >= 0.25 && distance[1, 0] < 0.5) && (distance[1, 2] >= 0.25 && distance[1, 2] < 0.5))
             {
-                //MAVLinkNodes[1].State = 1;
-                // TODO: Formation (Row, Column, Triangle)
-                Triangle();
+                switch (FormationMode)
+                {
+                    case FORMATION.ROW:
+                        Row();
+                        break;
+                    case FORMATION.COLUMN:
+                        Column();
+                        break;
+                    case FORMATION.TRIANGLE:
+                    default:
+                        Triangle();
+                        break;
+                }
             }
             else
             {
-                //MAVLinkNodes[1].State = 2;
-                // TODO: Formation (Row, Column, Triangle)
-                Triangle();
+                switch (FormationMode)
+                {
+                    case FORMATION.ROW:
+                        Row();
+                        break;
+                    case FORMATION.COLUMN:
+                        Column();
+                        break;
+                    case FORMATION.TRIANGLE:
+                    default:
+                        Triangle();
+                        break;
+                }
             }
 
             if (distance[1, 2] < 0.25 || distance[2, 0] < 0.25)
             {
-                //MAVLinkNodes[2].State = 0;
                 kAlignment = 0.2;
                 kSeperation = 1;
                 kCohesion = 0;
@@ -199,38 +236,52 @@ namespace MAVLink.NET
             }
             else if ((distance[1, 2] >= 0.25 && distance[1, 2] < 0.5) && (distance[2, 0] >= 0.25 && distance[2, 0] < 0.5))
             {
-                //MAVLinkNodes[2].State = 1;
-                // TODO: Formation (Row, Column, Triangle)
-                Triangle();
+                switch (FormationMode)
+                {
+                    case FORMATION.ROW:
+                        Row();
+                        break;
+                    case FORMATION.COLUMN:
+                        Column();
+                        break;
+                    case FORMATION.TRIANGLE:
+                    default:
+                        Triangle();
+                        break;
+                }
             }
             else
             {
-                // MAVLinkNodes[2].State = 2;
-                // TODO: Formation (Row, Column, Triangle)
-                Triangle();
+                switch (FormationMode)
+                {
+                    case FORMATION.ROW:
+                        Row();
+                        break;
+                    case FORMATION.COLUMN:
+                        Column();
+                        break;
+                    case FORMATION.TRIANGLE:
+                    default:
+                        Triangle();
+                        break;
+                }
             }
 
             Console.WriteLine("Node[0]: {0:f6}, {1:f6}", MAVLinkNodes[0].Position.X, MAVLinkNodes[0].Position.Y);
             Console.WriteLine("Node[1]: {0:f6}, {1:f6}", MAVLinkNodes[1].Direction.X, MAVLinkNodes[1].Direction.Y);
             Console.WriteLine("Node[2]: {0:f6}, {1:f6}", MAVLinkNodes[2].Direction.X, MAVLinkNodes[2].Direction.Y);
 
-            /* TODO: Set next waypoint
-            nextWaypoint[1] = WorldCoordinate2GPS(MAVLinkNodes[1].Direction);
-            nextWaypoint[2] = WorldCoordinate2GPS(MAVLinkNodes[2].Direction);
-            */
             MAVLinkNodes[1].NextWP(MAVLinkNodes[1].Direction.X, MAVLinkNodes[1].Direction.Y);
             MAVLinkNodes[2].NextWP(MAVLinkNodes[2].Direction.X, MAVLinkNodes[2].Direction.Y);
         }
 
-        public void Row()
+        public static void Row()
         {
-            double scale = 0.1;
-
-            //Vector3 fVector = MAVLinkNodes[0].Direction.Normalized();
+            double scale = 0.00001;
+            
             Vector3 fVector = MAVLinkNodes[0].Position.Normalized();
             Vector3 bVector = fVector * -1;
 
-            // 리더의 앞과 오른쪽 벡터 계산
             bVector *= (scale * 2);
 
             Vector3 leaderPosition = MAVLinkNodes[0].Position;
@@ -238,11 +289,10 @@ namespace MAVLink.NET
             MAVLinkNodes[2].Direction = leaderPosition + (bVector * 3);
         }
 
-        public void Column()
+        public static void Column()
         {
-            double scale = 0.1;
-
-            //Vector3 fVector = MAVLinkNodes[0].Direction.Normalized();
+            double scale = 0.00001;
+            
             Vector3 fVector = MAVLinkNodes[0].Position.Normalized();
 
             double x = Math.Cos(-90 * Degree2Radian) * fVector.X - Math.Sin(-90 * Degree2Radian) * fVector.Y;
@@ -250,8 +300,7 @@ namespace MAVLink.NET
             Vector3 rVector = new Vector3(x, y).Normalized();
 
             Vector3 lVector = rVector * -1;
-
-            // 리더의 앞과 오른쪽 벡터 계산
+            
             rVector *= (scale * 4.5);
             lVector *= (scale * 4.5);
 
@@ -260,13 +309,11 @@ namespace MAVLink.NET
             MAVLinkNodes[2].Direction = leaderPosition + rVector;
         }
 
-        public void Triangle()
+        public static void Triangle()
         {
             Console.WriteLine("Triangle");
-            double scale = 0.00001; // 0.1;
-
-            // TODO: NaN
-            // Vector3 fVector = MAVLinkNodes[0].Direction.Normalized();
+            double scale = 0.00001;
+            
             Vector3 fVector = MAVLinkNodes[0].Position.Normalized();
 
             double x = Math.Cos(-90 * Degree2Radian) * fVector.X - Math.Sin(-90 * Degree2Radian) * fVector.Y;
@@ -283,32 +330,12 @@ namespace MAVLink.NET
             lVector *= (scale * 2);
 
             Vector3 leaderPosition = MAVLinkNodes[0].Position;
-            //MAVLinkNodes[1].Direction = leaderPosition + bVector + lVector;
-            //MAVLinkNodes[2].Direction = leaderPosition + bVector + rVector;
             MAVLinkNodes[1].Direction = leaderPosition + bVector + lVector;
             MAVLinkNodes[2].Direction = leaderPosition + bVector + rVector;
         }
 
-        /*
-        public Vector3 WorldCoordinate2GPS(Vector3 coordinate)
+        public static void RunScenario()
         {
-            double x = (coordinate.X / 10000) + kZero;
-            double y = coordinate.Y / 10000;
-
-        }
-        */
-
-        /*
-        public void ComputeNextPosition()
-        {
-            // TODO: Compute Next Waypoint for each Agent
-        }
-        */
-
-        public void RunScenario()
-        {
-            //MAVLinkNode leaderNode = null;
-            //foreach (MAVLinkNode node in MAVLinkNodes) if (node.SYSTEM_ID == 2) leaderNode = node;
             MAVLinkNodes.Sort((x, y) => x.SYSTEM_ID == 2 ? 0 : 1);
             MAVLinkNode leaderNode = MAVLinkNodes[0];
 
@@ -318,6 +345,8 @@ namespace MAVLink.NET
             // Takeoff drones.
             // foreach (MAVLinkNode node in MAVLinkNodes) node.TakeoffCommand();
 
+            leaderNode.ChangeSpeed(1.0f);
+
             // Start mission.
             leaderNode.StartMission();
 
@@ -326,17 +355,16 @@ namespace MAVLink.NET
                 while (!leaderNode.HasCompletedMission())
                 {
                     Flocking();
-                    /*
-                    MAVLinkNode f1 = MAVLinkNodes[1];
-                    MAVLinkNode f2 = MAVLinkNodes[2];
-                    f1.NextWP(f1.Position.X + f1.Direction.X, f1.Position.Y + f1.Direction.Y);
-                    f2.NextWP(f2.Position.X + f2.Direction.X, f2.Position.Y + f2.Direction.Y);
-                    */
-                    System.Threading.Thread.Sleep(3000);
+                    System.Threading.Thread.Sleep(2000);
                 }
 
                 foreach (MAVLinkNode node in MAVLinkNodes)
+                {
+                    node.ClearMission();
                     node.LandCommand();
+                }
+
+                leaderNode.ResetMissionReachedSequence();
             });
             thread.Start();
         }
