@@ -71,6 +71,7 @@ namespace MAVLink.NET
         private Msg_command_ack             mCommandAck             = new Msg_command_ack();
         private Msg_statustext              mStatusText             = new Msg_statustext();
         private Msg_mission_count           mMissionCount           = new Msg_mission_count();
+        private Msg_mission_item            mMissionItem            = new Msg_mission_item();
         private Msg_mission_current         mMissionCurrent         = new Msg_mission_current();
         private Msg_mission_request         mMissionRequest         = new Msg_mission_request();
         private Msg_mission_ack             mMissionAck             = new Msg_mission_ack();
@@ -83,7 +84,7 @@ namespace MAVLink.NET
 
         public sbyte BatteryPercentage = 0;
 
-        private Msg_mission_item[] MissionItems = new Msg_mission_item[32];
+        private readonly Msg_mission_item[] MissionItems = new Msg_mission_item[32];
         private int MissionItemCount = 0;
         private ushort MissionCurrentSequence = ushort.MaxValue;
         private ushort MissionReachedSequence = ushort.MaxValue;
@@ -100,7 +101,7 @@ namespace MAVLink.NET
 
         public short HeadingDirection = 0;
 
-        private static float Radian = (float) (180 / Math.PI);
+        private const float Radian = (float) (180 / Math.PI);
 
         /**
          * Variables for agent's location.
@@ -197,7 +198,7 @@ namespace MAVLink.NET
                 }
                 catch (IndexOutOfRangeException e)
                 {
-                    // FIXME
+                    Console.Error.WriteLine(e.Message);
                 }
                 Console.WriteLine("heartbeat.custom_mode: " + mHeartbeat.custom_mode);
                 Console.WriteLine("Flight Mode: {0:s}, Sub Mode: {1:s}", FlightMode, SubMode);
@@ -274,9 +275,44 @@ namespace MAVLink.NET
                 mStatusText = (Msg_statustext) message;
             else if (message.GetType() == mMissionCount.GetType())      // Response to MISSION_REQUEST_LIST
             {
-                mMissionCount = (Msg_mission_count) message;
+                mMissionCount = message as Msg_mission_count;
                 MissionItemCount = mMissionCount.count;
                 Console.WriteLine("[SYSTEM #{0:d}] Msg_mission_count: {1:d}", SYSTEM_ID, mMissionCount.count);
+
+                Msg_mission_request requestMessage = new Msg_mission_request()
+                {
+                    target_system       = SYSTEM_ID,
+                    target_component    = COMPONENT_ID,
+                    seq                 = 0
+                };
+                SendPacket(requestMessage);
+            }
+            else if (message.GetType() == mMissionItem.GetType())
+            {
+                mMissionItem = message as Msg_mission_item;
+
+                ushort sequenceNumber = mMissionItem.seq;
+                MissionItems[sequenceNumber] = mMissionItem;
+
+                if (sequenceNumber < MissionItemCount - 1)
+                {
+                    Msg_mission_request requestMessage = new Msg_mission_request()
+                    {
+                        target_system       = SYSTEM_ID,
+                        target_component    = COMPONENT_ID,
+                        seq                 = (ushort) (sequenceNumber + 1)
+                    };
+                    SendPacket(requestMessage);
+                }
+                else
+                {
+                    Msg_mission_ack ackMessage = new Msg_mission_ack()
+                    {
+                        target_system       = SYSTEM_ID,
+                        target_component    = COMPONENT_ID,
+                        type                = (byte) MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED
+                    };
+                }
             }
             else if (message.GetType() == mMissionCurrent.GetType())
             {
@@ -294,13 +330,15 @@ namespace MAVLink.NET
             }
             else if (message.GetType() == mMissionRequest.GetType())
             {
-                mMissionRequest = (Msg_mission_request) message;
-                Console.WriteLine("mMissionRequest.seq: " + mMissionRequest.seq);
-                SendMission(mMissionRequest.seq);
+                mMissionRequest = message as Msg_mission_request;
+                ushort index = mMissionRequest.seq;
+                Msg_mission_item itemMessage = MissionItems[index];
+                itemMessage.seq = index;
+                SendPacket(itemMessage);
             }
             else if (message.GetType() == mMissionAck.GetType())
             {
-                mMissionAck = (Msg_mission_ack) message;
+                mMissionAck = message as Msg_mission_ack;
                 Console.WriteLine("[SYSTEM #{0:d}] Mission Ack: " + (mMissionAck.type == (byte) MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED), SYSTEM_ID);
             
                 // Follower: set_position as a single mission.
@@ -638,6 +676,8 @@ namespace MAVLink.NET
          */
         public void LandCommand()
         {
+            ClearMission();
+
             Msg_command_long message = new Msg_command_long()
             {
                 command             = (ushort) MAV_CMD.MAV_CMD_NAV_LAND,

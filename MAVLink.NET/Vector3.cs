@@ -35,7 +35,7 @@ namespace MAVLink.NET
 
         public double Size()
         {
-            return Math.Abs(Math.Sqrt(Math.Pow(X, 2) + Math.Pow(Y, 2) + Math.Pow(Z, 2)));
+            return Math.Sqrt(Math.Pow(X, 2) + Math.Pow(Y, 2) + Math.Pow(Z, 2));
         }
 
         public void Normalize()
