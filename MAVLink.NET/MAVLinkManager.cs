@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace MAVLink.NET
 {
@@ -36,7 +37,7 @@ namespace MAVLink.NET
 
         private static readonly double Degree2Radian = (Math.PI / 180);
 
-        private static readonly double World2Local = 100000;
+        private static readonly float World2Local = 100 * 1000;
         
         public enum FORMATION
         {
@@ -142,19 +143,19 @@ namespace MAVLink.NET
          ****************************************/
         public static Vector3 Alignment(List<MAVLinkNode> nodes)
         {
-            double x = nodes[0].Direction.X;
-            double y = nodes[0].Direction.Y;
-            return new Vector3(x, y);
+            float x = nodes[0].Direction.X;
+            float y = nodes[0].Direction.Y;
+            return new Vector3(x, y, 0f);
         }
 
         public static Vector3 Separate(Vector3 self, Vector3 other1, Vector3 other2)
         {
             Vector3 vector1 = (self - other1);
             Vector3 vector2 = (self - other2);
-            double x = vector1.Size();
-            double y = vector2.Size();
-            double kValue1 = x / (x + y);
-            double kValue2 = y / (x + y);
+            float x = vector1.Length();
+            float y = vector2.Length();
+            float kValue1 = x / (x + y);
+            float kValue2 = y / (x + y);
             vector1 *= kValue2;
             vector2 *= kValue1;
             return vector1 + vector2;
@@ -170,33 +171,33 @@ namespace MAVLink.NET
          ****************************************/
         public void Flocking()
         {
-            double kAlignment   = 1;
-            double kSeperation  = 1;
-            double kCohesion    = 1;
+            float kAlignment   = 1f;
+            float kSeperation  = 1f;
+            float kCohesion    = 1f;
 
             Vector3 flockCenter = new Vector3();
             for (int i = 0; i < MAVLinkNodes.Count; i++)
                 flockCenter += MAVLinkNodes[i].Position;
             flockCenter /= MAVLinkNodes.Count;
 
-            double[,] distance = new double[3, 3];
+            float[,] distance = new float[3, 3];
             for (int i = 0; i < MAVLinkNodes.Count; i++) for (int j = 0; j < MAVLinkNodes.Count; j++)
                 {
-                    distance[i, j] = (MAVLinkNodes[i].Position * World2Local - MAVLinkNodes[j].Position * World2Local).Size();
+                    distance[i, j] = (MAVLinkNodes[i].Position * World2Local - MAVLinkNodes[j].Position * World2Local).Length();
                     Console.WriteLine("distance[{0:d}][{1:d}]: {2:f6}", i, j, distance[i, j]);
                 }
 
-            Vector3 aVector2 = Alignment(MAVLinkNodes).Normalized();
-            Vector3 sVector2 = Separate(MAVLinkNodes[1].Position, MAVLinkNodes[0].Position, MAVLinkNodes[2].Position).Normalized();
-            Vector3 cVector2 = Cohesion(MAVLinkNodes[1].Position, flockCenter).Normalized();
+            Vector3 aVector2 = Vector3.Normalize(Alignment(MAVLinkNodes));
+            Vector3 sVector2 = Vector3.Normalize(Separate(MAVLinkNodes[1].Position, MAVLinkNodes[0].Position, MAVLinkNodes[2].Position));
+            Vector3 cVector2 = Vector3.Normalize(Cohesion(MAVLinkNodes[1].Position, flockCenter));
 
-            Vector3 aVector3 = Alignment(MAVLinkNodes).Normalized();
-            Vector3 sVector3 = Separate(MAVLinkNodes[2].Position, MAVLinkNodes[0].Position, MAVLinkNodes[1].Position).Normalized();
-            Vector3 cVector3 = Cohesion(MAVLinkNodes[2].Position, flockCenter).Normalized();
+            Vector3 aVector3 = Vector3.Normalize(Alignment(MAVLinkNodes));
+            Vector3 sVector3 = Vector3.Normalize(Separate(MAVLinkNodes[2].Position, MAVLinkNodes[0].Position, MAVLinkNodes[1].Position));
+            Vector3 cVector3 = Vector3.Normalize(Cohesion(MAVLinkNodes[2].Position, flockCenter));
 
             if (distance[1, 2] < 0.25 || distance[1, 0] < 0.25)
             {
-                kAlignment = 0.2;
+                kAlignment = 0.2f;
                 kSeperation = 1;
                 kCohesion = 0;
 
@@ -204,7 +205,7 @@ namespace MAVLink.NET
                 sVector2 *= kSeperation;
                 cVector2 *= kCohesion;
 
-                MAVLinkNodes[1].Direction = MAVLinkNodes[1].Position + (aVector2 + sVector2 + cVector2).Normalized() / World2Local;
+                MAVLinkNodes[1].Direction = Vector3.Normalize(MAVLinkNodes[1].Position + (aVector2 + sVector2 + cVector2)) / World2Local;
             }
             else if ((distance[1, 0] >= 0.25 && distance[1, 0] < 0.5) && (distance[1, 2] >= 0.25 && distance[1, 2] < 0.5))
             {
@@ -241,7 +242,7 @@ namespace MAVLink.NET
 
             if (distance[1, 2] < 0.25 || distance[2, 0] < 0.25)
             {
-                kAlignment = 0.2;
+                kAlignment = 0.2f;
                 kSeperation = 1;
                 kCohesion = 0;
 
@@ -249,7 +250,7 @@ namespace MAVLink.NET
                 sVector3 *= kSeperation;
                 cVector3 *= kCohesion;
 
-                MAVLinkNodes[2].Direction = MAVLinkNodes[2].Position + (aVector3 + sVector3 + cVector3).Normalized() / World2Local;
+                MAVLinkNodes[2].Direction = Vector3.Normalize(MAVLinkNodes[2].Position + (aVector3 + sVector3 + cVector3)) / World2Local;
             }
             else if ((distance[1, 2] >= 0.25 && distance[1, 2] < 0.5) && (distance[2, 0] >= 0.25 && distance[2, 0] < 0.5))
             {
@@ -294,9 +295,9 @@ namespace MAVLink.NET
 
         public static void Row(List<MAVLinkNode> nodes)
         {
-            double scale = 0.00001;
+            float scale = 0.00001f;
             
-            Vector3 fVector = nodes[0].Position.Normalized();
+            Vector3 fVector = Vector3.Normalize(nodes[0].Position);
             Vector3 bVector = fVector * -1;
 
             bVector *= (scale * 2);
@@ -308,18 +309,18 @@ namespace MAVLink.NET
 
         public static void Column(List<MAVLinkNode> nodes)
         {
-            double scale = 0.00001;
+            float scale = 0.00001f;
             
-            Vector3 fVector = nodes[0].Position.Normalized();
+            Vector3 fVector = Vector3.Normalize(nodes[0].Position);
 
-            double x = Math.Cos(-90 * Degree2Radian) * fVector.X - Math.Sin(-90 * Degree2Radian) * fVector.Y;
-            double y = Math.Sin(-90 * Degree2Radian) * fVector.X + Math.Cos(-90 * Degree2Radian) * fVector.Y;
-            Vector3 rVector = new Vector3(x, y).Normalized();
+            float x = (float) (Math.Cos(-90 * Degree2Radian) * fVector.X - Math.Sin(-90 * Degree2Radian) * fVector.Y);
+            float y = (float) (Math.Sin(-90 * Degree2Radian) * fVector.X + Math.Cos(-90 * Degree2Radian) * fVector.Y);
+            Vector3 rVector = Vector3.Normalize(new Vector3(x, y, 0f));
 
             Vector3 lVector = rVector * -1;
             
-            rVector *= (scale * 4.5);
-            lVector *= (scale * 4.5);
+            rVector *= (scale * 4.5f);
+            lVector *= (scale * 4.5f);
 
             Vector3 leaderPosition = nodes[0].Position;
             nodes[1].Direction = leaderPosition + lVector;
@@ -329,20 +330,20 @@ namespace MAVLink.NET
         public static void Triangle(List<MAVLinkNode> nodes)
         {
             Console.WriteLine("Triangle");
-            double scale = 0.00001;
+            float scale = 0.00001f;
             
-            Vector3 fVector = nodes[0].Position.Normalized();
+            Vector3 fVector = Vector3.Normalize(nodes[0].Position);
 
-            double x = Math.Cos(-90 * Degree2Radian) * fVector.X - Math.Sin(-90 * Degree2Radian) * fVector.Y;
-            double y = Math.Sin(-90 * Degree2Radian) * fVector.X + Math.Cos(-90 * Degree2Radian) * fVector.Y;
-            Vector3 rVector = new Vector3(x, y).Normalized();
+            float x = (float) (Math.Cos(-90 * Degree2Radian) * fVector.X - Math.Sin(-90 * Degree2Radian) * fVector.Y);
+            float y = (float) (Math.Sin(-90 * Degree2Radian) * fVector.X + Math.Cos(-90 * Degree2Radian) * fVector.Y);
+            Vector3 rVector = Vector3.Normalize(new Vector3(x, y, 0));
 
             Vector3 bVector = fVector * -1;
             Vector3 lVector = rVector * -1;
 
             // 리더의 앞과 오른쪽 벡터 계산
             fVector *= scale;
-            bVector *= (scale * 1.5);
+            bVector *= (scale * 1.5f);
             rVector *= (scale * 2);
             lVector *= (scale * 2);
 

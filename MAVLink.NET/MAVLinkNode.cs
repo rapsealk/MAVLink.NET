@@ -444,7 +444,7 @@ namespace MAVLink.NET
         
         public void SetCurrentPositionAsHome()
         {
-            UpdateHomeCommand((float) Position.X, (float) Position.Y);
+            UpdateHomeCommand(Position.X, Position.Y);
         }
 
         /**
@@ -461,9 +461,9 @@ namespace MAVLink.NET
                 // param2
                 param3              = .1f,   // horizontal navigation by pilot acceptable
                 // param4: yaw angle    (not supported)
-                param5              = (float) Position.X,   // latitude
-                param6              = (float) Position.Y,   // longitude
-                param7              = 5                     // altitude [meters]
+                param5              = Position.X,   // latitude
+                param6              = Position.Y,   // longitude
+                param7              = 5             // altitude [meters]
             };
             SendPacket(message);
 
@@ -486,8 +486,8 @@ namespace MAVLink.NET
                 // param2: Precision land mode. (0 = normal landing, 1 = opportunistic precision landing, 2 = required precision landing)
                 // param3: Empty
                 // param4: Desired yaw angle. NaN for unchanged.
-                param5              = (float) Position.X,   // Latitude
-                param6              = (float) Position.Y    // Longitude
+                param5              = Position.X,   // Latitude
+                param6              = Position.Y    // Longitude
                 // param7: Altitude (ground level)
             };
             SendPacket(message);
@@ -555,9 +555,9 @@ namespace MAVLink.NET
 
         public void UpdateGpsRaw(int latitude, int longitude, int altitude, ulong usec, byte nsatellites)
         {
-            Position.X      = latitude / Constant.GLOBAL_LOCAL_RATIO;
-            Position.Y      = longitude / Constant.GLOBAL_LOCAL_RATIO;
-            Position.Z      = altitude / Constant.GLOBAL_LOCAL_RATIO;
+            Position.X      = (float) (latitude / Constant.GLOBAL_LOCAL_RATIO);
+            Position.Y      = (float) (longitude / Constant.GLOBAL_LOCAL_RATIO);
+            Position.Z      = (float) (altitude / Constant.GLOBAL_LOCAL_RATIO);
             Gtimestamp      = usec;
             SatelliteNumber = nsatellites;
             //DatabaseManager.UpdatePosition(SYSTEM_ID, Position.X, Position.Y, Position.Z, SatelliteNumber, Gtimestamp);
@@ -571,8 +571,8 @@ namespace MAVLink.NET
 
         public void UpdateHomePosition(int latitude, int longitude)
         {
-            HomePosition.X = latitude / Constant.GLOBAL_LOCAL_RATIO;
-            HomePosition.Y = longitude / Constant.GLOBAL_LOCAL_RATIO;
+            HomePosition.X = (float) (latitude / Constant.GLOBAL_LOCAL_RATIO);
+            HomePosition.Y = (float) (longitude / Constant.GLOBAL_LOCAL_RATIO);
         }
 
         public void UpdateLocalNED(float x, float y, float z)
