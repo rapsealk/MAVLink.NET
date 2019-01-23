@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using MavLink;
 
 namespace MAVLink.NET
@@ -90,6 +91,7 @@ namespace MAVLink.NET
         public Vector3 Position;
         public Vector3 HomePosition;
         public Vector3 LocalPosition;
+
 
         public ulong Gtimestamp     = 0;        // GPS UNIX Timestamp (start from boot)
         public byte SatelliteNumber = 0;        // Number of visible Satellite
