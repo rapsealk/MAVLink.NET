@@ -152,6 +152,17 @@ namespace MAVLink.NET
         private void OnMAVPacketReceive(object sender, MavlinkPacket packet)
         {
             uint psize = mavlink.PacketsReceived;
+
+            /*
+             * FIXME: Sik Radio issue
+             * https://groups.google.com/forum/#!msg/drones-discuss/w_iuoVnA7K4/GRr1iUyJAwAJ
+             * https://github.com/ArduPilot/SiK/blob/master/Firmware/radio/mavlink.c#L51
+             */
+            if (packet.SystemId == 51)
+            {
+                return;
+            }
+
             SYSTEM_ID = (byte) packet.SystemId;
             COMPONENT_ID = (byte) packet.ComponentId;
             PacketSequence = packet.SequenceNumber;
@@ -164,14 +175,6 @@ namespace MAVLink.NET
              * TODO: Handle
              */
             _is_armed = (byte) (mHeartbeat.base_mode & (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED);
-
-            if (mStatusText.text != null)
-            {
-                int tsize = mStatusText.text.Length;
-                char[] c = new char[tsize];
-                for (int i = 0; i < tsize; i++) c[i] = (char) mStatusText.text[i];
-                StatusMessage = new string(c);
-            }
 
             _base_mode = mHeartbeat.base_mode;
         }
