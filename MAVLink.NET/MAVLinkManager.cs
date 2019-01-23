@@ -6,7 +6,7 @@ namespace MAVLink.NET
     sealed class MAVLinkManager
     {
         /*
-         * Multithreaded Singleton
+         * Multithreaded Singleton (https://docs.microsoft.com/en-us/previous-versions/msp-n-p/ff650316(v=pandp.10)
          */
         private static volatile MAVLinkManager instance;
         private static object syncRoot = new object();
