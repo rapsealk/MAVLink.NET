@@ -496,7 +496,7 @@ namespace MAVLink.NET
         /**
          * https://mavlink.io/en/messages/common.html#MAV_CMD_NAV_WAYPOINT
          */
-        public void NextWP(double latitude, double longitude)
+        public void NextWP(float latitude, float longitude, float altitude = 5f)
         {
             ClearMission();
 
@@ -511,9 +511,9 @@ namespace MAVLink.NET
                 autocontinue        = 1,
                 current             = 1,
                 seq                 = 1,
-                x                   = (float) latitude,
-                y                   = (float) longitude,
-                z                   = 5
+                x                   = latitude,
+                y                   = longitude,
+                z                   = altitude
             };
 
             // Upload 
