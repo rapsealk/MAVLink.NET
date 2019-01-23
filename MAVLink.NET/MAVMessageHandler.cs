@@ -16,8 +16,6 @@ namespace MAVLink.NET
         private Msg_vfr_hud                 mVfr                    = new Msg_vfr_hud();
         private Msg_home_position           mHomePosition           = new Msg_home_position();
         private Msg_local_position_ned      mLocalPositionNED       = new Msg_local_position_ned();
-        private Msg_raw_pressure            mRawPressure            = new Msg_raw_pressure();
-        private Msg_scaled_pressure         mScaledPressure         = new Msg_scaled_pressure();
         private Msg_command_ack             mCommandAck             = new Msg_command_ack();
         private Msg_statustext              mStatusText             = new Msg_statustext();
         private Msg_mission_count           mMissionCount           = new Msg_mission_count();
@@ -34,7 +32,6 @@ namespace MAVLink.NET
             HEARTBEAT, BATTERY_STATUS,
             ATTITUDE, GPS_RAW_INT, GPS_RTK, VFR_HUD,
             HOME_POSITION, LOCAL_POSITION_NED,
-            RAW_PRESSURE, SCALED_PRESSURE,
             COMMAND_ACK, STATUSTEXT,
             MISSION_COUNT, MISSION_ITEM, MISSION_CURRENT, MISSION_REQUEST, MISSION_ACK, MISSION_ITEM_REACHED
         }
@@ -54,8 +51,6 @@ namespace MAVLink.NET
             mDictionary[mVfr.GetType()]                 = MessageType.VFR_HUD;
             mDictionary[mHomePosition.GetType()]        = MessageType.HOME_POSITION;
             mDictionary[mLocalPositionNED.GetType()]    = MessageType.LOCAL_POSITION_NED;
-            mDictionary[mRawPressure.GetType()]         = MessageType.RAW_PRESSURE;
-            mDictionary[mScaledPressure.GetType()]      = MessageType.SCALED_PRESSURE;
             mDictionary[mCommandAck.GetType()]          = MessageType.COMMAND_ACK;
             mDictionary[mStatusText.GetType()]          = MessageType.STATUSTEXT;
             mDictionary[mMissionCount.GetType()]        = MessageType.MISSION_COUNT;
@@ -79,6 +74,7 @@ namespace MAVLink.NET
                     uint custom_index   = offset / 256;
                     // FlightMode = PX4Mode[mHeartbeat.custom_mode / 65536];
                     mavlinkNode.UpdatePX4Mode(base_index, custom_index);
+                    mavlinkNode.UpdateBaseMode(mHeartbeat.base_mode);
                     break;
                 case MessageType.BATTERY_STATUS:
                     mBatteryStatus = message as Msg_battery_status;
@@ -105,136 +101,43 @@ namespace MAVLink.NET
                     break;
                 case MessageType.LOCAL_POSITION_NED:
                     mLocalPositionNED = message as Msg_local_position_ned;
-                    break;
-                case MessageType.RAW_PRESSURE:
-                    break;
-                case MessageType.SCALED_PRESSURE:
+                    mavlinkNode.UpdateLocalNED(mLocalPositionNED.x, mLocalPositionNED.y, mLocalPositionNED.z);
                     break;
                 case MessageType.COMMAND_ACK:
+                    mCommandAck = message as Msg_command_ack;
+                    mavlinkNode.UpdateCommandResultMessage(mCommandAck.result);
                     break;
                 case MessageType.STATUSTEXT:
+                    mStatusText = message as Msg_statustext;
+                    mavlinkNode.UpdateStatusText(mStatusText.text);
                     break;
                 case MessageType.MISSION_COUNT:
+                    mMissionCount = message as Msg_mission_count;
+                    mavlinkNode.UpdateMissionCount(mMissionCount.count);
                     break;
                 case MessageType.MISSION_ITEM:
+                    mMissionItem = message as Msg_mission_item;
+                    mavlinkNode.OnMissionItemMessage(mMissionItem.seq);
                     break;
                 case MessageType.MISSION_CURRENT:
+                    mMissionCurrent = message as Msg_mission_current;
+                    mavlinkNode.OnMissionCurrentMessage(mMissionCurrent.seq);
                     break;
                 case MessageType.MISSION_REQUEST:
+                    mMissionRequest = message as Msg_mission_request;
+                    mavlinkNode.OnMissionRequestMessage(mMissionRequest.seq);
                     break;
                 case MessageType.MISSION_ACK:
+                    mMissionAck = message as Msg_mission_ack;
+                    mavlinkNode.OnMissionAckMessage(mMissionAck.type);
                     break;
                 case MessageType.MISSION_ITEM_REACHED:
+                    mMissionItemReached = message as Msg_mission_item_reached;
+                    mavlinkNode.OnMissionItemReachedMessage(mMissionItemReached.seq);
                     break;
                 default:
                     Console.WriteLine("Message type not found.");
                     break;
-            }
-            else if (message.GetType() == mLocalPositionNED.GetType())
-            {
-                mLocalPositionNED = (Msg_local_position_ned)message;
-                LocalPosition.X = mLocalPositionNED.x;
-                LocalPosition.Y = mLocalPositionNED.y;
-                LocalPosition.Z = mLocalPositionNED.z;
-            }
-            else if (message.GetType() == mRawPressure.GetType())
-                mRawPressure = (Msg_raw_pressure)message;
-            else if (message.GetType() == mScaledPressure.GetType())    // TODO: Log press_abs, temperature, press_diff
-                mScaledPressure = (Msg_scaled_pressure)message;
-            else if (message.GetType() == mCommandAck.GetType())
-            {
-                mCommandAck = (Msg_command_ack)message;
-                CommandResultMessage = ResultMessage[mCommandAck.result];
-            }
-            else if (message.GetType() == mStatusText.GetType())        // TODO: System status message
-                mStatusText = (Msg_statustext)message;
-            else if (message.GetType() == mMissionCount.GetType())      // Response to MISSION_REQUEST_LIST
-            {
-                mMissionCount = message as Msg_mission_count;
-                MissionItemCount = mMissionCount.count;
-                Console.WriteLine("[SYSTEM #{0:d}] Msg_mission_count: {1:d}", SYSTEM_ID, mMissionCount.count);
-
-                Msg_mission_request requestMessage = new Msg_mission_request()
-                {
-                    target_system = SYSTEM_ID,
-                    target_component = COMPONENT_ID,
-                    seq = 0
-                };
-                SendPacket(requestMessage);
-            }
-            else if (message.GetType() == mMissionItem.GetType())
-            {
-                mMissionItem = message as Msg_mission_item;
-
-                ushort sequenceNumber = mMissionItem.seq;
-                MissionItems[sequenceNumber] = mMissionItem;
-
-                if (sequenceNumber < MissionItemCount - 1)
-                {
-                    Msg_mission_request requestMessage = new Msg_mission_request()
-                    {
-                        target_system = SYSTEM_ID,
-                        target_component = COMPONENT_ID,
-                        seq = (ushort)(sequenceNumber + 1)
-                    };
-                    SendPacket(requestMessage);
-                }
-                else
-                {
-                    Msg_mission_ack ackMessage = new Msg_mission_ack()
-                    {
-                        target_system = SYSTEM_ID,
-                        target_component = COMPONENT_ID,
-                        type = (byte)MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED
-                    };
-                }
-            }
-            else if (message.GetType() == mMissionCurrent.GetType())
-            {
-                mMissionCurrent = (Msg_mission_current)message;
-                MissionCurrentSequence = mMissionCurrent.seq;
-                Msg_mission_item currentItem = MissionItems[MissionCurrentSequence];
-                if (_is_leader && currentItem != null)
-                {
-                    Direction.X = currentItem.x - Position.X;
-                    Direction.Y = currentItem.y - Position.Y;
-                    Direction.Z = currentItem.z - Position.Z;
-                }
-                Console.WriteLine("[SYSTEM #{0:d}] MissionCurrentSequence: " + MissionCurrentSequence, SYSTEM_ID);
-                //DatabaseManager.UpdateNextCommand(SYSTEM_ID, MissionCurrentSequence);
-            }
-            else if (message.GetType() == mMissionRequest.GetType())
-            {
-                mMissionRequest = message as Msg_mission_request;
-                ushort index = mMissionRequest.seq;
-                Msg_mission_item itemMessage = MissionItems[index];
-                itemMessage.seq = index;
-                SendPacket(itemMessage);
-            }
-            else if (message.GetType() == mMissionAck.GetType())
-            {
-                mMissionAck = message as Msg_mission_ack;
-                Console.WriteLine("[SYSTEM #{0:d}] Mission Ack: " + (mMissionAck.type == (byte)MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED), SYSTEM_ID);
-
-                // Follower: set_position as a single mission.
-                if (!_is_leader)
-                {
-                    Msg_command_long smessage = new Msg_command_long()
-                    {
-                        target_system = SYSTEM_ID,
-                        target_component = COMPONENT_ID,
-                        command = (ushort)MAV_CMD.MAV_CMD_MISSION_START
-                        // param1 = first_item: the first mission item to run
-                        // param2 = last_item: the last mission item to run (after this item is run, the mission ends)
-                    };
-                    SendPacket(smessage);
-                }
-            }
-            else if (message.GetType() == mMissionItemReached.GetType())
-            {
-                mMissionItemReached = (Msg_mission_item_reached)message;
-                MissionReachedSequence = mMissionItemReached.seq;
-                Console.WriteLine("[SYSTEM #{0:d}] Mission reached: {1:d}", SYSTEM_ID, MissionReachedSequence);
             }
         }
     }

@@ -59,17 +59,18 @@ namespace MAVLink.NET
 
         private readonly MAVMessageHandler MessageHandler;
 
-        public bool _is_leader = false;
+        public bool IsLeader = false;
 
         private byte _base_mode = 0;
-        public byte _is_armed = 0;
+        public byte ArmState = 0;
 
         public sbyte BatteryPercentage = 0;
 
+        // TODO: List<Msg_mission_item> with no limit.
         private readonly Msg_mission_item[] MissionItems = new Msg_mission_item[32];
-        private int MissionItemCount = 0;
-        private ushort MissionCurrentSequence = ushort.MaxValue;
-        private ushort MissionReachedSequence = ushort.MaxValue;
+        private UInt16 MissionItemCount = 0;
+        private UInt16 MissionCurrentSequence = UInt16.MaxValue;
+        private UInt16 MissionReachedSequence = UInt16.MaxValue;
 
         public string FlightMode            = "null";
         public string SubMode               = "null";
@@ -139,6 +140,7 @@ namespace MAVLink.NET
                     hb.system_status = 0;
                     hb.custom_mode = 0;
                     // hb.base_mode = 0;
+                    // FIXME: Required?
                     hb.base_mode = _base_mode;
                     hb.autopilot = 0;
 
@@ -163,20 +165,11 @@ namespace MAVLink.NET
                 return;
             }
 
-            SYSTEM_ID = (byte) packet.SystemId;
-            COMPONENT_ID = (byte) packet.ComponentId;
-            PacketSequence = packet.SequenceNumber;
+            SYSTEM_ID       = (byte) packet.SystemId;
+            COMPONENT_ID    = (byte) packet.ComponentId;
+            PacketSequence  = packet.SequenceNumber;
 
-            MavlinkMessage message = packet.Message;
-
-            MessageHandler.Handle(message);
-
-            /**
-             * TODO: Handle
-             */
-            _is_armed = (byte) (mHeartbeat.base_mode & (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED);
-
-            _base_mode = mHeartbeat.base_mode;
+            MessageHandler.Handle(packet.Message);
         }
 
         private void OnSerialReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
@@ -232,7 +225,7 @@ namespace MAVLink.NET
                 {
                     SendPacket(message);
                     System.Threading.Thread.Sleep(1000);
-                } while (target_arm ^ (_is_armed == 128 /* 0b1000_0000 */) && ++trial < 5);
+                } while (target_arm ^ (ArmState == 128 /* 0b1000_0000 */) && ++trial < 5);
 
                 if (button != null)
                     button.BeginInvoke((Action) delegate () { button.Enabled = true; });
@@ -539,6 +532,12 @@ namespace MAVLink.NET
             //DatabaseManager.UpdateFlightMode(SYSTEM_ID, FlightMode);
         }
 
+        public void UpdateBaseMode(byte baseMode)
+        {
+            _base_mode = baseMode;
+            ArmState = (byte) (mHeartbeat.base_mode & (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED);
+        }
+
         public void UpdateBatteryPercentage(sbyte percentage)
         {
             BatteryPercentage = percentage;
@@ -572,6 +571,119 @@ namespace MAVLink.NET
         {
             HomePosition.X = latitude / Constant.GLOBAL_LOCAL_RATIO;
             HomePosition.Y = longitude / Constant.GLOBAL_LOCAL_RATIO;
+        }
+
+        public void UpdateLocalNED(float x, float y, float z)
+        {
+            LocalPosition.X = x;
+            LocalPosition.Y = y;
+            LocalPosition.Z = z;
+        }
+
+        public void UpdateCommandAckMessage(int index)
+        {
+            CommandResultMessage = ResultMessage[index];
+        }
+
+        public void UpdateStatusText(byte[] text)
+        {
+            if (text == null) return;
+
+            int tsize = mStatusText.text.Length;
+            char[] c = new char[tsize];
+            for (int i = 0; i < tsize; i++) c[i] = (char) mStatusText.text[i];
+            StatusMessage = new string(c);
+        }
+
+        /**
+         * Response to MISSION_REQUEST_LIST.
+         */
+        public void UpdateMissionCount(UInt16 count)
+        {
+            MissionItemCount = count;
+
+            Msg_mission_request requestMessage = new Msg_mission_request()
+            {
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID,
+                seq                 = 0
+            };
+            SendPacket(requestMessage);
+        }
+
+        /**
+         * During mission download process.
+         */
+        public void OnMissionItemMessage(UInt16 sequenceNumber)
+        {
+            MissionItems[sequenceNumber] = mMissionItem;
+
+            if (sequenceNumber < MissionItemCount - 1)
+            {
+                Msg_mission_request requestMessage = new Msg_mission_request()
+                {
+                    target_system       = SYSTEM_ID,
+                    target_component    = COMPONENT_ID,
+                    seq                 = (ushort) (sequenceNumber + 1)
+                };
+                SendPacket(requestMessage);
+            }
+            else
+            {
+                Msg_mission_ack ackMessage = new Msg_mission_ack()
+                {
+                    target_system       = SYSTEM_ID,
+                    target_component    = COMPONENT_ID,
+                    type                = (byte) MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED
+                };
+                SendPacket(ackMessage);
+            }
+        }
+
+        public void OnMissionCurrentMessage(UInt16 sequenceNumber)
+        {
+            MissionCurrentSequence = sequenceNumber;
+
+            Msg_mission_item currentItem = MissionItems[MissionCurrentSequence];
+            
+            if (IsLeader && currentItem != null)
+            {
+                Direction.X = currentItem.x - Position.X;
+                Direction.Y = currentItem.y - Position.Y;
+                Direction.Z = currentItem.z - Position.Z;
+            }
+            //DatabaseManager.UpdateNextCommand(SYSTEM_ID, MissionCurrentSequence);
+        }
+
+        public void OnMissionRequestMessage(UInt16 sequenceNumber)
+        {
+            Msg_mission_item itemMessage = MissionItems[sequenceNumber];
+            itemMessage.seq = sequenceNumber;
+            SendPacket(itemMessage);
+        }
+
+        public void OnMissionAckMessage(MAV_MISSION_RESULT result)
+        {
+            bool accepted = (result == (byte) MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED);
+
+            // FIXME: Followers set_position as a single mission.
+            if (accepted && !IsLeader)
+            {
+                Msg_command_long startMessage = new Msg_command_long()
+                {
+                    target_system       = SYSTEM_ID,
+                    target_component    = COMPONENT_ID,
+                    command             = (ushort) MAV_CMD.MAV_CMD_MISSION_START
+                    // param1 = the first mission item to run
+                    // param2 = the last mission item to run (after this item is run, the mission ends)
+                };
+                SendPacket(startMessage);
+            }
+        }
+
+        public void OnMissionItemReachedMessage(UInt16 sequenceNumber)
+        {
+            MissionReachedSequence = mMissionItemReached.seq;
         }
     }
 }
