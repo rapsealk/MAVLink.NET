@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using MavLink;
 
 namespace MAVLink.NET
@@ -28,7 +29,7 @@ namespace MAVLink.NET
             SIMPLE
         }
         // PX4_CUSTOM_SUB_MODE AUTO
-        private static readonly string[] PX4SubMode =
+        public static readonly string[] PX4SubMode =
         {
             "(EMPTY)", "READY", "TAKEOFF", "LOITER", "MISSION", "RTL", "LAND",
             "RTGS", "FOLLOW_TARGET", "PRECLAND"
@@ -56,38 +57,20 @@ namespace MAVLink.NET
 
         public byte PacketSequence { get; private set; }
 
-        private Msg_heartbeat               mHeartbeat              = new Msg_heartbeat();
-        private Msg_sys_status              mSysStatus              = new Msg_sys_status();
-        private Msg_power_status            mPowerStatus            = new Msg_power_status();
-        private Msg_battery_status          mBatteryStatus          = new Msg_battery_status();
-        private Msg_attitude                mAttitude               = new Msg_attitude();
-        private Msg_gps_raw_int             mGPS                    = new Msg_gps_raw_int();
-        private Msg_gps_rtk                 mRTK                    = new Msg_gps_rtk();
-        private Msg_vfr_hud                 mVfr                    = new Msg_vfr_hud();
-        private Msg_home_position           mHomePosition           = new Msg_home_position();
-        private Msg_local_position_ned      mLocalPositionNED       = new Msg_local_position_ned();
-        private Msg_raw_pressure            mRawPressure            = new Msg_raw_pressure();
-        private Msg_scaled_pressure         mScaledPressure         = new Msg_scaled_pressure();
-        private Msg_command_ack             mCommandAck             = new Msg_command_ack();
-        private Msg_statustext              mStatusText             = new Msg_statustext();
-        private Msg_mission_count           mMissionCount           = new Msg_mission_count();
-        private Msg_mission_item            mMissionItem            = new Msg_mission_item();
-        private Msg_mission_current         mMissionCurrent         = new Msg_mission_current();
-        private Msg_mission_request         mMissionRequest         = new Msg_mission_request();
-        private Msg_mission_ack             mMissionAck             = new Msg_mission_ack();
-        private Msg_mission_item_reached    mMissionItemReached     = new Msg_mission_item_reached();
+        private readonly MAVMessageHandler MessageHandler;
 
-        public bool _is_leader = false;
+        public bool IsLeader = false;
 
         private byte _base_mode = 0;
-        public byte _is_armed = 0;
+        public byte ArmState = 0;
 
         public sbyte BatteryPercentage = 0;
 
+        // TODO: List<Msg_mission_item> with no limit.
         private readonly Msg_mission_item[] MissionItems = new Msg_mission_item[32];
-        private int MissionItemCount = 0;
-        private ushort MissionCurrentSequence = ushort.MaxValue;
-        private ushort MissionReachedSequence = ushort.MaxValue;
+        private UInt16 MissionItemCount = 0;
+        private UInt16 MissionCurrentSequence = UInt16.MaxValue;
+        private UInt16 MissionReachedSequence = UInt16.MaxValue;
 
         public string FlightMode            = "null";
         public string SubMode               = "null";
@@ -101,15 +84,12 @@ namespace MAVLink.NET
 
         public short HeadingDirection = 0;
 
-        private const float Radian = (float) (180 / Math.PI);
-
         /**
          * Variables for agent's location.
          */
         public Vector3 Position;
         public Vector3 HomePosition;
         public Vector3 LocalPosition;
-        public static double pRatio = 10 * 1000 * 1000; // 10_000_000
 
         public ulong Gtimestamp     = 0;        // GPS UNIX Timestamp (start from boot)
         public byte SatelliteNumber = 0;        // Number of visible Satellite
@@ -120,7 +100,7 @@ namespace MAVLink.NET
         public Vector3 Direction;
 
 
-        public MAVLinkNode(string port, int baud, byte SYSTEM_ID=1, byte COMPONENT_ID=1)
+        public MAVLinkNode(string port, int baud)
         {
             mavlink = new Mavlink();
             mavlink.PacketReceived += OnMAVPacketReceive;
@@ -130,11 +110,10 @@ namespace MAVLink.NET
             LocalPosition   = new Vector3();
             Direction       = new Vector3();
 
+            MessageHandler = new MAVMessageHandler(this);
+
             this.PortName = port;
             this.BaudRate = baud;
-
-            this.SYSTEM_ID      = SYSTEM_ID;
-            this.COMPONENT_ID   = COMPONENT_ID;
 
             Serial = new System.IO.Ports.SerialPort()
             {
@@ -161,6 +140,7 @@ namespace MAVLink.NET
                     hb.system_status = 0;
                     hb.custom_mode = 0;
                     // hb.base_mode = 0;
+                    // FIXME: Required?
                     hb.base_mode = _base_mode;
                     hb.autopilot = 0;
 
@@ -174,205 +154,22 @@ namespace MAVLink.NET
         private void OnMAVPacketReceive(object sender, MavlinkPacket packet)
         {
             uint psize = mavlink.PacketsReceived;
-            SYSTEM_ID = (byte) packet.SystemId;
-            COMPONENT_ID = (byte) packet.ComponentId;
-            PacketSequence = packet.SequenceNumber;
 
-            _is_leader = (SYSTEM_ID == 2);
-            
-            MavlinkMessage message = packet.Message;
-
-            if (message.GetType() == mHeartbeat.GetType())
+            /*
+             * FIXME: Sik Radio issue
+             * https://groups.google.com/forum/#!msg/drones-discuss/w_iuoVnA7K4/GRr1iUyJAwAJ
+             * https://github.com/ArduPilot/SiK/blob/master/Firmware/radio/mavlink.c#L51
+             */
+            if (packet.SystemId == 51)
             {
-                mHeartbeat = (Msg_heartbeat) message;
-                //  0000 0000 0000 0000 | 0000 0000 0000 0000
-                // \_custom_/  \_base_/
-                uint offset         = mHeartbeat.custom_mode >> 16;
-                uint base_index     = offset % 256;
-                uint custom_index   = offset / 256;
-                try
-                {
-                    // FlightMode = PX4Mode[mHeartbeat.custom_mode / 65536];
-                    FlightMode  = PX4Mode[base_index];
-                    SubMode     = PX4SubMode[custom_index];
-                }
-                catch (IndexOutOfRangeException e)
-                {
-                    Console.Error.WriteLine(e.Message);
-                }
-                Console.WriteLine("heartbeat.custom_mode: " + mHeartbeat.custom_mode);
-                Console.WriteLine("Flight Mode: {0:s}, Sub Mode: {1:s}", FlightMode, SubMode);
-
-                //DatabaseManager.UpdateFlightMode(SYSTEM_ID, FlightMode);
-            }
-            else if (message.GetType() == mSysStatus.GetType())
-            {
-                mSysStatus = (Msg_sys_status) message;
-            }
-            else if (message.GetType() == mPowerStatus.GetType())
-            {
-                mPowerStatus = (Msg_power_status) message;
-            }
-            else if (message.GetType() == mBatteryStatus.GetType())
-            {
-                mBatteryStatus = (Msg_battery_status) message;
-                BatteryPercentage = mBatteryStatus.battery_remaining;
-
-                //DatabaseManager.UpdateBattery(SYSTEM_ID, BatteryPercentage);
-            }
-            else if (message.GetType() == mAttitude.GetType())
-            {
-                mAttitude = (Msg_attitude) message;
-                Roll = mAttitude.roll * Radian;
-                Pitch = mAttitude.pitch * Radian;
-                Yaw = mAttitude.yaw * Radian;
-            }
-            else if (message.GetType() == mGPS.GetType())
-            {
-                mGPS = (Msg_gps_raw_int) message;
-                Position.X = mGPS.lat / pRatio;
-                Position.Y = mGPS.lon / pRatio;
-                Position.Z = mGPS.alt / pRatio;
-                Gtimestamp = mGPS.time_usec;
-                SatelliteNumber = mGPS.satellites_visible;
-
-                //DatabaseManager.UpdatePosition(SYSTEM_ID, Position.X, Position.Y, Position.Z, SatelliteNumber, Gtimestamp);
-            }
-            else if (message.GetType() == mRTK.GetType())
-            {
-                mRTK = (Msg_gps_rtk) message;
-            }
-            else if (message.GetType() == mVfr.GetType())
-            {
-                mVfr = (Msg_vfr_hud) message;
-                HeadingDirection = mVfr.heading;
-
-                //DatabaseManager.UpdateHeadingDirection(SYSTEM_ID, HeadingDirection);
-            }
-            else if (message.GetType() == mHomePosition.GetType())
-            {
-                mHomePosition = (Msg_home_position) message;
-                HomePosition.X = mHomePosition.latitude / pRatio;
-                HomePosition.Y = mHomePosition.longitude / pRatio;
-            }
-            else if (message.GetType() == mLocalPositionNED.GetType())
-            {
-                mLocalPositionNED = (Msg_local_position_ned) message;
-                LocalPosition.X = mLocalPositionNED.x;
-                LocalPosition.Y = mLocalPositionNED.y;
-                LocalPosition.Z = mLocalPositionNED.z;
-            }
-            else if (message.GetType() == mRawPressure.GetType())
-                mRawPressure = (Msg_raw_pressure) message;
-            else if (message.GetType() == mScaledPressure.GetType())    // TODO: Log press_abs, temperature, press_diff
-                mScaledPressure = (Msg_scaled_pressure) message;
-            else if (message.GetType() == mCommandAck.GetType())
-            {
-                mCommandAck = (Msg_command_ack) message;
-                CommandResultMessage = ResultMessage[mCommandAck.result];
-            }
-            else if (message.GetType() == mStatusText.GetType())        // TODO: System status message
-                mStatusText = (Msg_statustext) message;
-            else if (message.GetType() == mMissionCount.GetType())      // Response to MISSION_REQUEST_LIST
-            {
-                mMissionCount = message as Msg_mission_count;
-                MissionItemCount = mMissionCount.count;
-                Console.WriteLine("[SYSTEM #{0:d}] Msg_mission_count: {1:d}", SYSTEM_ID, mMissionCount.count);
-
-                Msg_mission_request requestMessage = new Msg_mission_request()
-                {
-                    target_system       = SYSTEM_ID,
-                    target_component    = COMPONENT_ID,
-                    seq                 = 0
-                };
-                SendPacket(requestMessage);
-            }
-            else if (message.GetType() == mMissionItem.GetType())
-            {
-                mMissionItem = message as Msg_mission_item;
-
-                ushort sequenceNumber = mMissionItem.seq;
-                MissionItems[sequenceNumber] = mMissionItem;
-
-                if (sequenceNumber < MissionItemCount - 1)
-                {
-                    Msg_mission_request requestMessage = new Msg_mission_request()
-                    {
-                        target_system       = SYSTEM_ID,
-                        target_component    = COMPONENT_ID,
-                        seq                 = (ushort) (sequenceNumber + 1)
-                    };
-                    SendPacket(requestMessage);
-                }
-                else
-                {
-                    Msg_mission_ack ackMessage = new Msg_mission_ack()
-                    {
-                        target_system       = SYSTEM_ID,
-                        target_component    = COMPONENT_ID,
-                        type                = (byte) MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED
-                    };
-                }
-            }
-            else if (message.GetType() == mMissionCurrent.GetType())
-            {
-                mMissionCurrent = (Msg_mission_current) message;
-                MissionCurrentSequence = mMissionCurrent.seq;
-                Msg_mission_item currentItem = MissionItems[MissionCurrentSequence];
-                if (_is_leader && currentItem != null)
-                {
-                    Direction.X = currentItem.x - Position.X;
-                    Direction.Y = currentItem.y - Position.Y;
-                    Direction.Z = currentItem.z - Position.Z;
-                }
-                Console.WriteLine("[SYSTEM #{0:d}] MissionCurrentSequence: " + MissionCurrentSequence, SYSTEM_ID);
-                //DatabaseManager.UpdateNextCommand(SYSTEM_ID, MissionCurrentSequence);
-            }
-            else if (message.GetType() == mMissionRequest.GetType())
-            {
-                mMissionRequest = message as Msg_mission_request;
-                ushort index = mMissionRequest.seq;
-                Msg_mission_item itemMessage = MissionItems[index];
-                itemMessage.seq = index;
-                SendPacket(itemMessage);
-            }
-            else if (message.GetType() == mMissionAck.GetType())
-            {
-                mMissionAck = message as Msg_mission_ack;
-                Console.WriteLine("[SYSTEM #{0:d}] Mission Ack: " + (mMissionAck.type == (byte) MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED), SYSTEM_ID);
-            
-                // Follower: set_position as a single mission.
-                if (!_is_leader)
-                {
-                    Msg_command_long smessage = new Msg_command_long()
-                    {
-                        target_system       = SYSTEM_ID,
-                        target_component    = COMPONENT_ID,
-                        command             = (ushort) MAV_CMD.MAV_CMD_MISSION_START
-                        // param1 = first_item: the first mission item to run
-                        // param2 = last_item: the last mission item to run (after this item is run, the mission ends)
-                    };
-                    SendPacket(smessage);
-                }
-            }
-            else if (message.GetType() == mMissionItemReached.GetType())
-            {
-                mMissionItemReached = (Msg_mission_item_reached) message;
-                MissionReachedSequence = mMissionItemReached.seq;
-                Console.WriteLine("[SYSTEM #{0:d}] Mission reached: {1:d}", SYSTEM_ID, MissionReachedSequence);
+                return;
             }
 
-            _is_armed = (byte) (mHeartbeat.base_mode & (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED);
+            SYSTEM_ID       = (byte) packet.SystemId;
+            COMPONENT_ID    = (byte) packet.ComponentId;
+            PacketSequence  = packet.SequenceNumber;
 
-            if (mStatusText.text != null)
-            {
-                int tsize = mStatusText.text.Length;
-                char[] c = new char[tsize];
-                for (int i = 0; i < tsize; i++) c[i] = (char) mStatusText.text[i];
-                StatusMessage = new string(c);
-            }
-
-            _base_mode = mHeartbeat.base_mode;
+            MessageHandler.Handle(packet.Message);
         }
 
         private void OnSerialReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
@@ -428,7 +225,7 @@ namespace MAVLink.NET
                 {
                     SendPacket(message);
                     System.Threading.Thread.Sleep(1000);
-                } while (target_arm ^ (_is_armed == 128 /* 0b1000_0000 */) && ++trial < 5);
+                } while (target_arm ^ (ArmState == 128 /* 0b1000_0000 */) && ++trial < 5);
 
                 if (button != null)
                     button.BeginInvoke((Action) delegate () { button.Enabled = true; });
@@ -725,6 +522,168 @@ namespace MAVLink.NET
                 count               = (ushort) MissionItemCount
             };
             SendPacket(missionCountMessage);
+        }
+
+        // FIXME: Update member data variables
+        public void UpdatePX4Mode(uint baseMode, uint customMode)
+        {
+            FlightMode  = PX4Mode[baseMode];
+            SubMode     = PX4SubMode[customMode];
+            //DatabaseManager.UpdateFlightMode(SYSTEM_ID, FlightMode);
+        }
+
+        public void UpdateBaseMode(byte baseMode)
+        {
+            _base_mode = baseMode;
+            ArmState = (byte) (mHeartbeat.base_mode & (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED);
+        }
+
+        public void UpdateBatteryPercentage(sbyte percentage)
+        {
+            BatteryPercentage = percentage;
+            //DatabaseManager.UpdateBattery(SYSTEM_ID, BatteryPercentage);
+        }
+
+        public void UpdateAttitude(float roll, float pitch, float yaw)
+        {
+            Roll    = roll * Constant.RADIAN;
+            Pitch   = pitch * Constant.RADIAN;
+            Yaw     = yaw * Constant.RADIAN;
+        }
+
+        public void UpdateGpsRaw(int latitude, int longitude, int altitude, ulong usec, byte nsatellites)
+        {
+            Position.X      = latitude / Constant.GLOBAL_LOCAL_RATIO;
+            Position.Y      = longitude / Constant.GLOBAL_LOCAL_RATIO;
+            Position.Z      = altitude / Constant.GLOBAL_LOCAL_RATIO;
+            Gtimestamp      = usec;
+            SatelliteNumber = nsatellites;
+            //DatabaseManager.UpdatePosition(SYSTEM_ID, Position.X, Position.Y, Position.Z, SatelliteNumber, Gtimestamp);
+        }
+
+        public void UpdateHeading(short heading)
+        {
+            HeadingDirection = heading;
+            //DatabaseManager.UpdateHeadingDirection(SYSTEM_ID, HeadingDirection);
+        }
+
+        public void UpdateHomePosition(int latitude, int longitude)
+        {
+            HomePosition.X = latitude / Constant.GLOBAL_LOCAL_RATIO;
+            HomePosition.Y = longitude / Constant.GLOBAL_LOCAL_RATIO;
+        }
+
+        public void UpdateLocalNED(float x, float y, float z)
+        {
+            LocalPosition.X = x;
+            LocalPosition.Y = y;
+            LocalPosition.Z = z;
+        }
+
+        public void UpdateCommandAckMessage(int index)
+        {
+            CommandResultMessage = ResultMessage[index];
+        }
+
+        public void UpdateStatusText(byte[] text)
+        {
+            if (text == null) return;
+
+            int tsize = mStatusText.text.Length;
+            char[] c = new char[tsize];
+            for (int i = 0; i < tsize; i++) c[i] = (char) mStatusText.text[i];
+            StatusMessage = new string(c);
+        }
+
+        /**
+         * Response to MISSION_REQUEST_LIST.
+         */
+        public void UpdateMissionCount(UInt16 count)
+        {
+            MissionItemCount = count;
+
+            Msg_mission_request requestMessage = new Msg_mission_request()
+            {
+                target_system       = SYSTEM_ID,
+                target_component    = COMPONENT_ID,
+                seq                 = 0
+            };
+            SendPacket(requestMessage);
+        }
+
+        /**
+         * During mission download process.
+         */
+        public void OnMissionItemMessage(UInt16 sequenceNumber)
+        {
+            MissionItems[sequenceNumber] = mMissionItem;
+
+            if (sequenceNumber < MissionItemCount - 1)
+            {
+                Msg_mission_request requestMessage = new Msg_mission_request()
+                {
+                    target_system       = SYSTEM_ID,
+                    target_component    = COMPONENT_ID,
+                    seq                 = (ushort) (sequenceNumber + 1)
+                };
+                SendPacket(requestMessage);
+            }
+            else
+            {
+                Msg_mission_ack ackMessage = new Msg_mission_ack()
+                {
+                    target_system       = SYSTEM_ID,
+                    target_component    = COMPONENT_ID,
+                    type                = (byte) MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED
+                };
+                SendPacket(ackMessage);
+            }
+        }
+
+        public void OnMissionCurrentMessage(UInt16 sequenceNumber)
+        {
+            MissionCurrentSequence = sequenceNumber;
+
+            Msg_mission_item currentItem = MissionItems[MissionCurrentSequence];
+            
+            if (IsLeader && currentItem != null)
+            {
+                Direction.X = currentItem.x - Position.X;
+                Direction.Y = currentItem.y - Position.Y;
+                Direction.Z = currentItem.z - Position.Z;
+            }
+            //DatabaseManager.UpdateNextCommand(SYSTEM_ID, MissionCurrentSequence);
+        }
+
+        public void OnMissionRequestMessage(UInt16 sequenceNumber)
+        {
+            Msg_mission_item itemMessage = MissionItems[sequenceNumber];
+            itemMessage.seq = sequenceNumber;
+            SendPacket(itemMessage);
+        }
+
+        public void OnMissionAckMessage(MAV_MISSION_RESULT result)
+        {
+            bool accepted = (result == (byte) MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED);
+
+            // FIXME: Followers set_position as a single mission.
+            if (accepted && !IsLeader)
+            {
+                Msg_command_long startMessage = new Msg_command_long()
+                {
+                    target_system       = SYSTEM_ID,
+                    target_component    = COMPONENT_ID,
+                    command             = (ushort) MAV_CMD.MAV_CMD_MISSION_START
+                    // param1 = the first mission item to run
+                    // param2 = the last mission item to run (after this item is run, the mission ends)
+                };
+                SendPacket(startMessage);
+            }
+        }
+
+        public void OnMissionItemReachedMessage(UInt16 sequenceNumber)
+        {
+            MissionReachedSequence = mMissionItemReached.seq;
         }
     }
 }
