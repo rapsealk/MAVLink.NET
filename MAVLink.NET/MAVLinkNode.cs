@@ -178,8 +178,6 @@ namespace MAVLink.NET
             COMPONENT_ID = (byte) packet.ComponentId;
             PacketSequence = packet.SequenceNumber;
 
-            _is_leader = (SYSTEM_ID == 2);
-            
             MavlinkMessage message = packet.Message;
 
             if (message.GetType() == mHeartbeat.GetType())
