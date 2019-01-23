@@ -56,9 +56,9 @@ namespace MAVLink.NET
         }
         */
 
-        public MAVLinkNode RegisterAgent(string port, int baud, byte systemId=1, byte componentId=1)
+        public MAVLinkNode RegisterAgent(string port, int baud)
         {
-            MAVLinkNode node = new MAVLinkNode(port, baud, systemId, componentId);
+            MAVLinkNode node = new MAVLinkNode(port, baud);
             MAVLinkNodes.Add(node);
 
             return node;
@@ -69,7 +69,7 @@ namespace MAVLink.NET
             MAVLinkNodes.Add(node);
         }
 
-        public MAVLinkNode FindNodeWithPortName(string portName)
+        public MAVLinkNode FindNodeByPortName(string portName)
         {
             foreach (MAVLinkNode mavlinkNode in MAVLinkNodes)
                 if (mavlinkNode.PortName.Equals(portName))
@@ -80,14 +80,18 @@ namespace MAVLink.NET
         /****************************************
          * Serial
          ****************************************/
-        public void Open(int index=0)
+        public void Open(string portName)
         {
-            MAVLinkNode node = MAVLinkNodes[index];
+            MAVLinkNode mavlinkNode = FindNodeByPortName(portName);
+            if (mavlinkNode == null) return;
 
             try
             {
-                if (!node.Serial.IsOpen)
-                    node.Serial.Open();
+                if (!mavlinkNode.Serial.IsOpen)
+                {
+                    mavlinkNode.Serial.Open();
+                    mavlinkNode.heartbeatWorker.RunWorkerAsync();
+                }
             }
             catch (System.IO.IOException e)
             {
@@ -98,8 +102,6 @@ namespace MAVLink.NET
             {
                 Console.Error.WriteLine(e.Message);
             }
-
-            node.heartbeatWorker.RunWorkerAsync();
         }
 
         public void Close(int index=0)
@@ -131,8 +133,8 @@ namespace MAVLink.NET
         public void IsLeader(int index=0)
         {
             foreach (MAVLinkNode node in MAVLinkNodes)
-                node._is_leader = false;
-            MAVLinkNodes[index]._is_leader = true;
+                node.IsLeader = false;
+            MAVLinkNodes[index].IsLeader = true;
         }
 
         /****************************************
@@ -351,7 +353,7 @@ namespace MAVLink.NET
 
         public void RunScenario()
         {
-            MAVLinkNodes.Sort((x, y) => x._is_leader ? 0 : 1);
+            MAVLinkNodes.Sort((x, y) => x.IsLeader ? 0 : 1);
             MAVLinkNode leaderNode = MAVLinkNodes[0];
 
             // Upload mission to leader.

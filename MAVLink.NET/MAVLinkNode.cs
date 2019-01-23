@@ -535,7 +535,7 @@ namespace MAVLink.NET
         public void UpdateBaseMode(byte baseMode)
         {
             _base_mode = baseMode;
-            ArmState = (byte) (mHeartbeat.base_mode & (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED);
+            ArmState = (byte) (baseMode & (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED);
         }
 
         public void UpdateBatteryPercentage(sbyte percentage)
@@ -589,9 +589,9 @@ namespace MAVLink.NET
         {
             if (text == null) return;
 
-            int tsize = mStatusText.text.Length;
+            int tsize = text.Length;
             char[] c = new char[tsize];
-            for (int i = 0; i < tsize; i++) c[i] = (char) mStatusText.text[i];
+            for (int i = 0; i < tsize; i++) c[i] = (char) text[i];
             StatusMessage = new string(c);
         }
 
@@ -614,17 +614,17 @@ namespace MAVLink.NET
         /**
          * During mission download process.
          */
-        public void OnMissionItemMessage(UInt16 sequenceNumber)
+        public void OnMissionItemMessage(Msg_mission_item item)
         {
-            MissionItems[sequenceNumber] = mMissionItem;
+            MissionItems[item.seq] = item;
 
-            if (sequenceNumber < MissionItemCount - 1)
+            if (item.seq < MissionItemCount - 1)
             {
                 Msg_mission_request requestMessage = new Msg_mission_request()
                 {
                     target_system       = SYSTEM_ID,
                     target_component    = COMPONENT_ID,
-                    seq                 = (ushort) (sequenceNumber + 1)
+                    seq                 = (ushort) (item.seq + 1)
                 };
                 SendPacket(requestMessage);
             }
@@ -662,7 +662,7 @@ namespace MAVLink.NET
             SendPacket(itemMessage);
         }
 
-        public void OnMissionAckMessage(MAV_MISSION_RESULT result)
+        public void OnMissionAckMessage(byte result)
         {
             bool accepted = (result == (byte) MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED);
 
@@ -683,7 +683,7 @@ namespace MAVLink.NET
 
         public void OnMissionItemReachedMessage(UInt16 sequenceNumber)
         {
-            MissionReachedSequence = mMissionItemReached.seq;
+            MissionReachedSequence = sequenceNumber;
         }
     }
 }
