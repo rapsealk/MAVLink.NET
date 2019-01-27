@@ -12,12 +12,12 @@ namespace MAVLink.NET
 {
     class DatabaseManager
     {
-        private static string server    = "localhost";
-        private static int port         = 3307;
+        private static string server    = Properties.Resources.DatabaseHostname;
+        private static int port         = int.Parse(Properties.Resources.DatabasePassword);
 
-        private static string database  = "uavdb";
-        private static string user      = "root";
-        private static string password  = "sb123!@#";
+        private static string database  = Properties.Resources.DatabaseName;
+        private static string user      = Properties.Resources.DatabaseUser;
+        private static string password  = Properties.Resources.DatabasePassword;
 
         public static MySqlConnection GetConnection()
         {
