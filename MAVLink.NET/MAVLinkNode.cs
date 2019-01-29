@@ -227,7 +227,7 @@ namespace MAVLink.NET
                 {
                     SendPacket(message);
                     System.Threading.Thread.Sleep(1000);
-                } while (target_arm ^ (ArmState == 128 /* 0b1000_0000 */) && ++trial < 5);
+                } while (target_arm ^ (ArmState == (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED) && ++trial < 5);
 
                 if (button != null)
                     button.BeginInvoke((Action) delegate () { button.Enabled = true; });

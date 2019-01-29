@@ -48,11 +48,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ByteArrayUtil.cs" />
-    <Compile Include="common.generated.cs" />
-    <Compile Include="common_codec.generated.cs" />
-    <Compile Include="FrameworkBitConverter.cs" />
-    <Compile Include="Mavlink.cs" />
+    <Compile Include="Interface\Observer.cs" />
+    <Compile Include="Deprecated\MAVLinkModelHandler.cs" />
+    <Compile Include="Deprecated\MAVLinkModelObserver.cs" />
+    <Compile Include="MavLink\ByteArrayUtil.cs" />
+    <Compile Include="MavLink\common.generated.cs" />
+    <Compile Include="MavLink\common_codec.generated.cs" />
+    <Compile Include="MavLink\FrameworkBitConverter.cs" />
+    <Compile Include="MavLink\Mavlink.cs" />
     <Compile Include="MAVLinkController.cs" />
     <Compile Include="MAVLinkModel.cs" />
     <Compile Include="MAVLinkView.cs">

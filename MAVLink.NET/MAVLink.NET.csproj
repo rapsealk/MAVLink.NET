@@ -62,6 +62,7 @@
     </Compile>
     <Compile Include="FrameworkBitConverter.cs" />
     <Compile Include="Mavlink.cs" />
+    <Compile Include="MAVLinkController.cs" />
     <Compile Include="MAVLinkManager.cs" />
     <Compile Include="MAVLinkNode.cs" />
     <Compile Include="MAVMessageHandler.cs" />

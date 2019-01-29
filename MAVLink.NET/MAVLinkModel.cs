@@ -121,7 +121,16 @@ namespace MAVLink.NET.Model
 
         public bool IsLeader;
         public byte BaseMode;
-        public byte ArmState;
+        private byte _ArmState;
+        public byte ArmState
+        {
+            get { return _ArmState; }
+            set
+            {
+                _ArmState = value;
+                
+            }
+        }
         public sbyte BatteryPercentage;
         public short HeadingDirection;
         public ulong GpsUnixTimestamp;
@@ -157,6 +166,23 @@ namespace MAVLink.NET.Model
         public MAVLinkModel()
         {
             MissionItems = new List<Msg_mission_item>();
+        }
+
+        
+
+        public class MAVLinkObserver : IObserver<MAVLinkModel>
+        {
+            private IDisposable cancellation;
+
+            public MAVLinkObserver()
+            {
+
+            }
+
+            public virtual void Subscribe(MAVLinkModel model)
+            {
+                cancellation = 
+            }
         }
     }
 }
