@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace UnitTest
@@ -16,7 +13,12 @@ namespace UnitTest
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MAVLinkView());
+
+            MAVLinkModel        model       = new MAVLinkModel();
+            MAVLinkView         view        = new MAVLinkView();
+            MAVLinkController   controller  = new MAVLinkController(model, view);
+
+            Application.Run(view);
         }
     }
 }

@@ -6,7 +6,7 @@ using MavLink;
 
 namespace UnitTest
 {
-    class MAVLinkModel
+    public class MAVLinkModel
     {
         // PX4_CUSTOM_MAIN_MODE
         public static readonly string[] PX4Mode =

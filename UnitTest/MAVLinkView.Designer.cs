@@ -31,6 +31,7 @@
             this.SerialPortNameComboBox = new System.Windows.Forms.ComboBox();
             this.SerialConnectButton = new System.Windows.Forms.Button();
             this.SerialPortNameLabel = new System.Windows.Forms.Label();
+            this.ArmDosarmButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // SerialPortNameComboBox
@@ -49,21 +50,33 @@
             this.SerialConnectButton.TabIndex = 1;
             this.SerialConnectButton.Text = "Connect";
             this.SerialConnectButton.UseVisualStyleBackColor = true;
+            this.SerialConnectButton.Click += new System.EventHandler(this.SerialConnectButton_Click);
             // 
             // SerialPortNameLabel
             // 
             this.SerialPortNameLabel.AutoSize = true;
             this.SerialPortNameLabel.Location = new System.Drawing.Point(21, 55);
             this.SerialPortNameLabel.Name = "SerialPortNameLabel";
-            this.SerialPortNameLabel.Size = new System.Drawing.Size(38, 12);
+            this.SerialPortNameLabel.Size = new System.Drawing.Size(63, 12);
             this.SerialPortNameLabel.TabIndex = 2;
             this.SerialPortNameLabel.Text = "Serial Port";
+            // 
+            // ArmDosarmButton
+            // 
+            this.ArmDosarmButton.Location = new System.Drawing.Point(225, 99);
+            this.ArmDosarmButton.Name = "ArmDosarmButton";
+            this.ArmDosarmButton.Size = new System.Drawing.Size(75, 23);
+            this.ArmDosarmButton.TabIndex = 3;
+            this.ArmDosarmButton.Text = "Arm";
+            this.ArmDosarmButton.UseVisualStyleBackColor = true;
+            this.ArmDosarmButton.Click += new System.EventHandler(this.ArmDosarmButton_Click);
             // 
             // MAVLinkView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(469, 450);
+            this.Controls.Add(this.ArmDosarmButton);
             this.Controls.Add(this.SerialPortNameLabel);
             this.Controls.Add(this.SerialConnectButton);
             this.Controls.Add(this.SerialPortNameComboBox);
@@ -79,6 +92,7 @@
         private System.Windows.Forms.ComboBox SerialPortNameComboBox;
         private System.Windows.Forms.Button SerialConnectButton;
         private System.Windows.Forms.Label SerialPortNameLabel;
+        private System.Windows.Forms.Button ArmDosarmButton;
     }
 }
 
