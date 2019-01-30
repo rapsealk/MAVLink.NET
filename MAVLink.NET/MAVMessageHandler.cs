@@ -105,7 +105,7 @@ namespace MAVLink.NET
                     break;
                 case MessageType.COMMAND_ACK:
                     mCommandAck = message as Msg_command_ack;
-                    mavlinkNode.UpdateCommandResultMessage(mCommandAck.result);
+                    mavlinkNode.UpdateCommandAckMessage(mCommandAck.result);
                     break;
                 case MessageType.STATUSTEXT:
                     mStatusText = message as Msg_statustext;
@@ -117,7 +117,7 @@ namespace MAVLink.NET
                     break;
                 case MessageType.MISSION_ITEM:
                     mMissionItem = message as Msg_mission_item;
-                    mavlinkNode.OnMissionItemMessage(mMissionItem.seq);
+                    mavlinkNode.OnMissionItemMessage(mMissionItem);
                     break;
                 case MessageType.MISSION_CURRENT:
                     mMissionCurrent = message as Msg_mission_current;

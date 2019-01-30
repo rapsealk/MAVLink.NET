@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
 using MavLink;
 
 namespace MAVLink.NET
@@ -15,6 +11,7 @@ namespace MAVLink.NET
         public MissionPlanItem(Vector3 position, MAV_CMD commandType=MAV_CMD.MAV_CMD_NAV_WAYPOINT)
         {
             Position = position;
+            Position.Z = (Position.Z == 0f) ? 5f : Position.Z;
             type = commandType;
         }
     }

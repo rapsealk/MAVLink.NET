@@ -6,6 +6,7 @@ namespace MAVLink.NET
 {
     public partial class Form1 : Form
     {
+        private MAVLinkManager mavlinkManager;
         private MAVLinkNode[] nodes;
 
         private string[] FormationModes = { "Triangle", "Row", "Column" };
@@ -35,13 +36,14 @@ namespace MAVLink.NET
 
             //*
             int count = 0;
+            mavlinkManager = MAVLinkManager.Instance;
             nodes = new MAVLinkNode[3];
             foreach (string portName in portNames.Reverse())
             {
-                nodes[count++] = MAVLinkManager.RegisterAgent(portName, 57600);
+                nodes[count++] = mavlinkManager.RegisterAgent(portName, 57600);
+                mavlinkManager.Open(portName);
                 if (count == nodes.Length) break;
             }
-            for (int i = 0; i < 3; i++) MAVLinkManager.Open(i);
             /*/
             //*/
             UpdateUI();
@@ -49,7 +51,7 @@ namespace MAVLink.NET
 
         ~Form1()
         {
-            MAVLinkManager.CloseAll();
+            mavlinkManager.CloseAll();
         }
 
         /* TODO: Lambda Generator
@@ -261,7 +263,7 @@ namespace MAVLink.NET
 
         private void StartButton_Click(object sender, EventArgs e)
         {
-            MAVLinkManager.RunScenario();
+            mavlinkManager.RunScenario();
         }
 
         private void DisarmAllButton_Click(object sender, EventArgs e)
@@ -284,7 +286,7 @@ namespace MAVLink.NET
 
         private void FormationModeButton_Click(object sender, EventArgs e)
         {
-            MAVLinkManager.FormationMode = Formations[FormationModeComboBox.SelectedIndex];
+            mavlinkManager.FormationMode = Formations[FormationModeComboBox.SelectedIndex];
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using MavLink;
 
 namespace MAVLink.NET
@@ -90,6 +91,7 @@ namespace MAVLink.NET
         public Vector3 Position;
         public Vector3 HomePosition;
         public Vector3 LocalPosition;
+
 
         public ulong Gtimestamp     = 0;        // GPS UNIX Timestamp (start from boot)
         public byte SatelliteNumber = 0;        // Number of visible Satellite
@@ -225,7 +227,7 @@ namespace MAVLink.NET
                 {
                     SendPacket(message);
                     System.Threading.Thread.Sleep(1000);
-                } while (target_arm ^ (ArmState == 128 /* 0b1000_0000 */) && ++trial < 5);
+                } while (target_arm ^ (ArmState == (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED) && ++trial < 5);
 
                 if (button != null)
                     button.BeginInvoke((Action) delegate () { button.Enabled = true; });
@@ -442,7 +444,7 @@ namespace MAVLink.NET
         
         public void SetCurrentPositionAsHome()
         {
-            UpdateHomeCommand((float) Position.X, (float) Position.Y);
+            UpdateHomeCommand(Position.X, Position.Y);
         }
 
         /**
@@ -459,9 +461,9 @@ namespace MAVLink.NET
                 // param2
                 param3              = .1f,   // horizontal navigation by pilot acceptable
                 // param4: yaw angle    (not supported)
-                param5              = (float) Position.X,   // latitude
-                param6              = (float) Position.Y,   // longitude
-                param7              = 5                     // altitude [meters]
+                param5              = Position.X,   // latitude
+                param6              = Position.Y,   // longitude
+                param7              = 5             // altitude [meters]
             };
             SendPacket(message);
 
@@ -484,8 +486,8 @@ namespace MAVLink.NET
                 // param2: Precision land mode. (0 = normal landing, 1 = opportunistic precision landing, 2 = required precision landing)
                 // param3: Empty
                 // param4: Desired yaw angle. NaN for unchanged.
-                param5              = (float) Position.X,   // Latitude
-                param6              = (float) Position.Y    // Longitude
+                param5              = Position.X,   // Latitude
+                param6              = Position.Y    // Longitude
                 // param7: Altitude (ground level)
             };
             SendPacket(message);
@@ -494,7 +496,7 @@ namespace MAVLink.NET
         /**
          * https://mavlink.io/en/messages/common.html#MAV_CMD_NAV_WAYPOINT
          */
-        public void NextWP(double latitude, double longitude)
+        public void NextWP(float latitude, float longitude, float altitude = 5f)
         {
             ClearMission();
 
@@ -509,9 +511,9 @@ namespace MAVLink.NET
                 autocontinue        = 1,
                 current             = 1,
                 seq                 = 1,
-                x                   = (float) latitude,
-                y                   = (float) longitude,
-                z                   = 5
+                x                   = latitude,
+                y                   = longitude,
+                z                   = altitude
             };
 
             // Upload 
@@ -535,7 +537,7 @@ namespace MAVLink.NET
         public void UpdateBaseMode(byte baseMode)
         {
             _base_mode = baseMode;
-            ArmState = (byte) (mHeartbeat.base_mode & (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED);
+            ArmState = (byte) (baseMode & (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED);
         }
 
         public void UpdateBatteryPercentage(sbyte percentage)
@@ -553,9 +555,9 @@ namespace MAVLink.NET
 
         public void UpdateGpsRaw(int latitude, int longitude, int altitude, ulong usec, byte nsatellites)
         {
-            Position.X      = latitude / Constant.GLOBAL_LOCAL_RATIO;
-            Position.Y      = longitude / Constant.GLOBAL_LOCAL_RATIO;
-            Position.Z      = altitude / Constant.GLOBAL_LOCAL_RATIO;
+            Position.X      = (float) (latitude / Constant.GLOBAL_LOCAL_RATIO);
+            Position.Y      = (float) (longitude / Constant.GLOBAL_LOCAL_RATIO);
+            Position.Z      = (float) (altitude / Constant.GLOBAL_LOCAL_RATIO);
             Gtimestamp      = usec;
             SatelliteNumber = nsatellites;
             //DatabaseManager.UpdatePosition(SYSTEM_ID, Position.X, Position.Y, Position.Z, SatelliteNumber, Gtimestamp);
@@ -569,8 +571,8 @@ namespace MAVLink.NET
 
         public void UpdateHomePosition(int latitude, int longitude)
         {
-            HomePosition.X = latitude / Constant.GLOBAL_LOCAL_RATIO;
-            HomePosition.Y = longitude / Constant.GLOBAL_LOCAL_RATIO;
+            HomePosition.X = (float) (latitude / Constant.GLOBAL_LOCAL_RATIO);
+            HomePosition.Y = (float) (longitude / Constant.GLOBAL_LOCAL_RATIO);
         }
 
         public void UpdateLocalNED(float x, float y, float z)
@@ -589,9 +591,9 @@ namespace MAVLink.NET
         {
             if (text == null) return;
 
-            int tsize = mStatusText.text.Length;
+            int tsize = text.Length;
             char[] c = new char[tsize];
-            for (int i = 0; i < tsize; i++) c[i] = (char) mStatusText.text[i];
+            for (int i = 0; i < tsize; i++) c[i] = (char) text[i];
             StatusMessage = new string(c);
         }
 
@@ -614,17 +616,17 @@ namespace MAVLink.NET
         /**
          * During mission download process.
          */
-        public void OnMissionItemMessage(UInt16 sequenceNumber)
+        public void OnMissionItemMessage(Msg_mission_item item)
         {
-            MissionItems[sequenceNumber] = mMissionItem;
+            MissionItems[item.seq] = item;
 
-            if (sequenceNumber < MissionItemCount - 1)
+            if (item.seq < MissionItemCount - 1)
             {
                 Msg_mission_request requestMessage = new Msg_mission_request()
                 {
                     target_system       = SYSTEM_ID,
                     target_component    = COMPONENT_ID,
-                    seq                 = (ushort) (sequenceNumber + 1)
+                    seq                 = (ushort) (item.seq + 1)
                 };
                 SendPacket(requestMessage);
             }
@@ -662,7 +664,7 @@ namespace MAVLink.NET
             SendPacket(itemMessage);
         }
 
-        public void OnMissionAckMessage(MAV_MISSION_RESULT result)
+        public void OnMissionAckMessage(byte result)
         {
             bool accepted = (result == (byte) MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED);
 
@@ -683,7 +685,7 @@ namespace MAVLink.NET
 
         public void OnMissionItemReachedMessage(UInt16 sequenceNumber)
         {
-            MissionReachedSequence = mMissionItemReached.seq;
+            MissionReachedSequence = sequenceNumber;
         }
     }
 }
