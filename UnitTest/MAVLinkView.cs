@@ -7,22 +7,60 @@ namespace UnitTest
     {
         private Interface.IMAVPublisher publisher = null;
 
-        private MAVLinkController Controller;
+        /*
+         * IMAVObserver
+         */
+        public Interface.IMAVPublisher Publisher
+        {
+            get { return publisher; }
+            set
+            {
+                if (publisher != null)
+                    publisher.Delete(this);
+                publisher = value;
+                publisher.Add(this);
+            }
+        }
+
+        public void Update(MAVLinkModel model)
+        {
+            // TODO: Update view
+            Console.WriteLine("Updated model system_id:" + model.SystemId);
+
+            SystemIdLabel.BeginInvoke((Action)delegate () { SystemIdLabel.Text = model.SystemId.ToString(); });
+            ComponentIdLabel.BeginInvoke((Action)delegate () { ComponentIdLabel.Text = model.ComponentId.ToString(); });
+        }
+
+        public void UpdateArmState(bool isArmed)
+        {
+            ArmButton.Enabled = !isArmed;
+            DisarmButton.Enabled = isArmed;
+        }
+
+        /**
+         * Callbacks.
+         */
+        public MAVLinkController Controller;
 
         public MAVLinkView()
         {
             InitializeComponent();
             SerialPortNameComboBox.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());
+            FlightModeComboBox.Items.AddRange(MAVLinkModel.PX4Mode);
+        }
+
+        private void MAVLinkView_Load(object sender, EventArgs e)
+        {
+            /*
+             * FIXME: (https://docs.microsoft.com/ko-kr/dotnet/framework/winforms/controls/how-to-bind-data-to-the-windows-forms-datagridview-control)
+            MissionItemsBindingSource.DataSource = Controller;
+            MissionDataGridView.DataSource = MissionItemsBindingSource;
+            */
         }
 
         public string SerialPortName
         {
             get { return SerialPortNameComboBox.SelectedItem as string; }
-        }
-
-        public void SetController(MAVLinkController controller)
-        {
-            Controller = controller;
         }
 
         public void EnableSerialPortNameComboBox(bool enabled)
@@ -40,47 +78,37 @@ namespace UnitTest
             Controller.SerialConnect();
         }
 
-        private void ArmDisarmButton_Click(object sender, EventArgs e)
+        private void ArmButton_Click(object sender, EventArgs e)
         {
-            Controller.ArmDisarmVehicle();
+            Controller.ArmDisarmCommand(true);
         }
 
-        public void EnableArmDisarmButton(bool enabled)
+        private void DisarmButton_Click(object sender, EventArgs e)
         {
-            ArmDisarmButton.Enabled = enabled;
-        }
-
-        public void SetArmDisarmButton(bool arm)
-        {
-            ArmDisarmButton.Text = arm ? "Arm" : "Disarm";
+            Controller.ArmDisarmCommand(false);
+            
+            /*
+            Button button = sender as Button;
+            Console.WriteLine("Button equals to disarmbutton: " + button.Equals(DisarmButton));
+            Console.WriteLine("Button.Text: " + button.Text);
+            */
         }
 
         /*
-         * IMAVObserver
-         */
-        public Interface.IMAVPublisher Publisher
+        public void EnableArmDisarmButton(bool enabled)
         {
-            get { return publisher; }
-            set {
-                if (publisher != null)
-                    publisher.Delete(this);
-                publisher = value;
-                publisher.Add(this);
-            }
+            ArmButton.Enabled = enabled;
+        }
+        */
+
+        private void TakeoffButton_Click(object sender, EventArgs e)
+        {
+            Controller.TakeoffCommand();
         }
 
-        public void Update(MAVLinkModel model)
+        private void LandButton_Click(object sender, EventArgs e)
         {
-            // TODO: Update view
-            Console.WriteLine("Updated model system_id:" + model.SystemId);
-
-            SystemIdLabel.BeginInvoke((Action) delegate () { SystemIdLabel.Text = model.SystemId.ToString(); });
-            ComponentIdLabel.BeginInvoke((Action) delegate () { ComponentIdLabel.Text = model.ComponentId.ToString(); });
-        }
-
-        public void UpdateArmState(bool isArmed)
-        {
-            SetArmDisarmButton(isArmed);
+            Controller.LandCommand();
         }
     }
 }

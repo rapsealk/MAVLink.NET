@@ -83,7 +83,7 @@ namespace UnitTest
             Model = model;
             View = view;
 
-            View.SetController(this);
+            View.Controller = this;
             View.Publisher = Model;
 
             mavlink = new Mavlink();
@@ -292,20 +292,21 @@ namespace UnitTest
             SerialPort.Write(bytes, 0, bytes.Length);
         }
 
-        public void ArmDisarmVehicle()
+        public void ArmDisarmCommand(bool doArm)
         {
             bool isArmed = (Model.ArmState == (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED);
+            if (isArmed == doArm) return;
 
             System.Threading.Thread thread = new System.Threading.Thread(() =>
             {
-                View.EnableArmDisarmButton(false);
+                //View.EnableArmDisarmButton(false);
 
                 Msg_command_long message = new Msg_command_long()
                 {
                     command             = (ushort) MAV_CMD.MAV_CMD_COMPONENT_ARM_DISARM,
                     target_system       = Model.SystemId,
                     target_component    = Model.ComponentId,
-                    param1              = isArmed ? 1f : 0f  // 1: arm, 0: disarm
+                    param1              = doArm ? 1f : 0f  // 1: arm, 0: disarm
                 };
 
                 int trial = 0;
@@ -313,11 +314,55 @@ namespace UnitTest
                 {
                     SendPacket(message);
                     System.Threading.Thread.Sleep(1000);
-                } while (isArmed ^ (Model.ArmState == (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED) && ++trial < 5);
+                } while (doArm ^ (Model.ArmState == (byte) MAV_MODE_FLAG.MAV_MODE_FLAG_SAFETY_ARMED) && ++trial < 5);
 
-                View.EnableArmDisarmButton(true);
+                //View.EnableArmDisarmButton(true);
             });
             thread.Start();
+        }
+
+        /**
+         * https://mavlink.io/en/messages/common.html#MAV_CMD_NAV_TAKEOFF
+         */
+        public void TakeoffCommand(float altitudeInMeters = 5f)
+        {
+            Msg_command_long takeoffMessage = new Msg_command_long()
+            {
+                command = (ushort)MAV_CMD.MAV_CMD_NAV_TAKEOFF,
+                target_system       = Model.SystemId,
+                target_component    = Model.ComponentId,
+                param1              = 2.5f, // Minimum pitch
+                // param2
+                param3              = .1f,   // horizontal navigation by pilot acceptable
+                // param4: yaw angle    (not supported)
+                param5              = Model.GlobalPosition.X,   // latitude
+                param6              = Model.GlobalPosition.Y,   // longitude
+                param7              = altitudeInMeters          // altitude [meters]
+            };
+            SendPacket(takeoffMessage);
+
+            ArmDisarmCommand(true);
+        }
+
+        /**
+         * https://mavlink.io/en/messages/common.html#MAV_CMD_NAV_LAND
+         */
+        public void LandCommand()
+        {
+            Msg_command_long landMessage = new Msg_command_long()
+            {
+                command             = (ushort) MAV_CMD.MAV_CMD_NAV_LAND,
+                target_system       = Model.SystemId,
+                target_component    = Model.ComponentId,
+                // param1: Abort Alt
+                // param2: Precision land mode. (0 = normal landing, 1 = opportunistic precision landing, 2 = required precision landing)
+                // param3: Empty
+                // param4: Desired yaw angle. NaN for unchanged.
+                param5              = Model.GlobalPosition.X,   // Latitude
+                param6              = Model.GlobalPosition.Y    // Longitude
+                // param7: Altitude (ground level)
+            };
+            SendPacket(landMessage);
         }
     }
 }

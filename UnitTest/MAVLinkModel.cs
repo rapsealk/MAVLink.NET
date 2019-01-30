@@ -52,7 +52,7 @@ namespace UnitTest
         public Vector3 LocalPosition;
         public Vector3 HomePosition;
 
-        public Vector3 Direction;
+        private Vector3 Direction { get; }
 
         // Mission items.
         public List<Msg_mission_item> MissionItems;
@@ -80,6 +80,11 @@ namespace UnitTest
             observers = new List<Interface.IMAVObserver>();
 
             MissionItems = new List<Msg_mission_item>();
+
+            GlobalPosition  = new Vector3();
+            LocalPosition   = new Vector3();
+            HomePosition    = new Vector3();
+            Direction       = new Vector3();
         }
 
         public byte SystemId
