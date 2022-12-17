@@ -1,28 +1,37 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Forms;
+using MAVLink.NET.Presenters;
+using MAVLink.NET.Views;
+using MetroFramework.Forms;
 
 namespace MAVLink.NET
 {
-    public partial class Form1 : Form
+    public partial class MainForm : MetroForm, IMainView
     {
+        private MainPresenter presenter;
+
         private MAVLinkManager mavlinkManager;
         private MAVLinkNode[] nodes;
 
         private string[] FormationModes = { "Triangle", "Row", "Column" };
         private MAVLinkManager.FORMATION[] Formations = { MAVLinkManager.FORMATION.TRIANGLE, MAVLinkManager.FORMATION.ROW, MAVLinkManager.FORMATION.COLUMN };
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
+
+            presenter = new MainPresenter(this);
 
             foreach (ComboBox flightModeComboBox in FlightModeComboBoxes)
                 flightModeComboBox.Items.AddRange(MAVLinkNode.PX4Mode);
 
             FormationModeComboBox.Items.AddRange(FormationModes);
 
+            /*
             string[] portNames = System.IO.Ports.SerialPort.GetPortNames();
 
+            // TODO
             foreach (string portName in portNames) Console.WriteLine("po: {0:s}", portName);
 
             if (portNames.Length < 3)
@@ -33,6 +42,8 @@ namespace MAVLink.NET
                 this.Close();
                 return;
             }
+            */
+            string[] portNames = { "COM1", "COM2", "COM3" };
 
             //*
             int count = 0;
@@ -49,7 +60,7 @@ namespace MAVLink.NET
             UpdateUI();
         }
 
-        ~Form1()
+        ~MainForm()
         {
             mavlinkManager.CloseAll();
         }

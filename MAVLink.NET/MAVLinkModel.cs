@@ -179,9 +179,23 @@ namespace MAVLink.NET.Model
 
             }
 
-            public virtual void Subscribe(MAVLinkModel model)
+            public void Subscribe(MAVLinkModel model)
             {
-                cancellation = 
+                // cancellation = 
+            }
+
+            public void OnNext(MAVLinkModel model) { }
+
+            public void OnCancel(MAVLinkModel model) { }
+
+            public void OnError(Exception error)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void OnCompleted()
+            {
+                throw new NotImplementedException();
             }
         }
     }
